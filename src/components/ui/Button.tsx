@@ -5,7 +5,7 @@
 import React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { type VariantProps, cva } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 import type { ButtonHTMLAttributes, FC } from 'react';
 
 // Button variants using class-variance-authority for better type safety

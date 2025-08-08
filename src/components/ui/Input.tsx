@@ -4,7 +4,7 @@
 
 import React, { forwardRef } from 'react';
 import { type VariantProps, cva } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from '../../lib/utils';
 import type { InputHTMLAttributes } from 'react';
 
 // Input variants using class-variance-authority

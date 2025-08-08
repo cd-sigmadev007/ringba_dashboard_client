@@ -5,8 +5,8 @@
 import React from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { STORAGE_KEYS, DEFAULT_THEME } from '@/lib/constants';
-import type { Theme } from '@/lib/types';
+import { STORAGE_KEYS, DEFAULT_THEME } from '../lib/constants';
+import type { Theme } from '../lib/types';
 
 interface ThemeState {
   /**

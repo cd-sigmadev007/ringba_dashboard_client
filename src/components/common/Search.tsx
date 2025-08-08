@@ -4,12 +4,12 @@
 
 import React, { useState, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { useThemeStore } from '@/store/themeStore';
-import { useDebounceSearch, useClickOutside } from '@/lib/hooks';
-import { cn } from '@/lib/utils';
-import type { SearchItem, SearchSuggestions } from '@/lib/types';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { useThemeStore } from '../../store/themeStore';
+import { useDebounceSearch, useClickOutside } from '../../lib/hooks';
+import { cn } from '../../lib/utils';
+import type { SearchItem, SearchSuggestions } from '../../lib/types';
 
 interface SearchProps {
   /**

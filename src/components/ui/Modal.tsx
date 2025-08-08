@@ -6,8 +6,8 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { type VariantProps, cva } from 'class-variance-authority';
 
-import { useEscapeKey } from '@/lib/hooks';
-import { cn } from '@/lib/utils';
+import { useEscapeKey } from '../../lib/hooks';
+import { cn } from '../../lib/utils';
 import type { FC, ReactNode } from 'react';
 
 // Modal variants

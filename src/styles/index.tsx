@@ -10,7 +10,7 @@ import './portfolio-sign-in.css';
 import 'react-tooltip/dist/react-tooltip.css';
 
 import clsx from 'clsx';
-import { useThemeStore } from '@/store/themeStore';
+import { useThemeStore } from '../store/themeStore';
 
 interface IndexProps {
   children: ReactNode;

@@ -3,6 +3,8 @@ import Logo from './logo';
 import { get, map } from 'lodash';
 import { socialLinks } from './social-links';
 import { Link } from '@tanstack/react-router';
+import { useThemeStore } from '../store/themeStore';
+import clsx from 'clsx';
 
 interface SocialLink {
     link: string;
@@ -10,11 +12,15 @@ interface SocialLink {
 }
 
 const Footer: FC = () => {
+    const { theme } = useThemeStore();
+    const isDark = theme === 'dark';
     
     return (
         <footer
-            className="w-full min-h-[97px] px-4 sm:px-6 lg:px-12 py-4 lg:py-6 flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-4 lg:gap-0"
-            style={{ backgroundColor: '#001e3c' }}
+            className={clsx(
+                "w-full min-h-[97px] px-4 sm:px-6 lg:px-12 py-4 lg:py-6 flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-4 lg:gap-0 transition-colors duration-300",
+                isDark ? 'bg-[#001e3c]' : 'bg-white'
+            )}
         >
             {/* Left Section - Logo and Social Icons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-[14px]">
@@ -47,20 +53,26 @@ const Footer: FC = () => {
                 {/* Legal Links */}
                 <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 sm:gap-[14px]">
                     <span 
-                        className="text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap"
-                        style={{ color: '#A1A5B7' }}
+                        className={clsx(
+                            "text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap",
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5e6278]'
+                        )}
                     >
                         Terms
                     </span>
                     <span 
-                        className="text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap"
-                        style={{ color: '#A1A5B7' }}
+                        className={clsx(
+                            "text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap",
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5e6278]'
+                        )}
                     >
                         Privacy Policy
                     </span>
                     <span 
-                        className="text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap"
-                        style={{ color: '#A1A5B7' }}
+                        className={clsx(
+                            "text-[12px] sm:text-[14px] font-medium cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap",
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5e6278]'
+                        )}
                     >
                         Cookie Policy
                     </span>
@@ -68,8 +80,10 @@ const Footer: FC = () => {
                 
                 {/* Copyright */}
                 <p 
-                    className="text-[10px] sm:text-[12px] lg:text-[14px] font-normal text-center lg:text-right max-w-[300px] sm:max-w-[500px] lg:max-w-[762px] leading-relaxed"
-                    style={{ color: '#7E8299' }}
+                    className={clsx(
+                        "text-[10px] sm:text-[12px] lg:text-[14px] font-normal text-center lg:text-right max-w-[300px] sm:max-w-[500px] lg:max-w-[762px] leading-relaxed",
+                        isDark ? 'text-[#7E8299]' : 'text-[#a1a5b7]'
+                    )}
                 >
                     © 2023 Insidefi.io All rights reserved by Clickdee Mediashare OÜ, 6 sepapaja, Harijumma, Tallinn, 15551, Estonia
                 </p>
