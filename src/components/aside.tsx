@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { get, map } from 'lodash';
 import clsx from 'clsx';
-import Button from './button';
+import Button from './ui/Button';
 import ThemeSwitcher from './theme-switcher';
 import { navLinks } from './navLinks';
 import Tooltip from './tooltip';

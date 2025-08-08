@@ -4,8 +4,8 @@ import clsx from 'clsx';
 import { Outlet } from '@tanstack/react-router';
 
 // import LoadingBar from 'react-top-loading-bar';
-import Header from '../components/header';
-import Footer from '../components/footer';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import Aside from '../components/aside';
 
 
