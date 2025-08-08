@@ -11,5 +11,3 @@ export * from './common';
 
 // Legacy components (to be migrated)
 export { default as Logo } from './logo';
-export { default as ThemeSwitcher } from './theme-switcher';
-export { default as Tooltip } from './tooltip';

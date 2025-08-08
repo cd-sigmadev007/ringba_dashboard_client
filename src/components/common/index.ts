@@ -4,3 +4,4 @@
  */
 
 export * from './Search';
+export * from './tooltip';

@@ -4,9 +4,9 @@ import clsx from 'clsx';
 import { Outlet } from '@tanstack/react-router';
 
 // import LoadingBar from 'react-top-loading-bar';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Aside from '../components/aside';
+import Header from './Header';
+import Footer from './Footer';
+import Aside from './Aside';
 
 
 const RootLayout: React.FC = () => {

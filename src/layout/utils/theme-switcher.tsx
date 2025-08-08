@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from './ui/Button';
-import { useThemeStore } from '../store/themeStore';
+import Button from '../../components/ui/Button';
+import { useThemeStore } from '../../store/themeStore';
 import clsx from 'clsx';
 
 interface ThemeSwitcherProps {

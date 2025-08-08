@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Logo from './logo';
-import ThemeSwitcher from './theme-switcher';
-import Button from './ui/Button';
+import Logo from '../components/logo';
+import ThemeSwitcher from './utils/theme-switcher';
+import Button from '../components/ui/Button';
 import { useThemeStore } from '../store/themeStore';
 import { Link } from '@tanstack/react-router';
 

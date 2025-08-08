@@ -1,7 +1,7 @@
 import React, { type FC } from 'react';
-import Logo from './logo';
+import Logo from '../components/logo';
 import { get, map } from 'lodash';
-import { socialLinks } from './social-links';
+import { socialLinks } from './utils/social-links';
 import { Link } from '@tanstack/react-router';
 import { useThemeStore } from '../store/themeStore';
 import clsx from 'clsx';

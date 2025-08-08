@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { get, map } from 'lodash';
 import clsx from 'clsx';
-import Button from './ui/Button';
-import ThemeSwitcher from './theme-switcher';
-import { navLinks } from './navLinks';
-import Tooltip from './tooltip';
+import Button from '../components/ui/Button';
+import ThemeSwitcher from './utils/theme-switcher';
+import { navLinks } from './utils/navLinks';
+import Tooltip from '../components/common/tooltip';
 import { useThemeStore } from '../store/themeStore';
 
 

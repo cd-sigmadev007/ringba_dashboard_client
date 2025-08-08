@@ -23,7 +23,7 @@ import './styles/pagination.css';
 import reportWebVitals from './reportWebVitals.ts'
 
 import App from './App.tsx'
-import RootLayout from './routes/root-layout.tsx'
+import RootLayout from './layout/Index.tsx'
 
 // Initialize theme on app startup
 const savedTheme = localStorage.getItem('theme') || 'light';
