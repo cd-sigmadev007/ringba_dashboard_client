@@ -1,0 +1,59 @@
+@reference "tailwindcss";
+
+@layer components {
+  .theme-dark .pagination .rc-pagination-item {
+    @apply !bg-[#002B57] text-[#F0F5FF] text-[16px] font-medium leading-[18.038px] w-10 h-9 !rounded-[10px] flex items-center justify-center cursor-pointer;
+  }
+
+  .theme-dark .pagination .rc-pagination-item-active,
+  .theme-dark .pagination .rc-pagination-item.rc-pagination-item-active:nth-last-child(3) {
+    @apply !bg-[#1A64FF] text-[#F0F5FF];
+  }
+
+  .rc-pagination-options,
+  .rc-pagination-next .rc-pagination-disabled {
+    @apply hidden;
+  }
+
+  .rc-pagination {
+    @apply flex gap-x-2;
+  }
+
+  .theme-light .pagination .rc-pagination-item {
+    @apply !bg-white text-[#3F4254] text-[16px] font-medium leading-[18.038px] w-10 h-9 !rounded-[10px] flex items-center justify-center cursor-pointer;
+  }
+
+  .theme-light .pagination .rc-pagination-item-active,
+  .theme-light .pagination .rc-pagination-item.rc-pagination-item-active:nth-last-child(3) {
+    @apply !bg-[#1A64FF] text-[#F0F5FF];
+  }
+
+  .theme-dark .pagination .rc-pagination-item:nth-last-child(3),
+  .theme-light .pagination .rc-pagination-item:nth-last-child(3) {
+    @apply !bg-transparent;
+  }
+
+  .theme-dark .pagination .break {
+    @apply text-white cursor-pointer;
+  }
+
+  .theme-light .pagination .break {
+    @apply text-[#3F4254] cursor-pointer;
+  }
+
+  .theme-dark .pagination-info {
+    @apply text-[#A1A5B7];
+  }
+
+  .theme-light .pagination-info {
+    @apply text-[#5E6278];
+  }
+
+  .rc-pagination-next .rc-pagination-disabled {
+    @apply !hidden;
+  }
+
+  .rc-pagination-total-text {
+    @apply w-full text-center md:text-left;
+  }
+}

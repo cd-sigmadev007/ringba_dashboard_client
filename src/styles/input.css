@@ -1,0 +1,84 @@
+@reference "tailwindcss";
+
+@layer components {
+
+  .form-control {
+    @apply rounded-[7px] transition-all duration-100 ease-in text-[14px] md:text-[16px] cursor-pointer;
+  }
+
+  .theme-dark .form-control {
+    @apply bg-[#001e3c] text-[#fff] focus:bg-[#0A1828] focus:outline-0 border border-transparent focus:border-[#007FFF];
+  }
+
+  .theme-light .form-control {
+    @apply bg-white text-[#3F4254] focus:outline-0 border border-transparent hover:border-[#007FFF] focus:border-[#007FFF];
+  }
+
+  #input-wallet {
+    @apply placeholder:text-[#7e8299];
+  }
+
+  .theme-dark #input-wallet {
+    @apply bg-[#132F4C] text-[#f5f8fa] focus:bg-[#071B2F];
+  }
+
+  .theme-light #input-wallet {
+    @apply bg-[#ffffff] text-[#3f4254];
+  }
+
+  .theme-dark .input-search:focus {
+    @apply bg-transparent;
+  }
+
+  .theme-dark .input-search:hover,
+  .theme-light .input-search:hover,
+  .theme-dark .input-search:focus,
+  .theme-light .input-search:focus {
+    border-color: #0254a5;
+  }
+
+  .theme-dark .input-search::placeholder {
+    color: #7e8299;
+  }
+
+  .theme-dark .input-select {
+    background-color: #001e3c;
+    color: #f5f8fa;
+  }
+
+  .theme-light .input-select {
+    background-color: #ffffff;
+    color: #3f4254;
+  }
+
+  .theme-dark .input-select:focus {
+    background-color: transparent;
+  }
+
+  .theme-dark .nft-collection .input-select {
+    background-color: #002b57;
+    color: #f5f8fa;
+  }
+
+  .theme-light .nft-collection .input-select {
+    background-color: #ffffff;
+    color: #3f4254;
+  }
+
+  .theme-dark .onboarding #onboarding-input {
+    @apply bg-[#002B57] text-[#f5f8fa] focus:bg-[#0A1828] placeholder:text-[#A1A5B7];
+  }
+
+  .theme-light .onboarding #onboarding-input {
+    @apply bg-[#EFF2F5] text-[#3f4254] focus:bg-white placeholder:text-[#A1A5B7];
+  }
+
+  .theme-dark #proposal-input {
+    @apply bg-[#002B57] text-[#f5f8fa] focus:bg-[#071B2F] placeholder:text-[#A1A5B7];
+  }
+
+  .theme-light #proposal-input {
+    @apply bg-[#F5F8FA] text-[#3f4254] focus:bg-white placeholder:text-[#A1A5B7];
+  }
+
+}
