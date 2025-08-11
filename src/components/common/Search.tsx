@@ -2,10 +2,9 @@
  * Search component with dropdown suggestions and modern TypeScript patterns
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
 import { useThemeStore } from '../../store/themeStore';
 import { useDebounceSearch, useClickOutside } from '../../lib/hooks';
 import { cn } from '../../lib/utils';

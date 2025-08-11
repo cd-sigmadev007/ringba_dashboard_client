@@ -46,6 +46,7 @@ span {
     opacity: 0;
     transform: translateY(100px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -56,6 +57,7 @@ span {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -70,6 +72,7 @@ span {
 }
 
 @layer base {
+
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -222,12 +225,10 @@ input[type='search']::-webkit-search-results-decoration {
 }
 
 .theme-dark .banner-bg {
-  background: linear-gradient(
-    213deg,
-    #0c294d 0%,
-    #001e3c 37.73%,
-    #042141 93.68%
-  );
+  background: linear-gradient(213deg,
+      #0c294d 0%,
+      #001e3c 37.73%,
+      #042141 93.68%);
   box-shadow: 0px 0px 0px 4px rgba(255, 255, 255, 0.01);
 }
 
@@ -239,16 +240,12 @@ input[type='search']::-webkit-search-results-decoration {
 
 :root {
   /* Text */
-  --color-gradient-primary: linear-gradient(
-    268deg,
-    #00d8ff 50.63%,
-    #007fff 92.05%
-  );
-  --color-gradient-secondary: linear-gradient(
-    268deg,
-    #00d8ff 50.63%,
-    #007fff 92.05%
-  );
+  --color-gradient-primary: linear-gradient(268deg,
+      #00d8ff 50.63%,
+      #007fff 92.05%);
+  --color-gradient-secondary: linear-gradient(268deg,
+      #00d8ff 50.63%,
+      #007fff 92.05%);
   /* Text */
 
   /*Icon*/
@@ -341,23 +338,17 @@ input[type='search']::-webkit-search-results-decoration {
   --color-link-active: #f5f8fa;
   /* Link */
 
-  --color-landing-bg: linear-gradient(
-    257deg,
-    #253758 -7.86%,
-    #081a2c 37.14%,
-    #091b2d 71.23%,
-    #253c50 111.55%
-  );
-  --color-text-gradient: linear-gradient(
-    269deg,
-    #00d8ff 19.59%,
-    #007fff 68.07%
-  );
-  --color-gradient-primary: linear-gradient(
-    87deg,
-    #001e3c 22.77%,
-    #013365 95.52%
-  );
+  --color-landing-bg: linear-gradient(257deg,
+      #253758 -7.86%,
+      #081a2c 37.14%,
+      #091b2d 71.23%,
+      #253c50 111.55%);
+  --color-text-gradient: linear-gradient(269deg,
+      #00d8ff 19.59%,
+      #007fff 68.07%);
+  --color-gradient-primary: linear-gradient(87deg,
+      #001e3c 22.77%,
+      #013365 95.52%);
   --color-hover-bg: rgba(27, 69, 111, 0.5);
 }
 
@@ -366,13 +357,11 @@ input[type='search']::-webkit-search-results-decoration {
   --color-icon: #3f4254;
   /*Icon*/
 
-  --color-landing-bg-light: linear-gradient(
-    259deg,
-    #dce2f9 -1.25%,
-    #dfebf6 27.82%,
-    #e2edf4 63.68%,
-    #d9edf7 107%
-  );
+  --color-landing-bg-light: linear-gradient(259deg,
+      #dce2f9 -1.25%,
+      #dfebf6 27.82%,
+      #e2edf4 63.68%,
+      #d9edf7 107%);
   --color-gradient-light: linear-gradient(20deg, #eff2f5, #bcddff);
   --color-text-gradient: linear-gradient(50deg, #61b0ff, #037ef7);
   --color-side-bg: #ffffff;
@@ -471,7 +460,7 @@ input[type='search']::-webkit-search-results-decoration {
 
 .theme-light .card {
   background-color: #ffffff;
-  border: 1px solid #fff;
+  border: none;
   color: #3F4254;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.03);
 }
@@ -529,6 +518,10 @@ input[type='search']::-webkit-search-results-decoration {
   border-radius: 7px;
   transition: all 300ms ease-out;
   font-size: 16px;
+  font-family: Poppins;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
 }
 
 .theme-dark .sidebar-item {
@@ -785,7 +778,7 @@ input[type='search']::-webkit-search-results-decoration {
 }
 
 .modal-overlay {
-  background-color: rgba(0,0,0,0.30);
+  background-color: rgba(0, 0, 0, 0.30);
 }
 
 .theme-dark .chart-tooltip {
@@ -916,7 +909,7 @@ input[type='search']::-webkit-search-results-decoration {
 }
 
 .theme-dark .user-dropdown-btn {
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.9);
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.9);
 }
 
 .theme-light .user-dropdown-btn {
@@ -928,7 +921,7 @@ input[type='search']::-webkit-search-results-decoration {
 }
 
 .theme-light .user-dropdown-btn {
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.03);
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.03);
 }
 
 .theme-dark .user-dropdown-menu {
@@ -1050,4 +1043,15 @@ input[type='search']::-webkit-search-results-decoration {
 .theme-light {
   background: #fff;
   box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.05);
+}
+
+.horizontal-line {
+  width: 100%;
+  height: 1px;
+  background: #1B456F;
+}
+
+.theme-dark .horizontal-line {
+  /* background: var(--p-700); */
+  border: 1px solid #1B456F ;
 }

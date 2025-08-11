@@ -6,3 +6,6 @@
 export * from './Button';
 export * from './Input';
 export * from './Modal';
+export { default as Table } from './Table';
+export { default as FilterSelect } from './FilterSelect';
+export { default as TimeFilter } from './TimeFilter';

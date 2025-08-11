@@ -6,17 +6,18 @@ import React, { forwardRef } from 'react';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import type { InputHTMLAttributes } from 'react';
+import { useThemeStore } from '../../store/themeStore';
 
 // Input variants using class-variance-authority
 const inputVariants = cva(
   // Base styles
-  'flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'rounded-[7px] w-full px-[15px] py-[10px] placeholder:text-[#A1A5B7] focus:outline-0 border border-transparent focus:border-[#007FFF] transition-all duration-100 ease-in bg-[#FFF] focus:bg-[#FFFFFF] text-[#3F4254] disabled:opacity-40 disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
-        default: 'border-input',
-        error: 'border-destructive focus-visible:ring-destructive',
-        success: 'border-green-500 focus-visible:ring-green-500',
+        default: '',
+        error: 'border-[#F64E60] focus:border-[#F64E60]',
+        success: 'border-green-500 focus:border-green-500',
       },
       inputSize: {
         sm: 'h-8 px-2 text-xs',
@@ -106,6 +107,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const inputVariant = error ? 'error' : success ? 'success' : variant;
+    const { theme } = useThemeStore();
+    const isDark = theme === 'dark';
 
     return (
       <div className={cn('w-full', containerClassName)}>
@@ -126,6 +129,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             type={type}
             className={cn(
               inputVariants({ variant: inputVariant, inputSize }),
+              isDark ? 'bg-[#001E3C] focus:bg-[#001E3C] text-white' : '',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               !shadow && 'shadow-none',

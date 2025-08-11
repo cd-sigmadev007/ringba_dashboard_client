@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import {
   RouterProvider,
   createRootRoute,
-  createRoute,
   createRouter,
 } from '@tanstack/react-router'
 import TableDemo from './routes/demo.table.tsx'
@@ -12,17 +11,8 @@ import CallerAnalysis from './routes/caller-analysis.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
-import './styles.css'
-import './styles/index.css';
-import './styles/card.css';
-import './styles/buttons.css';
-import './styles/input.css';
-import './styles/table.css';
-import './styles/pagination.css';
-
 import reportWebVitals from './reportWebVitals.ts'
 
-import App from './App.tsx'
 import RootLayout from './layout/Index.tsx'
 
 // Initialize theme on app startup
@@ -33,14 +23,7 @@ const rootRoute = createRootRoute({
   component: RootLayout,
 })
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: App,
-})
-
 const routeTree = rootRoute.addChildren([
-  indexRoute,
   TableDemo(rootRoute),
   TanStackQueryDemo(rootRoute),
   CallerAnalysis(rootRoute),

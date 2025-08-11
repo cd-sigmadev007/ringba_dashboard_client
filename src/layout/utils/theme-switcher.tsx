@@ -15,7 +15,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ className }) => {
     <Button
       onClick={toggleTheme}
       className={clsx(
-        'px-[9px] banner-btn justify-center group',
+        '!px-[9px] banner-btn justify-center group',
         'flex items-center gap-2',
         'min-w-[44px] min-h-[44px]', // Touch-friendly size
         'sm:min-w-auto sm:min-h-auto',

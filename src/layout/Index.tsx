@@ -3,6 +3,8 @@ import React, { Fragment, useState } from 'react';
 import clsx from 'clsx';
 import { Outlet } from '@tanstack/react-router';
 
+import Styles from '@/styles/index'
+
 // import LoadingBar from 'react-top-loading-bar';
 import Header from './Header';
 import Footer from './Footer';
@@ -14,7 +16,7 @@ const RootLayout: React.FC = () => {
 
 
   return (
-    <Fragment>
+    <Styles>
       <div className={clsx('min-h-screen overflow-y-auto', openMenu && 'xl:h-screen xl:overflow-y-hidden 2xl:h-auto 2xl:overflow-y-auto')}>
         {/* <LoadingBar color="#007FFF" progress={progress} onLoaderFinished={() => setProgress(0)} /> */}
         <Header setOpenMenu={setOpenMenu} openMenu={openMenu} />
@@ -29,7 +31,7 @@ const RootLayout: React.FC = () => {
           </div>
         </div>
       </div>
-    </Fragment>
+    </Styles>
   );
 };
 

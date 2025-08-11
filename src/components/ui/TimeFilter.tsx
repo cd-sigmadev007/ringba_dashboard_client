@@ -1,0 +1,167 @@
+import React, { useState } from 'react';
+import { DayPicker } from 'react-day-picker';
+import type { DateRange, SelectRangeEventHandler } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import clsx from 'clsx';
+import dayjs from 'dayjs';
+import { twMerge } from 'tailwind-merge';
+import { useClickOutside } from '../../lib/hooks/useClickOutside';
+import { useThemeStore } from '../../store/themeStore';
+import Button from './Button';
+import { cn } from '@/lib';
+import { Input } from './Input';
+
+export interface TimeFilterProps {
+  /** Callback fired when the range changes */
+  onChange?: (range: { from?: Date; to?: Date }) => void;
+  className?: string;
+}
+
+const presets = [
+  { label: 'Today', days: 0 },
+  { label: 'Yesterday', days: 1 },
+  { label: 'Last 7 days', days: 7 },
+  { label: 'Last 30 days', days: 30 },
+  { label: 'Last 60 days', days: 60 },
+  { label: 'Custom', days: 0 },
+];
+
+// Custom navigation icons for the calendar
+const IconRight = () => (
+  <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.8358 12L10.3608 9.52499L11.0678 8.81799L14.2498 12L11.0678 15.182L10.3608 14.475L12.8358 12Z" fill="#EBEBEB" />
+  </svg>
+);
+
+const IconLeft = () => (
+  <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.664 12L14.139 14.475L13.432 15.182L10.25 12L13.432 8.81799L14.139 9.52499L11.664 12Z" fill="#EBEBEB" />
+  </svg>
+);
+
+const inputRightIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+    <path d="M11.5833 9.83333C11.7601 9.83333 11.9297 9.7631 12.0547 9.63807C12.1798 9.51305 12.25 9.34348 12.25 9.16667C12.25 8.98986 12.1798 8.82029 12.0547 8.69526C11.9297 8.57024 11.7601 8.5 11.5833 8.5C11.4065 8.5 11.237 8.57024 11.1119 8.69526C10.9869 8.82029 10.9167 8.98986 10.9167 9.16667C10.9167 9.34348 10.9869 9.51305 11.1119 9.63807C11.237 9.7631 11.4065 9.83333 11.5833 9.83333ZM11.5833 12.5C11.7601 12.5 11.9297 12.4298 12.0547 12.3047C12.1798 12.1797 12.25 12.0101 12.25 11.8333C12.25 11.6565 12.1798 11.487 12.0547 11.3619C11.9297 11.2369 11.7601 11.1667 11.5833 11.1667C11.4065 11.1667 11.237 11.2369 11.1119 11.3619C10.9869 11.487 10.9167 11.6565 10.9167 11.8333C10.9167 12.0101 10.9869 12.1797 11.1119 12.3047C11.237 12.4298 11.4065 12.5 11.5833 12.5ZM8.91667 9.16667C8.91667 9.34348 8.84643 9.51305 8.7214 9.63807C8.59638 9.7631 8.42681 9.83333 8.25 9.83333C8.07319 9.83333 7.90362 9.7631 7.7786 9.63807C7.65357 9.51305 7.58333 9.34348 7.58333 9.16667C7.58333 8.98986 7.65357 8.82029 7.7786 8.69526C7.90362 8.57024 8.07319 8.5 8.25 8.5C8.42681 8.5 8.59638 8.57024 8.7214 8.69526C8.84643 8.82029 8.91667 8.98986 8.91667 9.16667ZM8.91667 11.8333C8.91667 12.0101 8.84643 12.1797 8.7214 12.3047C8.59638 12.4298 8.42681 12.5 8.25 12.5C8.07319 12.5 7.90362 12.4298 7.7786 12.3047C7.65357 12.1797 7.58333 12.0101 7.58333 11.8333C7.58333 11.6565 7.65357 11.487 7.7786 11.3619C7.90362 11.2369 8.07319 11.1667 8.25 11.1667C8.42681 11.1667 8.59638 11.2369 8.7214 11.3619C8.84643 11.487 8.91667 11.6565 8.91667 11.8333ZM4.91667 9.83333C5.09348 9.83333 5.26305 9.7631 5.38807 9.63807C5.5131 9.51305 5.58333 9.34348 5.58333 9.16667C5.58333 8.98986 5.5131 8.82029 5.38807 8.69526C5.26305 8.57024 5.09348 8.5 4.91667 8.5C4.73986 8.5 4.57029 8.57024 4.44526 8.69526C4.32024 8.82029 4.25 8.98986 4.25 9.16667C4.25 9.34348 4.32024 9.51305 4.44526 9.63807C4.57029 9.7631 4.73986 9.83333 4.91667 9.83333ZM4.91667 12.5C5.09348 12.5 5.26305 12.4298 5.38807 12.3047C5.5131 12.1797 5.58333 12.0101 5.58333 11.8333C5.58333 11.6565 5.5131 11.487 5.38807 11.3619C5.26305 11.2369 5.09348 11.1667 4.91667 11.1667C4.73986 11.1667 4.57029 11.2369 4.44526 11.3619C4.32024 11.487 4.25 11.6565 4.25 11.8333C4.25 12.0101 4.32024 12.1797 4.44526 12.3047C4.57029 12.4298 4.73986 12.5 4.91667 12.5Z" fill="#F5F8FA" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.91665 1.66667C5.04926 1.66667 5.17644 1.71935 5.2702 1.81312C5.36397 1.90689 5.41665 2.03406 5.41665 2.16667V2.67534C5.85798 2.66667 6.34398 2.66667 6.87865 2.66667H9.62065C10.156 2.66667 10.642 2.66667 11.0833 2.67534V2.16667C11.0833 2.03406 11.136 1.90689 11.2298 1.81312C11.3235 1.71935 11.4507 1.66667 11.5833 1.66667C11.7159 1.66667 11.8431 1.71935 11.9369 1.81312C12.0306 1.90689 12.0833 2.03406 12.0833 2.16667V2.71801C12.2566 2.73134 12.4209 2.74823 12.576 2.76867C13.3573 2.87401 13.99 3.09534 14.4893 3.594C14.988 4.09334 15.2093 4.72601 15.3146 5.50734C15.4166 6.26734 15.4166 7.23734 15.4166 8.46267V9.87067C15.4166 11.096 15.4166 12.0667 15.3146 12.826C15.2093 13.6073 14.988 14.24 14.4893 14.7393C13.99 15.238 13.3573 15.4593 12.576 15.5647C11.816 15.6667 10.846 15.6667 9.62065 15.6667H6.87998C5.65465 15.6667 4.68398 15.6667 3.92465 15.5647C3.14332 15.4593 2.51065 15.238 2.01132 14.7393C1.51265 14.24 1.29132 13.6073 1.18598 12.826C1.08398 12.066 1.08398 11.096 1.08398 9.87067V8.46267C1.08398 7.23734 1.08398 6.26667 1.18598 5.50734C1.29132 4.72601 1.51265 4.09334 2.01132 3.594C2.51065 3.09534 3.14332 2.87401 3.92465 2.76867C4.08021 2.74823 4.24443 2.73134 4.41732 2.71801V2.16667C4.41732 2.03418 4.4699 1.9071 4.56353 1.81335C4.65715 1.7196 4.78416 1.66685 4.91665 1.66667ZM4.05665 3.76C3.38665 3.85001 2.99998 4.01934 2.71798 4.30134C2.43598 4.58334 2.26665 4.97001 2.17665 5.64001C2.16154 5.75334 2.14865 5.87312 2.13798 5.99934H14.362C14.3513 5.87312 14.3384 5.75312 14.3233 5.63934C14.2333 4.96934 14.064 4.58267 13.782 4.30067C13.5 4.01867 13.1133 3.84934 12.4426 3.75934C11.758 3.66734 10.8546 3.66601 9.58332 3.66601H6.91665C5.64532 3.66601 4.74265 3.668 4.05665 3.76ZM2.08332 8.50001C2.08332 7.93067 2.08332 7.43534 2.09198 7.00001H14.408C14.4166 7.43534 14.4166 7.93067 14.4166 8.50001V9.83334C14.4166 11.1047 14.4153 12.008 14.3233 12.6933C14.2333 13.3633 14.064 13.75 13.782 14.032C13.5 14.314 13.1133 14.4833 12.4426 14.5733C11.758 14.6653 10.8546 14.6667 9.58332 14.6667H6.91665C5.64532 14.6667 4.74265 14.6653 4.05665 14.5733C3.38665 14.4833 2.99998 14.314 2.71798 14.032C2.43598 13.75 2.26665 13.3633 2.17665 12.6927C2.08465 12.008 2.08332 11.1047 2.08332 9.83334V8.50001Z" fill="#F5F8FA" />
+  </svg>
+);
+
+
+const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
+  // Re-usable nav button style based on theme
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+  const [open, setOpen] = useState(false);
+  const [range, setRange] = useState<DateRange | undefined>();
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+
+  const triggerRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
+
+  const applyPreset = (preset: { label: string; days: number }) => {
+    const { days, label } = preset;
+    const to = dayjs().endOf('day').toDate();
+    const from = days === 0 ? dayjs().startOf('day').toDate() : dayjs().subtract(days, 'day').startOf('day').toDate();
+    setRange({ from, to });
+    setActivePreset(label);
+    // Defer onChange until the user clicks "Done"
+  };
+
+  const handleSelect: SelectRangeEventHandler = (rng) => {
+    setRange(rng);
+    setActivePreset('Custom');
+  };
+
+  return (
+    <div ref={triggerRef} className={twMerge('relative', className)}>
+      {/* Trigger */}
+      {/* <button
+        onClick={() => setOpen((prev) => !prev)}
+        className={clsx(
+          'h-11 flex items-center gap-2 px-4 rounded-[7px] border text-sm md:text-base',
+          isDark
+            ? 'bg-primary-600 text-neutrals-50 border-transparent hover:border-primary-300'
+            : 'bg-white text-neutrals-800 border-transparent hover:border-primary-500'
+        )}
+      >
+        Date
+        <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </button> */}
+      <Input
+        placeholder='Date'
+        className='w-full'
+        rightIcon={inputRightIcon}
+      />
+
+      {/* Popover */}
+      {open && (
+        <div
+          className={clsx(
+            'absolute z-50 rounded-[7px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)]',
+            isDark
+              ? 'border-[#002B57] bg-[#071B2FE6] text-neutrals-50'
+              : 'border-gray-200 bg-white text-neutrals-800'
+          )}
+        >
+          <div className="flex flex-col md:flex-row gap-[15px] text-body-xs">
+            {/* Preset list */}
+            <ul className="flex flex-col gap-[5px] basis-[150px] flex-[2_0_0]">
+              {presets.map((p) => (
+                <li>
+                  <Button
+                    variant={'ghost'}
+                    onClick={() => applyPreset(p)}
+                    className={cn(
+                      '!py-[7px] !px-[10px] border-none w-full text-start hover:bg-[#132F4C]',
+                      activePreset === p.label ? 'bg-[#132F4C]' : ''
+                    )}
+                  >
+                    {p.label}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Calendar */}
+            <DayPicker
+              mode="range"
+              selected={range}
+              onSelect={handleSelect}
+              className="rdp no-focus"
+              components={{
+                Chevron: ({ orientation }) => {
+                  if (orientation === 'left') {
+                    return <IconLeft />;
+                  }
+                  return <IconRight />;
+                }
+              }}
+              captionLayout="dropdown-years"
+              startMonth={dayjs().subtract(25, 'year').toDate()}
+              endMonth={dayjs().toDate()}
+            />
+          </div>
+          <div className="horizontal-line" />
+          <div className="flex justify-between gap-2">
+            <Button variant="ghost" onClick={() => {
+              setRange(undefined);
+              setActivePreset(null);
+              onChange?.({ from: undefined, to: undefined });
+            }}>
+              Clear
+            </Button>
+            <Button variant="primary" onClick={() => {
+              if (range?.from && range.to) onChange?.({ from: range.from, to: range.to });
+              setOpen(false);
+            }}>
+              Done
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TimeFilter;

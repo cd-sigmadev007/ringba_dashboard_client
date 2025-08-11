@@ -2,23 +2,23 @@
 
 @layer components {
   .theme-dark .table-container {
-    @apply md:border border-[#132F4C] md:rounded-[10px];
+    @apply border border-[color:var(--primary-002-b-57-p-500,#002B57)] rounded-[10px];
   }
 
   .theme-light .table-container {
-    @apply md:rounded-[10px];
+    @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
   }
 
   .theme-dark .single-table {
-    @apply bg-[#001e3c] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
+    @apply rounded-[10px] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
   }
 
   .theme-light .single-table {
-    @apply bg-white;
+    @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
   }
 
   .single-table {
-    @apply md:rounded-b-[10px] z-[15];
+    @apply md:rounded-[10px] z-[15];
   }
 
   .theme-dark .single-table thead {
@@ -36,20 +36,36 @@
 
   .theme-dark .single-table thead tr,
   .table-header {
-    @apply border-b !border-[#132F4C];
+    @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)];
+  }
+  
+  .theme-dark .single-table thead tr:first-child th:first-child {
+    @apply rounded-tl-[10px];
+  }
+  
+  .theme-dark .single-table thead tr:first-child th:last-child {
+    @apply rounded-tr-[10px];
   }
 
   .theme-light .single-table thead tr,
   .table-header {
     @apply border-b !border-[#F0F5FF];
   }
+  
+  .theme-light .single-table thead tr:first-child th:first-child {
+    @apply rounded-tl-[10px];
+  }
+  
+  .theme-light .single-table thead tr:first-child th:last-child {
+    @apply rounded-tr-[10px];
+  }
 
   .theme-dark .table-header {
-    @apply border-b !border-[#132F4C] bg-[#001E3C];
+    @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)];
   }
 
   .theme-light .table-header {
-    @apply border-b !border-[#F0F5FF] bg-white;
+    @apply border-b !border-[#F0F5FF] bg-[var(--Neutrals-g-10,#FFF)];
   }
 
   .theme-dark .single-table tr:not(:last-child) {
@@ -68,11 +84,35 @@
     @apply hover:bg-[#F0F5FF];
   }
 
-  .not-multi tbody .tr td:first-child {
+  .not-multi tbody tr:last-child td:first-child {
     @apply rounded-bl-[10px];
   }
 
-  .not-multi tbody .tr td:last-child {
+  .not-multi tbody tr:last-child td:last-child {
+    @apply rounded-br-[10px];
+  }
+  
+  .theme-dark .single-table tbody tr:last-child td:first-child {
+    @apply rounded-bl-[10px];
+  }
+  
+  .theme-dark .single-table tbody tr:last-child td:last-child {
+    @apply rounded-br-[10px];
+  }
+  
+  .theme-light .single-table tbody tr:last-child td:first-child {
+    @apply rounded-bl-[10px];
+  }
+  
+  .theme-light .single-table tbody tr:last-child td:last-child {
+    @apply rounded-br-[10px];
+  }
+  
+  .theme-light .single-table tbody tr:last-child td:first-child {
+    @apply rounded-bl-[10px];
+  }
+  
+  .theme-light .single-table tbody tr:last-child td:last-child {
     @apply rounded-br-[10px];
   }
 
