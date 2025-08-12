@@ -1,491 +1,231 @@
-Welcome to your new TanStack app! 
+# Ringba - Call Analytics Platform
 
-# Getting Started
+A modern call analytics platform built with React, TypeScript, and a modular architecture.
 
-To run this application:
+## 🏗️ Architecture Overview
 
-```bash
-npm install
-npm run start
+This project follows a **modular architecture** pattern where each feature is organized as an independent module. This approach promotes maintainability, reusability, and scalability.
+
+### 📁 Project Structure
+
+```
+ringba/
+├── src/
+│   ├── assets/                 # Global assets (SVG icons, images)
+│   ├── components/             # Shared UI components
+│   │   ├── common/            # Common components (Search, Tooltip)
+│   │   └── ui/                # UI library components
+│   ├── layout/                # App layout components
+│   ├── lib/                   # Utilities, hooks, types
+│   ├── modules/               # Feature modules (independent)
+│   │   └── caller-analysis/   # Example module
+│   ├── routes/                # Route definitions
+│   ├── store/                 # Global state management
+│   └── styles/                # Global styles
+└── ...
 ```
 
-# Building For Production
+## 🧩 Module Architecture
 
-To build this application for production:
+Each module follows a consistent structure for maintainability and developer experience:
 
-```bash
-npm run build
+### Module Structure Template
+
+```
+modules/[module-name]/
+├── components/        # Reusable UI components specific to this module
+├── containers/        # Container components (business logic)
+├── hooks/            # Custom hooks for state and logic
+├── pages/            # Page-level components
+├── data/             # Mock data, constants, API calls
+├── utils/            # Utility functions
+├── types/            # TypeScript type definitions
+└── index.ts          # Module exports
 ```
 
-## Testing
+### 📋 Example: Caller Analysis Module
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-npm run test
+```
+modules/caller-analysis/
+├── components/
+│   ├── StatusBadge.tsx      # Status indicator component
+│   ├── CampaignIcons.tsx    # Campaign type indicators
+│   ├── FilterPills.tsx      # Applied filter pills
+│   ├── FiltersSection.tsx   # Filter controls section
+│   └── index.ts
+├── containers/
+│   ├── CallerAnalysisContainer.tsx  # Main container
+│   └── index.ts
+├── hooks/
+│   ├── useCallerAnalysis.ts         # State management hook
+│   ├── useTableColumns.tsx          # Table configuration hook
+│   └── index.ts
+├── pages/
+│   ├── CallerAnalysisPage.tsx       # Page component with routing
+│   └── index.ts
+├── data/
+│   └── mockData.ts                  # Call data and filter options
+├── utils/
+│   └── filterUtils.ts               # Filtering logic functions
+├── types/
+│   └── index.ts                     # Module-specific types
+└── index.ts                         # Main module exports
 ```
 
-## Styling
+## 🎯 Module Guidelines
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+### 1. **Component Organization**
 
+- **Components**: Reusable UI components with single responsibility
+- **Containers**: Business logic and state management
+- **Pages**: Route-level components that compose containers
 
-## Linting & Formatting
+### 2. **State Management**
 
+- Use custom hooks for complex state logic
+- Keep state close to where it's used
+- Extract reusable logic into custom hooks
 
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+### 3. **Type Safety**
 
-```bash
-npm run lint
-npm run format
-npm run check
-```
+- Define module-specific types in `types/index.ts`
+- Export types for external consumption
+- Use TypeScript strictly throughout
 
+### 4. **Data Layer**
 
+- Keep mock data and constants in `data/`
+- Separate API calls and data fetching logic
+- Export data for testing and development
 
-## Routing
-This project uses [TanStack Router](https://tanstack.com/router). The initial setup is a code based router. Which means that the routes are defined in code (in the `./src/main.tsx` file). If you like you can also use a file based routing setup by following the [File Based Routing](https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing) guide.
+### 5. **Utilities**
 
-### Adding A Route
+- Pure functions for business logic
+- No side effects in utility functions
+- Comprehensive unit test coverage
 
-To add a new route to your application just add another `createRoute` call to the `./src/main.tsx` file. The example below adds a new `/about`route to the root route.
+## 🚀 Getting Started
 
-```tsx
-const aboutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/about",
-  component: () => <h1>About</h1>,
-});
-```
+### Adding a New Module
 
-You will also need to add the route to the `routeTree` in the `./src/main.tsx` file.
+1. **Create module directory structure**:
+   ```bash
+   mkdir -p src/modules/[module-name]/{components,containers,hooks,pages,data,utils,types}
+   ```
 
-```tsx
-const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
-```
+2. **Create index files**:
+   ```bash
+   touch src/modules/[module-name]/{components,containers,hooks,pages}/index.ts
+   touch src/modules/[module-name]/index.ts
+   ```
 
-With this set up you should be able to navigate to `/about` and see the about page.
+3. **Follow the established patterns**:
+   - Use the caller-analysis module as a reference
+   - Maintain consistent naming conventions
+   - Export everything through index files
 
-Of course you don't need to implement the About page in the `main.tsx` file. You can create that component in another file and import it into the `main.tsx` file, then use it in the `component` property of the `createRoute` call, like so:
+### Development Workflow
 
-```tsx
-import About from "./components/About.tsx";
+1. **Start with types**: Define your data structures
+2. **Create utilities**: Pure functions for business logic
+3. **Build components**: Start with simple UI components
+4. **Add state management**: Custom hooks for complex logic
+5. **Compose containers**: Combine components with business logic
+6. **Create pages**: Route-level components
 
-const aboutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/about",
-  component: About,
-});
-```
+## 🧪 Testing Strategy
 
-That is how we have the `App` component set up with the home page.
+### Component Testing
+- Test components in isolation
+- Mock external dependencies
+- Focus on user interactions
 
-For more information on the options you have when you are creating code based routes check out the [Code Based Routing](https://tanstack.com/router/latest/docs/framework/react/guide/code-based-routing) documentation.
+### Hook Testing
+- Test custom hooks with `@testing-library/react-hooks`
+- Verify state changes and side effects
+- Mock external dependencies
 
-Now that you have two routes you can use a `Link` component to navigate between them.
+### Utility Testing
+- Unit test pure functions
+- Test edge cases and error handling
+- Maintain high coverage
 
-### Adding Links
+## 📦 Dependencies
 
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+### Core Dependencies
+- **React 18**: UI library
+- **TypeScript**: Type safety
+- **TanStack Router**: Routing
+- **TanStack Table**: Data tables
+- **Tailwind CSS**: Styling
+- **Day.js**: Date manipulation
+- **Zustand**: State management
 
-```tsx
-import { Link } from "@tanstack/react-router";
-```
+### Development Dependencies
+- **Vite**: Build tool
+- **ESLint**: Code linting
+- **Prettier**: Code formatting
 
-Then anywhere in your JSX you can use it like so:
+## 🎨 Styling Guidelines
 
-```tsx
-<Link to="/about">About</Link>
-```
+- Use Tailwind CSS for styling
+- Maintain consistent color schemes
+- Support dark/light themes
+- Follow responsive design principles
 
-This will create a link that will navigate to the `/about` route.
+## 🔄 State Management
 
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+- **Global State**: Zustand for app-wide state (theme, user)
+- **Local State**: React hooks for component state
+- **Server State**: TanStack Query for data fetching
 
-### Using A Layout
+## 📱 Responsive Design
 
+- Mobile-first approach
+- Breakpoint consistency
+- Touch-friendly interfaces
+- Accessible design patterns
 
-Layouts can be used to wrap the contents of the routes in menus, headers, footers, etc.
+## 🚦 Code Quality
 
-There is already a layout in the `src/main.tsx` file:
+- **Linting**: ESLint with TypeScript rules
+- **Formatting**: Prettier for consistent formatting
+- **Type Checking**: Strict TypeScript configuration
+- **Code Reviews**: Required for all changes
 
-```tsx
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
+## 📈 Performance
 
-You can use the React component specified in the `component` property of the `rootRoute` to wrap the contents of the routes. The `<Outlet />` component is used to render the current route within the body of the layout. For example you could add a header to the layout like so:
+- **Code Splitting**: Lazy loading for routes
+- **Memoization**: React.memo and useMemo where appropriate
+- **Bundle Analysis**: Regular bundle size monitoring
+- **Lighthouse Scores**: Maintain high performance scores
 
-```tsx
-import { Link } from "@tanstack/react-router";
+## 🔐 Security
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it if you don't want it in your layout.
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-
-### Migrating To File Base Routing
-
-First you need to add the Vite plugin for Tanstack Router:
-
-```bash
-npm install @tanstack/router-plugin -D
-```
-
-From there you need to update your `vite.config.js` file to use the plugin:
-
-```ts
-import { defineConfig } from "vite";
-import viteReact from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-import tailwindcss from "@tailwindcss/vite";
-
-  
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    TanStackRouterVite(),
-    viteReact(),
-    tailwindcss()
-  ],
-});
-```
-
-Now you'll need to rearrange your files a little bit. That starts with creating a `routes` directory in the `src` directory:
-
-```bash
-mkdir src/routes
-```
-
-Then you'll need to create a `src/routes/__root.tsx` file with the contents of the root route that was in `main.tsx`.
-
-```tsx
-import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Next up you'll need to move your home route code into `src/routes/index.tsx`
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router";
-
-import logo from "../logo.svg";
-import "../App.css";
-
-export const Route = createFileRoute("/")({
-  component: App,
-});
-
-function App() {
-  return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
-  );
-}
-```
-
-At this point you can delete `src/App.tsx`, you will no longer need it as the contents have moved into `src/routes/index.tsx`.
-
-The only additional code is the `createFileRoute` function that tells TanStack Router where to render the route. Helpfully the Vite plugin will keep the path argument that goes to `createFileRoute` automatically in sync with the file system.
-
-Finally the `src/main.tsx` file can be simplified down to this:
-
-```tsx
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
-
-import "./styles.css";
-import reportWebVitals from "./reportWebVitals.ts";
-
-// Create a new router instance
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  defaultPreloadStaleTime: 0,
-  scrollRestoration: true,
-  defaultStructuralSharing: true
-});
-
-// Register the router instance for type safety
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-// Render the app
-const rootElement = document.getElementById("app")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
-  );
-}
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
-```
-
-Now you've got a file based routing setup in your project! Let's have some fun with it! Just create a file in `about.tsx` in `src/routes` and it if the application is running TanStack will automatically add contents to the file and you'll have the start of your `/about` route ready to go with no additional work. You can see why folks find File Based Routing so easy to use.
-
-You can find out everything you need to know on how to use file based routing in the [File Based Routing](https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing) documentation.
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
-  },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    );
-  },
-});
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-### React-Query
-
-React-Query is an excellent addition or alternative to route loading and integrating it into you application is a breeze.
-
-First add your dependencies:
-
-```bash
-npm install @tanstack/react-query @tanstack/react-query-devtools
-```
-
-Next we'll need to create a query client and provider. We recommend putting those in `main.tsx`.
-
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// ...
-
-const queryClient = new QueryClient();
-
-// ...
-
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  );
-}
-```
-
-You can also add TanStack Query Devtools to the root route (optional).
-
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-Now you can use `useQuery` to fetch your data.
-
-```tsx
-import { useQuery } from "@tanstack/react-query";
-
-import "./App.css";
-
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
-
-  return (
-    <div>
-      <ul>
-        {data.map((person) => (
-          <li key={person.name}>{person.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the [React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are many options for state management in React. TanStack Store provides a great starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-npm install @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store, Derived } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another store. The `Derived` class has a `mount` method that will start the derived store updating.
-
-Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+- **Type Safety**: Prevent runtime errors
+- **Input Validation**: Validate all user inputs
+- **Dependency Updates**: Regular security updates
+- **Code Reviews**: Security-focused reviews
+
+## 📚 Documentation
+
+- **Component Documentation**: JSDoc for complex components
+- **Type Documentation**: Comprehensive type definitions
+- **README Updates**: Keep documentation current
+- **Code Comments**: Explain complex business logic
+
+## 🤝 Contributing
+
+1. Follow the modular architecture patterns
+2. Maintain consistent code style
+3. Add comprehensive tests
+4. Update documentation
+5. Follow semantic versioning
+
+## 📝 License
+
+This project is proprietary and confidential.
+
+---
+
+**Happy Coding! 🚀**
