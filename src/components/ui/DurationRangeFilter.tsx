@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import { useThemeStore } from '../../store/themeStore';
+import { useClickOutside } from '../../lib/hooks';
 import { cn } from '../../lib/utils';
 
 export interface DurationRange {
@@ -40,6 +41,9 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
   
   const [isOpen, setIsOpen] = useState(false);
   const [tempRange, setTempRange] = useState<DurationRange>(value);
+
+  // Click outside to close dropdown
+  const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false));
 
   // Color definitions matching FilterSelect
   const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white';
@@ -92,7 +96,7 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
   };
 
   return (
-    <div className={cn('relative', className)}>
+    <div ref={dropdownRef} className={cn('relative', className)}>
       {/* Trigger Button */}
       <div
         className={cn(

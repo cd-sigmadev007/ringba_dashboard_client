@@ -46,8 +46,6 @@ const modalContentVariants = cva(
         lg: 'max-w-2xl',
         xl: 'max-w-4xl',
         full: 'w-full h-full',
-        fullWidth: 'w-full',
-        fullHeight: 'h-full',
       },
       position: {
         center: 'rounded-[10px] m-4',
@@ -90,6 +88,7 @@ export interface ModalProps
   className?: string;
   overlayClassName?: string;
   container?: Element;
+  border?: boolean;
 }
 
 /**
@@ -111,6 +110,7 @@ export const Modal: FC<ModalProps> = ({
   className,
   overlayClassName,
   container,
+  border = false,
 }) => {
   // Handle escape key
   useEscapeKey(onClose, closeOnEscape && open);
@@ -140,12 +140,17 @@ export const Modal: FC<ModalProps> = ({
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
+      {/* Instead of fixed heightless container, allow modal content to scroll */}
       <div
-        className={cn(modalContentVariants({ size, position, animation }), className)}
+        className={cn(
+          modalContentVariants({ size, position, animation }),
+          className,
+          "max-h-[90vh] overflow-y-auto custom-scroll"
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-6">
+          <div className="flex items-center justify-between px-6 py-4 sticky top-0 bg-[#071B2F] z-10">
             {title && (
               <h2 id="modal-title" className="text-lg font-semibold text-[#F5F8FA]">
                 {title}
@@ -177,7 +182,12 @@ export const Modal: FC<ModalProps> = ({
 
         {showSeparator && <div className="mx-6 h-px bg-[#A1A5B7]" />}
 
-        <div className="mx-6 mb-6 border border-[#1B456F] rounded-[7px] p-4 bg-transparent">
+        <div
+          className={cn(
+            "mx-6 border border-[#1B456F] rounded-[7px] p-4 bg-transparent",
+            !border && "border-none"
+          )}
+        >
           <div className="text-[#F5F8FA]">{children}</div>
         </div>
       </div>

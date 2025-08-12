@@ -89,27 +89,31 @@ span {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background-color: transparent;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
 }
 
 .theme-dark .custom-scroll::-webkit-scrollbar {
-  width: 0.25rem;
+  width: 0.75rem;
   background-color: transparent;
 }
 
 .theme-dark .custom-scroll::-webkit-scrollbar-thumb {
   background-color: #A1A5B7;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
+  border: 0.25rem solid transparent;
+  background-clip: content-box;
 }
 
 .theme-light .custom-scroll::-webkit-scrollbar {
-  width: 0.25rem;
+  width: 0.75rem;
   background-color: transparent;
 }
 
 .theme-light .custom-scroll::-webkit-scrollbar-thumb {
   background-color: #A1A5B7;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
+  border: 0.25rem solid transparent;
+  background-clip: content-box;
 }
 
 .grid-card {

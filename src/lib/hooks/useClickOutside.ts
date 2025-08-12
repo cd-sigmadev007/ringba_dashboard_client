@@ -11,7 +11,7 @@ import { useEffect, useRef } from 'react';
  */
 export function useClickOutside<T extends HTMLElement = HTMLElement>(
   callback: () => void
-): React.RefObject<T> {
+): React.RefObject<T | null> {
   const ref = useRef<T>(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function useEscapeKey(callback: () => void, enabled: boolean = true): voi
 export function useCloseOnOutsideClick<T extends HTMLElement = HTMLElement>(
   callback: () => void,
   enabled: boolean = true
-): React.RefObject<T> {
+): React.RefObject<T | null> {
   const ref = useClickOutside<T>(enabled ? callback : () => {});
   useEscapeKey(callback, enabled);
   
