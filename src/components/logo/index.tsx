@@ -1,28 +1,22 @@
 import { type FC } from 'react';
-import DarkLogo from '/logo-dark.svg';
-import DarkLogoMobile from '/logo-mobile-dark.svg';
-import LightLogo from '/logo-light.svg';
-import LightLogoMobile from '/logo-mobile-light.svg';
 import { useThemeStore } from '../../store/themeStore';
-// import { useSettingsStore } from '../../store/index';
-// import { get } from 'lodash';
-
+import { DarkLogo, LightLogo } from '@/assets/svg'
 
 const Logo: FC = () => {
     const { theme } = useThemeStore();
     const isDark = theme === 'dark';
     return (
         <div>
-            <img
-                src={isDark ? DarkLogo : LightLogo}
-                alt="Logo"
-                className="hidden lg:block"
-            />
-            <img
-                src={isDark ? DarkLogoMobile : LightLogoMobile}
-                alt="Logo"
-                className="lg:hidden"
-            />
+            {isDark ? (
+                <DarkLogo className="hidden lg:block h-8 w-auto" />
+            ) : (
+                <LightLogo className="hidden lg:block h-8 w-auto" />
+            )}
+            {isDark ? (
+                <DarkLogo className="lg:hidden h-8 w-auto" />
+            ) : (
+                <LightLogo className="lg:hidden h-8 w-auto" />
+            )}
         </div>
     );
 };

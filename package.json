@@ -9,8 +9,9 @@
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
-    "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
+    "format": "prettier .",
+    "check": "prettier --write . && eslint --fix",
+    "update-icons": "ts-node scripts/update-icons.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.6.0",
@@ -36,17 +37,23 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@svgr/cli": "^8.1.0",
     "@tanstack/eslint-config": "^0.3.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^24.2.0",
+    "@types/node": "^24.2.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.1",
+    "fs-extra": "^11.3.1",
     "jsdom": "^26.0.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.7.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
     "vite": "^6.3.5",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4"

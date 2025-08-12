@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { get, isEqual } from 'lodash';
 import { useClickOutside } from '../../lib/hooks/useClickOutside';
 import { useThemeStore } from '../../store/themeStore';
+import { ChevronDownDark, ChevronDownLight } from '../../assets/svg';
 
 export interface SelectOption {
   title: string;
@@ -85,37 +86,13 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         </span>
         {/* Chevron */}
         {isDark ? (
-          <svg
+          <ChevronDownDark
             className={clsx('transition-transform duration-200', openSelect && 'rotate-180')}
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="14"
-            viewBox="0 0 13 14"
-            fill="none"
-          >
-            <path
-              d="M2.16602 5.375L6.49935 9.70833L10.8327 5.375"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          />
         ) : (
-          <svg
+          <ChevronDownLight
             className={clsx('transition-transform duration-200', openSelect && 'rotate-180')}
-            xmlns="http://www.w3.org/2000/svg"
-            width="11"
-            height="7"
-            viewBox="0 0 11 7"
-            fill="none"
-          >
-            <path
-              d="M1.16602 1.375L5.49935 5.70833L9.83268 1.375"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          />
         )}
       </div>
 
