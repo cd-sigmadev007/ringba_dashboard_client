@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import Button from '../components/ui/Button';
 import ThemeSwitcher from './utils/theme-switcher';
 import { navLinks } from './utils/navLinks';
-import Tooltip from '../components/common/tooltip';
+import Tooltip from '../components/common/Tooltip';
 import { useThemeStore } from '../store/themeStore';
 
 

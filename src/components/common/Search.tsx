@@ -27,6 +27,10 @@ interface SearchProps {
    * Callback when search is performed
    */
   onSearch?: (query: string) => void;
+  /**
+   * Disable the dropdown suggestions
+   */
+  disableDropdown?: boolean;
 }
 
 /**
@@ -43,6 +47,7 @@ export const Search: React.FC<SearchProps> = ({
   className,
   placeholder = 'Search any Address, dApps, NFT Collection',
   onSearch,
+  disableDropdown = false,
 }) => {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
@@ -64,6 +69,14 @@ export const Search: React.FC<SearchProps> = ({
     const value = event.target.value;
     setSearchQuery(value);
     
+    // Call onSearch callback immediately for real-time filtering
+    onSearch?.(value);
+    
+    if (disableDropdown) {
+      setShowSuggestions(false);
+      return;
+    }
+    
     if (value.trim() === '') {
       setShowSuggestions(false);
       setSuggestions({ wallets: [], protocols: [], nfts: [] });
@@ -74,6 +87,8 @@ export const Search: React.FC<SearchProps> = ({
 
   // Handle focus event
   const handleInputFocus = () => {
+    if (disableDropdown) return;
+    
     if (searchQuery.trim() !== '') {
       setShowSuggestions(true);
     }
@@ -81,10 +96,12 @@ export const Search: React.FC<SearchProps> = ({
 
   // Perform search when debounced term changes
   React.useEffect(() => {
+    if (disableDropdown) return;
+    
     if (debouncedSearchTerm.trim() !== '') {
       performSearch(debouncedSearchTerm);
     }
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, disableDropdown]);
 
   // Mock search function - replace with actual API call
   const performSearch = async (query: string) => {

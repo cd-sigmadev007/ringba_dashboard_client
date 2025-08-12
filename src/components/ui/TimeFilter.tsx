@@ -30,7 +30,6 @@ const presets = [
 // Custom navigation icons for the calendar
 const IconRight = () => <ChevronRight />;
 const IconLeft = () => <ChevronLeft />;
-const inputRightIcon = <Calendar />;
 
 
 const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
@@ -43,13 +42,31 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
   const triggerRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
 
+  // Format the display value based on selected range
+  const getDisplayValue = () => {
+    if (!range?.from) {
+      return ''; // Return empty string to show placeholder
+    }
+    
+    if (range.from && range.to) {
+      const fromFormatted = dayjs(range.from).format('MMM DD, YYYY');
+      const toFormatted = dayjs(range.to).format('MMM DD, YYYY');
+      return `${fromFormatted} - ${toFormatted}`;
+    }
+    
+    if (range.from) {
+      return dayjs(range.from).format('MMM DD, YYYY');
+    }
+    
+    return '';
+  };
+
   const applyPreset = (preset: { label: string; days: number }) => {
     const { days, label } = preset;
     const to = dayjs().endOf('day').toDate();
     const from = days === 0 ? dayjs().startOf('day').toDate() : dayjs().subtract(days, 'day').startOf('day').toDate();
     setRange({ from, to });
     setActivePreset(label);
-    // Defer onChange until the user clicks "Done"
   };
 
   const handleSelect: SelectRangeEventHandler = (rng) => {
@@ -59,17 +76,22 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
   return (
     <div ref={triggerRef} className={twMerge('relative', className)}>
-      <Input
-        placeholder='Date'
-        className='w-full'
-        rightIcon={inputRightIcon}
-      />
+      {/* Use your Input component with proper design */}
+      <div onClick={() => setOpen(prev => !prev)}>
+        <Input
+          value={getDisplayValue()}
+          placeholder="Aug 01, 2024 - Aug 31, 2024"
+          className="cursor-pointer"
+          rightIcon={<Calendar />}
+          readOnly
+        />
+      </div>
 
       {/* Popover */}
       {open && (
         <div
           className={clsx(
-            'absolute z-50 rounded-[7px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)]',
+            'absolute z-50 rounded-[7px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)] mt-2',
             isDark
               ? 'border-[#002B57] bg-[#071B2FE6] text-neutrals-50'
               : 'border-gray-200 bg-white text-neutrals-800'
@@ -119,11 +141,14 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
               setRange(undefined);
               setActivePreset(null);
               onChange?.({ from: undefined, to: undefined });
+              setOpen(false);
             }}>
               Clear
             </Button>
             <Button variant="primary" onClick={() => {
-              if (range?.from && range.to) onChange?.({ from: range.from, to: range.to });
+              if (range?.from && range.to) {
+                onChange?.({ from: range.from, to: range.to });
+              }
               setOpen(false);
             }}>
               Done

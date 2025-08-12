@@ -15,3 +15,5 @@ export * from './SearchIcon';
 export * from './CloseIconDark';
 export * from './CloseIconLight';
 export * from './CallerAnalysisIcon';
+export * from './CheckboxIcon';
+export * from './CrossIcon';

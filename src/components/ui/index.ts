@@ -4,6 +4,7 @@
  */
 
 export * from './Button';
+export * from './DurationRangeFilter';
 export * from './Input';
 export * from './Modal';
 export { default as Table } from './Table';
