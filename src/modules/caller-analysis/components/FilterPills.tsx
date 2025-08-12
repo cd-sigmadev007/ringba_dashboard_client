@@ -1,7 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { useThemeStore } from '../../../store/themeStore';
 import Button from '../../../components/ui/Button';
 import CrossIcon from '../../../assets/svg/CrossIcon';
 import { campaignOptions, statusOptions } from '../data/mockData';
@@ -20,8 +18,6 @@ interface FilterPillsProps {
 }
 
 export const FilterPills: React.FC<FilterPillsProps> = ({ filters, onRemoveFilter }) => {
-  const { theme } = useThemeStore();
-  const isDark = theme === 'dark';
 
   const formatDurationRange = (range: DurationRange) => {
     if (range.min !== undefined && range.max !== undefined) {

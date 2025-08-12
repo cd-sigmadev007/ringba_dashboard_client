@@ -9,7 +9,7 @@ import { useCallerAnalysis, useTableColumns } from '../hooks';
 export const CallerAnalysisContainer: React.FC = () => {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
-  
+
   const {
     filters,
     filteredData,
@@ -24,17 +24,17 @@ export const CallerAnalysisContainer: React.FC = () => {
 
   return (
     <div className="min-h-screen content">
-      <div className="p-4 lg:p-8">
+      <div className="p-3 sm:p-4 lg:p-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h1 className={clsx(
-            'text-2xl lg:text-3xl font-bold mb-2',
+            'text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2',
             isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
           )}>
             Caller Analysis
           </h1>
           <p className={clsx(
-            'text-sm',
+            'text-xs sm:text-sm',
             isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
           )}>
             Comprehensive call tracking and analysis dashboard
@@ -42,22 +42,22 @@ export const CallerAnalysisContainer: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           {/* Filter Controls */}
-          <FiltersSection 
+          <FiltersSection
             filters={filters}
             onFiltersChange={updateFilters}
           />
 
           {/* Applied Filters Pills */}
-          <FilterPills 
+          <FilterPills
             filters={filters}
             onRemoveFilter={removeFilters}
           />
 
           {/* Filter Summary */}
           <div className={clsx(
-            'text-sm flex items-center gap-2',
+            'text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center gap-2',
             isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
           )}>
             <span>Showing {filteredData.length} of {totalRecords} calls</span>
@@ -65,6 +65,7 @@ export const CallerAnalysisContainer: React.FC = () => {
               <Button
                 variant='ghost'
                 onClick={clearAllFilters}
+                className="text-xs sm:text-sm"
               >
                 Clear all filters
               </Button>
@@ -73,7 +74,7 @@ export const CallerAnalysisContainer: React.FC = () => {
         </div>
 
         {/* Main Table */}
-        <div>
+        <div className="overflow-x-auto">
           <Table
             data={filteredData}
             columns={columns}
@@ -82,7 +83,7 @@ export const CallerAnalysisContainer: React.FC = () => {
             pageSize={20}
             clickableRows={false}
             size="medium"
-            className="w-full"
+            className="w-full min-w-[600px]"
           />
         </div>
       </div>

@@ -1,29 +1,31 @@
 /**
- * Modal component with modern TypeScript patterns and accessibility features
+ * Modal component with extended positions (center, top, bottom, left, right)
+ * and correct animations.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, type FC, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { type VariantProps, cva } from 'class-variance-authority';
 
 import { useEscapeKey } from '../../lib/hooks';
 import { cn } from '../../lib/utils';
-import type { FC, ReactNode } from 'react';
 
-// Modal variants
+// Overlay container variants
 const modalVariants = cva(
-  'fixed inset-0 z-50 flex items-center justify-center p-4',
+  'fixed inset-0 z-[9999] flex',
   {
     variants: {
       overlay: {
-        default: 'bg-black/50',
-        blur: 'bg-black/50 backdrop-blur-sm',
+        default: 'bg-black/70',
+        blur: 'bg-black/70 backdrop-blur-sm',
         dark: 'bg-black/70',
       },
       position: {
         center: 'items-center justify-center',
-        top: 'items-start justify-center pt-20',
-        bottom: 'items-end justify-center pb-20',
+        top: 'items-start justify-center',
+        bottom: 'items-end justify-center',
+        left: 'items-center justify-start',
+        right: 'items-center justify-end',
       },
     },
     defaultVariants: {
@@ -33,8 +35,9 @@ const modalVariants = cva(
   }
 );
 
+// Modal content variants
 const modalContentVariants = cva(
-  'relative w-full max-w-lg mx-auto bg-background border border-border rounded-lg shadow-lg',
+  'relative bg-[#071B2F] border-0 shadow-lg',
   {
     variants: {
       size: {
@@ -42,78 +45,55 @@ const modalContentVariants = cva(
         md: 'max-w-lg',
         lg: 'max-w-2xl',
         xl: 'max-w-4xl',
-        full: 'max-w-[95vw] max-h-[95vh]',
+        full: 'w-full h-full',
+        fullWidth: 'w-full',
+        fullHeight: 'h-full',
+      },
+      position: {
+        center: 'rounded-[10px] m-4',
+        top: 'rounded-b-[10px] w-full',
+        bottom: 'rounded-t-[10px] w-full',
+        left: 'rounded-r-[10px] h-full',
+        right: 'rounded-l-[10px] h-full',
       },
       animation: {
         scale: 'animate-in zoom-in-95 duration-300',
-        slide: 'animate-in slide-in-from-bottom-4 duration-300',
         fade: 'animate-in fade-in duration-300',
+        slide: '', // handled by compound variants
       },
     },
+    compoundVariants: [
+      { animation: 'slide', position: 'bottom', class: 'animate-in slide-in-from-bottom-4 duration-300' },
+      { animation: 'slide', position: 'top', class: 'animate-in slide-in-from-top-4 duration-300' },
+      { animation: 'slide', position: 'left', class: 'animate-in slide-in-from-left-4 duration-300' },
+      { animation: 'slide', position: 'right', class: 'animate-in slide-in-from-right-4 duration-300' },
+    ],
     defaultVariants: {
       size: 'md',
+      position: 'center',
       animation: 'scale',
     },
   }
 );
 
-export interface ModalProps extends VariantProps<typeof modalVariants>, VariantProps<typeof modalContentVariants> {
-  /**
-   * Whether the modal is open
-   */
+export interface ModalProps
+  extends VariantProps<typeof modalVariants>,
+  VariantProps<typeof modalContentVariants> {
   open: boolean;
-  /**
-   * Callback to close the modal
-   */
   onClose: () => void;
-  /**
-   * Modal content
-   */
   children: ReactNode;
-  /**
-   * Modal title
-   */
   title?: ReactNode;
-  /**
-   * Whether to show the close button
-   */
   showCloseButton?: boolean;
-  /**
-   * Whether clicking the overlay closes the modal
-   */
+  showSeparator?: boolean;
   closeOnOverlayClick?: boolean;
-  /**
-   * Whether pressing escape closes the modal
-   */
   closeOnEscape?: boolean;
-  /**
-   * Custom className for the modal content
-   */
   className?: string;
-  /**
-   * Custom className for the overlay
-   */
   overlayClassName?: string;
-  /**
-   * Portal container (defaults to document.body)
-   */
   container?: Element;
 }
 
 /**
- * Modal component with portal rendering and accessibility features
- * 
- * @example
- * ```tsx
- * <Modal
- *   open={isOpen}
- *   onClose={() => setIsOpen(false)}
- *   title="Confirm Action"
- *   size="md"
- * >
- *   <p>Are you sure you want to continue?</p>
- * </Modal>
- * ```
+ * Modal component with extended positioning and animations
  */
 export const Modal: FC<ModalProps> = ({
   open,
@@ -121,6 +101,7 @@ export const Modal: FC<ModalProps> = ({
   children,
   title,
   showCloseButton = true,
+  showSeparator = false,
   closeOnOverlayClick = true,
   closeOnEscape = true,
   overlay,
@@ -131,21 +112,18 @@ export const Modal: FC<ModalProps> = ({
   overlayClassName,
   container,
 }) => {
-
   // Handle escape key
   useEscapeKey(onClose, closeOnEscape && open);
 
-  // Handle body scroll lock
+  // Body scroll lock
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    }
+    if (open) document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [open]);
 
-  // Handle overlay click
+  // Overlay click handler
   const handleOverlayClick = (event: React.MouseEvent) => {
     if (closeOnOverlayClick && event.target === event.currentTarget) {
       onClose();
@@ -163,28 +141,24 @@ export const Modal: FC<ModalProps> = ({
       aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
-        className={cn(modalContentVariants({ size, animation }), className)}
+        className={cn(modalContentVariants({ size, position, animation }), className)}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className="flex items-center justify-between px-6 py-6">
             {title && (
-              <h2
-                id="modal-title"
-                className="text-lg font-semibold text-foreground"
-              >
+              <h2 id="modal-title" className="text-lg font-semibold text-[#F5F8FA]">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-accent rounded-md transition-colors"
+                className="p-2 hover:bg-[#1B456F]/20 rounded-[20px] transition-colors"
                 aria-label="Close modal"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 text-[#F5F8FA]"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -201,9 +175,10 @@ export const Modal: FC<ModalProps> = ({
           </div>
         )}
 
-        {/* Content */}
-        <div className="p-6">
-          {children}
+        {showSeparator && <div className="mx-6 h-px bg-[#A1A5B7]" />}
+
+        <div className="mx-6 mb-6 border border-[#1B456F] rounded-[7px] p-4 bg-transparent">
+          <div className="text-[#F5F8FA]">{children}</div>
         </div>
       </div>
     </div>
@@ -212,50 +187,23 @@ export const Modal: FC<ModalProps> = ({
   return createPortal(modalContent, container || document.body);
 };
 
-/**
- * Modal header component
- */
+// Subcomponents
 export const ModalHeader: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className,
-}) => (
-  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)}>
-    {children}
-  </div>
-);
+}) => <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)}>{children}</div>;
 
-/**
- * Modal title component
- */
 export const ModalTitle: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className,
-}) => (
-  <h3 className={cn('text-lg font-semibold leading-none tracking-tight', className)}>
-    {children}
-  </h3>
-);
+}) => <h3 className={cn('text-lg font-semibold leading-none tracking-tight text-[#F5F8FA]', className)}>{children}</h3>;
 
-/**
- * Modal description component
- */
 export const ModalDescription: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className,
-}) => (
-  <p className={cn('text-sm text-muted-foreground', className)}>
-    {children}
-  </p>
-);
+}) => <p className={cn('text-sm text-[#A1A5B7]', className)}>{children}</p>;
 
-/**
- * Modal footer component
- */
 export const ModalFooter: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className,
-}) => (
-  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}>
-    {children}
-  </div>
-);
+}) => <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}>{children}</div>;

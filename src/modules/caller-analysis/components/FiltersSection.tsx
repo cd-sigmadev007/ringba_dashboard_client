@@ -17,11 +17,14 @@ interface FiltersSectionProps {
 
 export const FiltersSection: React.FC<FiltersSectionProps> = ({ filters, onFiltersChange }) => {
   return (
-    <div className="flex gap-4">
-      <TimeFilter onChange={onFiltersChange.dateRange} className='min-w-[20%]' />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
+      <TimeFilter 
+        onChange={onFiltersChange.dateRange} 
+        className='col-span-1 sm:col-span-2 lg:col-span-1' 
+      />
       <Search
         placeholder='Search caller ID'
-        className='min-w-[20%]'
+        className='col-span-1'
         onSearch={onFiltersChange.search}
         disableDropdown={true}
       />
@@ -31,7 +34,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({ filters, onFilte
         setFilter={onFiltersChange.campaign}
         multiple={true}
         selectedValues={filters.campaignFilter}
-        className='flex-1/4'
+        className='col-span-1'
       />
       <FilterSelect
         defaultValue={{ title: 'Status', value: 'status' }}
@@ -39,11 +42,12 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({ filters, onFilte
         setFilter={onFiltersChange.status}
         multiple={true}
         selectedValues={filters.statusFilter}
+        className='col-span-1'
       />
       <DurationRangeFilter
         value={filters.durationRange}
         onChange={onFiltersChange.durationRange}
-        className='min-w-[22%]'
+        className='col-span-1'
       />
     </div>
   );
