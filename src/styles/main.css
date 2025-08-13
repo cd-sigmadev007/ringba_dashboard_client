@@ -82,39 +82,44 @@ span {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  @apply w-0 h-0;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  border-radius: 0.5rem;
+  @apply bg-transparent rounded;
 }
 
 .theme-dark .custom-scroll::-webkit-scrollbar {
-  width: 0.75rem;
-  background-color: transparent;
+  @apply w-2 bg-transparent;
 }
 
 .theme-dark .custom-scroll::-webkit-scrollbar-thumb {
-  background-color: #A1A5B7;
-  border-radius: 0.5rem;
-  border: 0.25rem solid transparent;
+  @apply bg-[#A1A5B7] rounded;
+  border: 2px solid transparent;
   background-clip: content-box;
 }
 
 .theme-light .custom-scroll::-webkit-scrollbar {
-  width: 0.75rem;
-  background-color: transparent;
+  @apply w-2 bg-transparent;
 }
 
 .theme-light .custom-scroll::-webkit-scrollbar-thumb {
-  background-color: #A1A5B7;
-  border-radius: 0.5rem;
-  border: 0.25rem solid transparent;
+  @apply bg-[#A1A5B7] rounded;
+  border: 2px solid transparent;
   background-clip: content-box;
 }
+
+/* Floating scrollbar for modal */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
 
 .grid-card {
   width: 100%;
@@ -517,15 +522,16 @@ input[type='search']::-webkit-search-results-decoration {
 /* Sidebar Item Styles */
 .sidebar-item {
   display: flex;
-  padding: 0.625rem;
-  gap: 0.625rem;
+  padding: 10px;
+  align-items: center;
+  gap: 10px;
   border-radius: 7px;
-  transition: all 300ms ease-out;
-  font-size: 16px;
   font-family: Poppins;
+  font-size: 16px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  transition: all 300ms ease-out;
 }
 
 .theme-dark .sidebar-item {
@@ -1057,5 +1063,15 @@ input[type='search']::-webkit-search-results-decoration {
 
 .theme-dark .horizontal-line {
   /* background: var(--p-700); */
-  border: 1px solid #1B456F ;
+  border: 1px solid #1B456F;
+}
+
+.rdp-month_caption {
+  color: #F5F8FA;
+  font-family: Poppins;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: 0.16px;
 }

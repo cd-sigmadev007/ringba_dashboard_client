@@ -5,6 +5,8 @@ import { get, isEqual } from 'lodash';
 import { useClickOutside } from '../../lib/hooks/useClickOutside';
 import { useThemeStore } from '../../store/themeStore';
 import { ChevronDownDark, ChevronDownLight, CheckboxIcon } from '../../assets/svg';
+import { Modal } from './Modal';
+import { useIsMobile } from '../../lib/hooks';
 
 export interface SelectOption {
   title: string;
@@ -38,8 +40,14 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
   const [selected, setSelected] = useState<SelectOption>(defaultValue);
   const [multiSelected, setMultiSelected] = useState<string[]>(selectedValues);
   const theme = useThemeStore((s) => s.theme); // 'dark' | 'light'
+  const isMobile = useIsMobile();
 
-  const selectRef = useClickOutside<HTMLDivElement>(() => setOpenSelect(false));
+  const selectRef = useClickOutside<HTMLDivElement>(() => {
+    // Only close on click outside for desktop (when not using mobile modal)
+    if (!isMobile) {
+      setOpenSelect(false);
+    }
+  });
 
   useEffect(() => {
     if (!multiple) {
@@ -105,6 +113,41 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
   
   const disabledText = isDark ? 'text-[#5E6278]' : 'text-[#A1A5B7]';
 
+  // Content that will be used in both desktop dropdown and mobile modal
+  const optionsContent = (
+    <ul className="flex flex-col gap-y-1 max-h-64 text-xs p-2.5">
+      {filterList.map((item: SelectOption) => (
+        <li
+          key={item.value}
+          className={clsx(
+            'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
+            optionText,
+            (multiple ? multiSelected.includes(item.value) : isEqual(item.value, selected.value)) && optionSelected,
+            item.soon && disabledText,
+            !item.soon && optionHover
+          )}
+          onClick={() => {
+            if (!item.soon) handleOptionClick(item);
+          }}
+        >
+          {/* Checkbox indicator for all items */}
+          <div className="flex items-center justify-center w-5 h-5">
+            <CheckboxIcon
+              checked={multiple ? multiSelected.includes(item.value) : isEqual(item.value, selected.value)}
+              isDark={isDark}
+            />
+          </div>
+          
+          {item.icon && (
+            <img src={item.icon} alt={item.title} className="w-5 h-5" />
+          )}
+          <span className="flex-1">{item.title}</span>
+          {item.soon && <span className="text-xs px-2 py-1 rounded bg-yellow-500 text-black ml-auto">Soon</span>}
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <div
       ref={selectRef}
@@ -146,47 +189,37 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         )}
       </div>
 
-      {/* Options list */}
-      <div
-        className={clsx(
-          'w-full absolute mt-2 rounded-[7px] z-40 backdrop-blur-[25px]',
-          dropdownBg,
-          dropdownShadow,
-          openSelect ? 'block' : 'hidden'
-        )}
-      >
-        <ul className="flex flex-col gap-y-1 max-h-64 overflow-y-auto text-xs custom-scroll p-2.5">
-          {filterList.map((item: SelectOption) => (
-            <li
-              key={item.value}
-              className={clsx(
-                'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
-                optionText,
-                (multiple ? multiSelected.includes(item.value) : isEqual(item.value, selected.value)) && optionSelected,
-                item.soon && disabledText,
-                !item.soon && optionHover
-              )}
-              onClick={() => {
-                if (!item.soon) handleOptionClick(item);
-              }}
-            >
-              {/* Checkbox indicator for all items */}
-              <div className="flex items-center justify-center w-5 h-5">
-                <CheckboxIcon
-                  checked={multiple ? multiSelected.includes(item.value) : isEqual(item.value, selected.value)}
-                  isDark={isDark}
-                />
-              </div>
-              
-              {item.icon && (
-                <img src={item.icon} alt={item.title} className="w-5 h-5" />
-              )}
-              <span className="flex-1">{item.title}</span>
-              {item.soon && <span className="text-xs px-2 py-1 rounded bg-yellow-500 text-black ml-auto">Soon</span>}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Desktop dropdown */}
+      {!isMobile && openSelect && (
+        <div
+          className={clsx(
+            'w-full absolute mt-2 rounded-[7px] z-40 backdrop-blur-[25px]',
+            dropdownBg,
+            dropdownShadow
+          )}
+        >
+          {optionsContent}
+        </div>
+      )}
+
+      {/* Mobile modal */}
+      {isMobile && (
+        <Modal
+          open={openSelect}
+          onClose={() => setOpenSelect(false)}
+          title={multiple ? "Select Options" : "Select Option"}
+          size='sm'
+          className='w-full'
+          position="bottom"
+          animation="slide"
+          border={false}
+          showCloseButton={true}
+        >
+          <div className="flex-1 -mx-6">
+            {optionsContent}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

@@ -8,14 +8,9 @@ const Logo: FC = () => {
     return (
         <div>
             {isDark ? (
-                <DarkLogo className="hidden lg:block h-8 w-auto" />
+                <DarkLogo className="h-8 w-auto" />
             ) : (
-                <LightLogo className="hidden lg:block h-8 w-auto" />
-            )}
-            {isDark ? (
-                <DarkLogo className="lg:hidden h-8 w-auto" />
-            ) : (
-                <LightLogo className="lg:hidden h-8 w-auto" />
+                <LightLogo className="h-8 w-auto" />
             )}
         </div>
     );

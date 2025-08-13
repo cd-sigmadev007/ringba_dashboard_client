@@ -39,7 +39,12 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
   const [range, setRange] = useState<DateRange | undefined>();
   const [activePreset, setActivePreset] = useState<string | null>(null);
 
-  const triggerRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
+  const triggerRef = useClickOutside<HTMLDivElement>(() => {
+    // Only close on click outside for desktop (when not using mobile modal)
+    if (!isMobile) {
+      setOpen(false);
+    }
+  });
 
   const getDisplayValue = () => {
     if (!range?.from) return '';
@@ -87,25 +92,26 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
         </ul>
 
         {/* Calendar */}
-       <div className='sm:w-full'>
-       <DayPicker
-          mode="range"
-          selected={range}
-          onSelect={handleSelect}
-          className="rdp no-focus"
-          components={{
-            Chevron: ({ orientation }) =>
-              orientation === 'left' ? <IconLeft /> : <IconRight />,
-          }}
-          captionLayout="dropdown-years"
-          startMonth={dayjs().subtract(25, 'year').toDate()}
-          endMonth={dayjs().toDate()}
-        />
-       </div>
+        <div className={cn('p-0')}>
+          <DayPicker
+            mode="range"
+            selected={range}
+            onSelect={handleSelect}
+            className="rdp no-focus"
+            components={{
+              Chevron: ({ orientation }) =>
+                orientation === 'left' ? <IconLeft /> : <IconRight />,
+            }}
+            captionLayout="dropdown-years"
+            startMonth={dayjs().subtract(25, 'year').toDate()}
+            endMonth={dayjs().toDate()}
+          />
+        </div>
       </div>
       <div className="horizontal-line my-4" />
-      <div className="flex justify-between gap-2">
+      <div className={cn("flex justify-between gap-2", isMobile && 'flex w-full justify-between gap-2')}>
         <Button
+          className={isMobile ? 'w-full' : ''}
           variant="ghost"
           onClick={() => {
             setRange(undefined);
@@ -117,6 +123,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
           Clear
         </Button>
         <Button
+          className={isMobile ? 'w-full' : ''}
           variant="primary"
           onClick={() => {
             if (range?.from && range.to) {
@@ -147,7 +154,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
       {!isMobile && open && (
         <div
           className={clsx(
-            'absolute z-50 rounded-[7px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)] mt-2',
+            'absolute z-50 rounded-[7px] max-w-[450px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)] mt-2',
             isDark
               ? 'border-[#002B57] bg-[#071B2FE6] text-neutrals-50'
               : 'border-gray-200 bg-white text-neutrals-800'
@@ -159,6 +166,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
       {/* Mobile modal */}
       {isMobile && (
+
         <Modal
           open={open}
           onClose={() => setOpen(false)}
@@ -168,8 +176,9 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
           position="bottom"
           animation="slide"
           border={false}
+          showCloseButton={true}
         >
-          <div className="flex-1 overflow-y-auto custom-scroll -mx-6">
+          <div className="flex-1">
             {pickerContent}
           </div>
         </Modal>
