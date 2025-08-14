@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -25,6 +25,17 @@ export const useCallerAnalysis = () => {
     durationRange: {},
     searchQuery: ''
   });
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate initial data loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter data based on current filters
   const filteredData = useMemo(() => {
@@ -144,6 +155,7 @@ export const useCallerAnalysis = () => {
     removeFilters,
     clearAllFilters,
     hasActiveFilters,
-    totalRecords: callData.length
+    totalRecords: callData.length,
+    isLoading
   };
 };

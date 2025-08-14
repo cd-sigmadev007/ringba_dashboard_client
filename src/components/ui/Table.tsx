@@ -17,6 +17,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import clsx from 'clsx';
 import { useThemeStore } from '../../store/themeStore';
 import { cn } from '../../lib/utils';
+import TableLoader from './TableLoader';
 
 interface TableProps<T = any> {
   /**
@@ -165,30 +166,22 @@ const Table = <T,>({
   };
 
   if (loading) {
+    // Create headers configuration from columns for the loader
+    const loaderHeaders = columns.map((column: any) => ({
+      title: column.header || column.id || 'Column',
+      width: column.meta?.width || undefined,
+    }));
+
     return (
       <div className={cn('w-full', className)}>
         <div className="card rounded-[10px] overflow-hidden">
-          <div className="animate-pulse">
-            {/* Header skeleton */}
-            <div
-              className={clsx(
-                'h-12 border-b',
-                isDark
-                  ? 'bg-[color:var(--primary-001-e-3-cp-600,#001E3C)] border-[color:var(--primary-1-b-456-fp-300,#1B456F)]'
-                  : 'bg-[#F5F8FA] border-[#ECECEC]'
-              )}
-            />
-            {/* Rows skeleton */}
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div
-                key={index}
-                className={clsx(
-                  'h-14 border-b last:border-b-0',
-                  isDark ? 'border-[#1B456F]' : 'border-[#ECECEC]'
-                )}
-              />
-            ))}
-          </div>
+          <TableLoader
+            headers={loaderHeaders}
+            withThead={showHeader}
+            withHeading={false}
+            rowCount={pageSize || 5}
+            className="w-full"
+          />
         </div>
       </div>
     );

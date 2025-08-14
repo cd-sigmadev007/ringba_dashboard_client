@@ -9,7 +9,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 05, 06:00:00 AM ET',
     duration: '03m 25s',
     lifetimeRevenue: 503.99,
-    campaign: 'H ⚠ P',
+    campaign: 'M A P',
     action: 'Post Control',
     status: 'High Quality Unb...'
   },
@@ -19,7 +19,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 05, 02:45:00 AM ET',
     duration: '05m 12s',
     lifetimeRevenue: 30.96,
-    campaign: '⚠',
+    campaign: 'A',
     action: 'Chargeback Risk (C...',
     status: 'Chargeback Risk (C...'
   },
@@ -29,7 +29,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 04, 10:20:00 PM ET',
     duration: '02m 45s',
     lifetimeRevenue: 290.45,
-    campaign: '⚠',
+    campaign: 'A',
     action: 'Wrong Appliance Ca...',
     status: 'Wrong Appliance Ca...'
   },
@@ -39,7 +39,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 04, 05:00:00 PM ET',
     duration: '04m 05s',
     lifetimeRevenue: 110.95,
-    campaign: 'H P',
+    campaign: 'M P',
     action: 'Wrong Appliance Ca...',
     status: 'Wrong Appliance Ca...'
   },
@@ -49,7 +49,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 04, 10:30:00 AM ET',
     duration: '06m 13s',
     lifetimeRevenue: 201.00,
-    campaign: 'H ⚠ P',
+    campaign: 'M A P',
     action: 'Wrong Post Control',
     status: 'Wrong Post Control'
   },
@@ -69,7 +69,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 03, 09:00:00 AM ET',
     duration: '00m 05s',
     lifetimeRevenue: 0,
-    campaign: 'H ⚠ P',
+    campaign: 'M A P',
     action: 'Caller Hung Up (IV...',
     status: 'Caller Hung Up (IV...'
   },
@@ -79,7 +79,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 02, 03:20:00 PM ET',
     duration: '01m 09s',
     lifetimeRevenue: 90.50,
-    campaign: '⚠ P',
+    campaign: 'A P',
     action: 'Competitor Mention...',
     status: 'Competitor Mention...'
   },
@@ -89,7 +89,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 02, 11:00:00 AM ET',
     duration: '03m 30s',
     lifetimeRevenue: 503.99,
-    campaign: 'H ⚠',
+    campaign: 'M A',
     action: 'Positive Sentiment',
     status: 'Positive Sentiment'
   },
@@ -99,7 +99,7 @@ export const callData: CallData[] = [
     lastCall: 'Aug 01, 04:00:00 PM ET',
     duration: '01m 02s',
     lifetimeRevenue: 708.20,
-    campaign: 'H P',
+    campaign: 'M P',
     action: 'Short Call (105)',
     status: 'Short Call (105)'
   }
@@ -107,13 +107,13 @@ export const callData: CallData[] = [
 
 // Filter options
 export const campaignOptions: SelectOption[] = [
-  { title: 'H Only', value: 'H' },
-  { title: 'P Only', value: 'P' },
-  { title: 'Warning (⚠)', value: '⚠' },
-  { title: 'H + P', value: 'H,P' },
-  { title: 'H + Warning', value: 'H,⚠' },
-  { title: 'P + Warning', value: 'P,⚠' },
-  { title: 'All (H + P + Warning)', value: 'H,P,⚠' },
+  { title: 'Medicare Only', value: 'M' },
+  { title: 'Appliance Repair Only', value: 'A' },
+  { title: 'Pest Control Only', value: 'P' },
+  { title: 'Medicare + Appliance', value: 'M,A' },
+  { title: 'Medicare + Pest Control', value: 'M,P' },
+  { title: 'Appliance + Pest Control', value: 'A,P' },
+  { title: 'All (Medicare + Appliance + Pest)', value: 'M,A,P' },
 ];
 
 export const statusOptions: SelectOption[] = [

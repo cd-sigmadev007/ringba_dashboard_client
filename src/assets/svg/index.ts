@@ -17,3 +17,8 @@ export * from './CloseIconLight';
 export * from './CallerAnalysisIcon';
 export * from './CheckboxIcon';
 export * from './CrossIcon';
+export * from './CopyIcon';
+export * from './PlayIcon';
+export * from './PauseIcon';
+export * from './DocumentIcon';
+export * from './WarningIcon';

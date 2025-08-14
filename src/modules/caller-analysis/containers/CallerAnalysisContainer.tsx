@@ -17,7 +17,8 @@ export const CallerAnalysisContainer: React.FC = () => {
     removeFilters,
     clearAllFilters,
     hasActiveFilters,
-    totalRecords
+    totalRecords,
+    isLoading
   } = useCallerAnalysis();
 
   const columns = useTableColumns();
@@ -83,6 +84,7 @@ export const CallerAnalysisContainer: React.FC = () => {
             pageSize={20}
             clickableRows={false}
             size="medium"
+            loading={isLoading}
             className="w-full min-w-[600px]"
           />
         </div>

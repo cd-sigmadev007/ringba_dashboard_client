@@ -1,30 +1,47 @@
 import React from 'react';
-import clsx from 'clsx';
-import { useThemeStore } from '../../../store/themeStore';
+import medicareImg from '../../../assets/png/medicare.png';
+import applianceImg from '../../../assets/png/appliance.png';
+import pestImg from '../../../assets/png/pest.png';
 
 interface CampaignProps {
   campaign: string;
 }
 
 export const Campaign: React.FC<CampaignProps> = ({ campaign }) => {
-  const { theme } = useThemeStore();
-  const isDark = theme === 'dark';
+  // Map campaign letters to images
+  const campaignImages = [
+    { key: 'M', image: medicareImg, alt: 'Medicare' },
+    { key: 'A', image: applianceImg, alt: 'Appliance Repair' },
+    { key: 'P', image: pestImg, alt: 'Pest Control' },
+  ];
+
+  // Filter images based on campaign string
+  const activeCampaigns = campaignImages.filter(item => 
+    campaign.toUpperCase().includes(item.key)
+  );
+
+  if (activeCampaigns.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-1">
-      {campaign.includes('H') && (
-        <span className={clsx('text-xs font-bold', isDark ? 'text-blue-400' : 'text-blue-600')}>
-          H
-        </span>
-      )}
-      {campaign.includes('⚠') && (
-        <span className="text-xs">⚠️</span>
-      )}
-      {campaign.includes('P') && (
-        <span className={clsx('text-xs font-bold', isDark ? 'text-purple-400' : 'text-purple-600')}>
-          P
-        </span>
-      )}
+    <div className="flex items-center" style={{ gap: '-3px' }}>
+      {activeCampaigns.map((item, index) => (
+        <div
+          key={item.key}
+          className="relative w-6 h-6 rounded-full overflow-hidden"
+          style={{ 
+            marginLeft: index > 0 ? '-3px' : '0',
+            zIndex: activeCampaigns.length - index 
+          }}
+        >
+          <img
+            src={item.image}
+            alt={item.alt}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ))}
     </div>
   );
 };
