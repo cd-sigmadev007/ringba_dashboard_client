@@ -33,9 +33,8 @@ const Button: React.FC<ButtonProps> = ({
       (isDark
         ? 'disabled:!bg-[#132F4C] disabled:text-[#7E8299]'
         : 'disabled:!bg-[#E0E0E0] disabled:text-[#7E8299]'),
-    ghost: 'text-btn-ghost border border-[color:var(--primary-1-b-456-fp-300,#1B456F)]' + 
-    ' hover:bg-[color:var(--primary-1-b-456-fp-300,#1B456F)]' +
-    ' hover:text-[#F5F8FA]',
+    ghost: 'text-btn-ghost border border-[#1B456F] ' +
+    (isDark ? 'hover:bg-[#0254A5]' : 'hover:bg-[#E0E0E0]'),
     secondary: 'bg-[#132F4C] hover:bg-opacity-80 text-[#EFF2F5]',
     default: '',
   };

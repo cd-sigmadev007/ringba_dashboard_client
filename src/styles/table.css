@@ -132,6 +132,53 @@
     @apply bg-[#F5F8FA] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
   }
 
+  /* Add box shadow only when table is scrollable */
+  .table-scrollable .sticky-column,
+  .table-scrollable .sticky-column-th {
+    box-shadow: 14px 0 10px 0 rgba(0, 0, 0, 0.20);
+  }
+
+  /* Ensure sticky columns maintain position */
+  .sticky-column,
+  .sticky-column-th {
+    position: sticky !important;
+    left: 0 !important;
+  }
+
+  /* Prevent table from collapsing sticky columns */
+  .single-table {
+    table-layout: auto;
+  }
+
+  /* Ensure proper z-index stacking - sticky header behind first header */
+  .sticky-column-th {
+    z-index: 5 !important;
+  }
+
+  .sticky-column {
+    z-index: 5 !important;
+  }
+
+  /* First header should be above sticky header */
+  .single-table thead tr th:first-child {
+    z-index: 10 !important;
+  }
+
+  /* Table container overflow handling */
+  .table-container {
+    position: relative;
+  }
+
+  /* Ensure sticky columns don't get cut off */
+  .table-scrollable {
+    position: relative;
+  }
+
+  /* Prevent sticky column from scrolling at the end */
+  .table-scrollable .single-table {
+    min-width: max-content;
+  }
+
   .theme-dark .filter-select-dark {
     @apply bg-[#001E3C] hover:border-[#0254a5] focus:border-[#0254a5] text-[#f5f8fa];
   }

@@ -1,5 +1,4 @@
-import dayjs from 'dayjs';
-import type { DurationRange } from '../../../components/ui/DurationRangeFilter';
+import type { DurationRange } from '@/components';
 
 // Helper function to parse duration string to seconds
 export const parseDuration = (duration: string): number => {

@@ -77,11 +77,6 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
     setIsOpen(false);
   };
 
-  const handleCancel = () => {
-    setTempRange(value);
-    setIsOpen(false);
-  };
-
   const getDisplayText = () => {
     if (value.min !== undefined && value.max !== undefined) {
       return `${value.min}s - ${value.max}s`;

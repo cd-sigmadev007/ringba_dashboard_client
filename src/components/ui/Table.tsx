@@ -114,7 +114,7 @@ const Table = <T,>({
 
       if (tableElement && containerElement) {
         const isOverflowingHorizontally =
-          tableElement.clientWidth > containerElement.clientWidth;
+          tableElement.scrollWidth > containerElement.clientWidth;
         setIsOverflowing(isOverflowingHorizontally);
       }
     };
@@ -125,7 +125,7 @@ const Table = <T,>({
     return () => {
       window.removeEventListener('resize', checkOverflow);
     };
-  }, []);
+  }, [data]); // Re-check when data changes
 
   // Fuzzy filter function
   const fuzzyFilter = (row: any, columnId: string, value: string) => {
@@ -244,11 +244,13 @@ const Table = <T,>({
         <div
           className={clsx(
             'overflow-x-auto transition-all duration-500 ease-out',
-            collapsed ? 'max-h-0 overflow-hidden' : 'max-h-none'
+            collapsed ? 'max-h-0 overflow-hidden' : 'max-h-none',
+            isOverflowing ? 'table-scrollable' : 'table-not-scrollable'
           )}
         >
           <table
             className="table-auto w-full single-table relative"
+            style={{ minWidth: isOverflowing ? 'max-content' : 'auto' }}
             ref={tableRef}
           >
             {/* Table Header */}
@@ -270,10 +272,10 @@ const Table = <T,>({
                         className={clsx(
                           'px-5 py-[9px] uppercase text-[14px] font-semibold text-left',
                           (header.column.columnDef.meta as any)?.sticky && isOverflowing
-                            ? 'sticky left-0 w-full sticky-column-th z-10'
+                            ? 'sticky left-0 z-5 sticky-column-th'
                             : 'static w-auto',
                           isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
-                          index === 0 && 'first:rounded-tl-[10px]',
+                          index === 0 && 'first:rounded-tl-[10px] z-10',
                           index === headerGroup.headers.length - 1 && 'last:rounded-tr-[10px]'
                         )}
                       >
@@ -350,7 +352,7 @@ const Table = <T,>({
                         'font-medium transition-colors',
                         sizeVariants[size],
                         (cell.column.columnDef.meta as any)?.sticky && isOverflowing
-                          ? 'sticky left-0 w-full sticky-column z-[5]'
+                          ? 'sticky left-0 z-10 sticky-column'
                           : 'static',
                         isDark
                           ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]/80'

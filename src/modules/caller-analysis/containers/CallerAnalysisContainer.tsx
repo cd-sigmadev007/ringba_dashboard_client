@@ -1,14 +1,18 @@
-import React from 'react';
-import clsx from 'clsx';
-import { useThemeStore } from '../../../store/themeStore';
-import { Table } from '../../../components/ui';
-import Button from '../../../components/ui/Button';
-import { FiltersSection, FilterPills } from '../components';
-import { useCallerAnalysis, useTableColumns } from '../hooks';
+import React from 'react'
+import clsx from 'clsx'
+import { useCallerAnalysis, useTableColumns } from '../hooks'
+import { useThemeStore } from '@/store/themeStore.ts'
+import { Modal, Table } from '@/components/ui'
+import Button from '@/components/ui/Button'
+import { FilterPills, FiltersSection } from '@/modules'
+import type { CallData } from '../types'
+import { PersonalIdentification } from '../components/PersonalIdentification'
 
 export const CallerAnalysisContainer: React.FC = () => {
-  const { theme } = useThemeStore();
-  const isDark = theme === 'dark';
+  const { theme } = useThemeStore()
+  const isDark = theme === 'dark'
+  const [openModal, setOpenModal] = React.useState(false)
+  const [selectedCaller, setSelectedCaller] = React.useState<CallData | null>(null)
 
   const {
     filters,
@@ -18,26 +22,40 @@ export const CallerAnalysisContainer: React.FC = () => {
     clearAllFilters,
     hasActiveFilters,
     totalRecords,
-    isLoading
-  } = useCallerAnalysis();
+    isLoading,
+  } = useCallerAnalysis()
 
-  const columns = useTableColumns();
+  const columns = useTableColumns()
+
+  const handleRowClick = (row: CallData) => {
+    setSelectedCaller(row)
+    setOpenModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false)
+    setSelectedCaller(null)
+  }
 
   return (
     <div className="min-h-screen content">
       <div className="p-3 sm:p-4 lg:p-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className={clsx(
-            'text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2',
-            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-          )}>
+          <h1
+            className={clsx(
+              'text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2',
+              isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
+            )}
+          >
             Caller Analysis
           </h1>
-          <p className={clsx(
-            'text-xs sm:text-sm',
-            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-          )}>
+          <p
+            className={clsx(
+              'text-xs sm:text-sm',
+              isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+            )}
+          >
             Comprehensive call tracking and analysis dashboard
           </p>
         </div>
@@ -45,26 +63,24 @@ export const CallerAnalysisContainer: React.FC = () => {
         {/* Filters */}
         <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           {/* Filter Controls */}
-          <FiltersSection
-            filters={filters}
-            onFiltersChange={updateFilters}
-          />
+          <FiltersSection filters={filters} onFiltersChange={updateFilters} />
 
           {/* Applied Filters Pills */}
-          <FilterPills
-            filters={filters}
-            onRemoveFilter={removeFilters}
-          />
+          <FilterPills filters={filters} onRemoveFilter={removeFilters} />
 
           {/* Filter Summary */}
-          <div className={clsx(
-            'text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center gap-2',
-            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-          )}>
-            <span>Showing {filteredData.length} of {totalRecords} calls</span>
+          <div
+            className={clsx(
+              'text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center gap-2',
+              isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+            )}
+          >
+            <span>
+              Showing {filteredData.length} of {totalRecords} calls
+            </span>
             {hasActiveFilters && (
               <Button
-                variant='ghost'
+                variant="ghost"
                 onClick={clearAllFilters}
                 className="text-xs sm:text-sm"
               >
@@ -82,13 +98,26 @@ export const CallerAnalysisContainer: React.FC = () => {
             showHeader={true}
             pagination={true}
             pageSize={20}
-            clickableRows={false}
+            clickableRows={true}
+            onRowClick={handleRowClick}
             size="medium"
             loading={isLoading}
             className="w-full min-w-[600px]"
           />
         </div>
+        <Modal
+          open={openModal}
+          onClose={handleCloseModal}
+          position={'right'}
+          title="Caller Details"
+          size="full"
+          className={'max-w-[40%]'}
+        >
+          <div>
+            {selectedCaller && <PersonalIdentification callerData={selectedCaller} />}
+          </div>
+        </Modal>
       </div>
     </div>
-  );
-};
+  )
+}

@@ -10,13 +10,13 @@ export interface CallData {
   lifetimeRevenue: number;
   campaign: string;
   action: string;
-  status: string;
+  status: Array<string>;
 }
 
 export interface FilterState {
   dateRange: { from?: Date; to?: Date };
-  campaignFilter: string[];
-  statusFilter: string[];
+  campaignFilter: Array<string>;
+  statusFilter: Array<string>;
   durationFilter: string;
   durationRange: { min?: number; max?: number };
   searchQuery: string;

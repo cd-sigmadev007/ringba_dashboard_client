@@ -74,14 +74,14 @@ const TableLoader: React.FC<TableLoaderProps> = ({
             'flex justify-between items-center px-5 pt-[21px] pb-[26px] rounded-t-[10px] border-b',
             isDark
               ? 'bg-[#001E3C] border-[#1B456F]'
-              : 'bg-white border-[#ECECEC]'
+              : 'bg-white border-[#ECECEC]',
           )}
         >
           <SkeletonRect width={extra ? 'w-20' : 'w-44'} height="h-4" />
           {extra && <SkeletonRect width="w-20" height="h-4" />}
         </div>
       )}
-      
+
       <div className="w-full overflow-x-auto">
         <table className="w-full">
           {withThead && (
@@ -91,7 +91,7 @@ const TableLoader: React.FC<TableLoaderProps> = ({
                   'border-b',
                   isDark
                     ? 'bg-[#001E3C] border-[#1B456F]'
-                    : 'bg-[#F5F8FA] border-[#ECECEC]'
+                    : 'bg-[#F5F8FA] border-[#ECECEC]',
                 )}
               >
                 {headers.map((header, index) => (
@@ -99,7 +99,7 @@ const TableLoader: React.FC<TableLoaderProps> = ({
                     key={index}
                     className={clsx(
                       'px-5 py-4 text-left',
-                      header.width || 'w-auto'
+                      header.width || 'w-auto',
                     )}
                   >
                     <SkeletonRect width="w-16" height="h-3" />
@@ -108,7 +108,7 @@ const TableLoader: React.FC<TableLoaderProps> = ({
               </tr>
             </thead>
           )}
-          
+
           <tbody>
             {Array.from({ length: rowCount }).map((_, rowIndex) => (
               <tr
@@ -119,18 +119,22 @@ const TableLoader: React.FC<TableLoaderProps> = ({
                     ? 'bg-[#001E3C] border-[#1B456F]'
                     : 'bg-white border-[#ECECEC]',
                   // Add opacity variation for visual depth
-                  rowIndex % 2 === 1 && 'bg-opacity-50'
+                  rowIndex % 2 === 1 && 'bg-opacity-50',
                 )}
               >
-                {headers.map((header, cellIndex) => (
+                {headers.map((_header, cellIndex) => (
                   <td key={cellIndex} className="px-5 py-6">
-                    <SkeletonRect 
+                    <SkeletonRect
                       width={
-                        cellIndex === 0 ? 'w-24' : // First column (name) wider
-                        cellIndex === 1 ? 'w-20' : // Phone number
-                        cellIndex === 2 ? 'w-16' : // Date
-                        cellIndex === 3 ? 'w-12' : // Duration
-                        'w-14' // Status or other columns
+                        cellIndex === 0
+                          ? 'w-24' // First column (name) wider
+                          : cellIndex === 1
+                            ? 'w-20' // Phone number
+                            : cellIndex === 2
+                              ? 'w-16' // Date
+                              : cellIndex === 3
+                                ? 'w-12' // Duration
+                                : 'w-14' // Status or other columns
                       }
                       height="h-4"
                     />
@@ -142,7 +146,7 @@ const TableLoader: React.FC<TableLoaderProps> = ({
         </table>
       </div>
     </div>
-  );
+  )
 };
 
 export default TableLoader;

@@ -39,6 +39,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
   const [range, setRange] = useState<DateRange | undefined>();
   const [activePreset, setActivePreset] = useState<string | null>(null);
 
+  // Click outside handler for desktop popover only
   const triggerRef = useClickOutside<HTMLDivElement>(() => {
     // Only close on click outside for desktop (when not using mobile modal)
     if (!isMobile) {
@@ -79,7 +80,10 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
             <li key={p.label}>
               <Button
                 variant={'ghost'}
-                onClick={() => applyPreset(p)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  applyPreset(p);
+                }}
                 className={cn(
                   '!py-[7px] !px-[10px] border-none w-full text-start hover:bg-[#132F4C]',
                   activePreset === p.label ? 'bg-[#132F4C]' : ''
@@ -113,7 +117,8 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
         <Button
           className={isMobile ? 'w-full' : ''}
           variant="ghost"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             setRange(undefined);
             setActivePreset(null);
             onChange?.({ from: undefined, to: undefined });
@@ -125,7 +130,8 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
         <Button
           className={isMobile ? 'w-full' : ''}
           variant="primary"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             if (range?.from && range.to) {
               onChange?.({ from: range.from, to: range.to });
             }
@@ -140,7 +146,10 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
   return (
     <div ref={triggerRef} className={twMerge('relative', className)}>
-      <div onClick={() => setOpen((prev) => !prev)}>
+      <div onClick={(e) => {
+        e.stopPropagation();
+        setOpen((prev) => !prev);
+      }}>
         <Input
           value={getDisplayValue()}
           placeholder="Aug 01, 2024 - Aug 31, 2024"
@@ -159,6 +168,10 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
               ? 'border-[#002B57] bg-[#071B2FE6] text-neutrals-50'
               : 'border-gray-200 bg-white text-neutrals-800'
           )}
+          onClick={(e) => {
+            // Stop propagation to prevent the popover from closing when clicked
+            e.stopPropagation();
+          }}
         >
           {pickerContent}
         </div>
@@ -166,7 +179,6 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
       {/* Mobile modal */}
       {isMobile && (
-
         <Modal
           open={open}
           onClose={() => setOpen(false)}

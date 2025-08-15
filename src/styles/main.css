@@ -487,30 +487,6 @@ input[type='search']::-webkit-search-results-decoration {
   color: #3F4254;
 }
 
-.theme-dark h1,
-.theme-dark h2,
-.theme-dark h3,
-.theme-dark h4,
-.theme-dark h5,
-.theme-dark h6,
-.theme-dark p,
-.theme-dark span,
-.theme-dark div {
-  color: #F5F8FA;
-}
-
-.theme-light h1,
-.theme-light h2,
-.theme-light h3,
-.theme-light h4,
-.theme-light h5,
-.theme-light h6,
-.theme-light p,
-.theme-light span,
-.theme-light div {
-  color: #3F4254;
-}
-
 .theme-dark .text-secondary {
   color: #A1A5B7;
 }
@@ -526,7 +502,7 @@ input[type='search']::-webkit-search-results-decoration {
   align-items: center;
   gap: 10px;
   border-radius: 7px;
-  font-family: Poppins;
+  font-family: Poppins, serif;
   font-size: 16px;
   font-style: normal;
   font-weight: 500;

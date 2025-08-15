@@ -2,7 +2,7 @@
  * Custom hooks for debouncing values and callbacks
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Hook to debounce a value
@@ -38,6 +38,7 @@ export function useDebounceCallback<T extends (...args: any[]) => any>(
   delay: number,
   deps: React.DependencyList = []
 ): T {
+  // @ts-ignore
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const debouncedCallback = useCallback(

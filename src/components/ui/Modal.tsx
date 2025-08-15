@@ -1,34 +1,34 @@
-import React, { useEffect, type FC, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
+import { cva } from 'class-variance-authority'
+import type { FC, ReactNode } from 'react'
+import type { VariantProps } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils';
-import CrossIcon from '@/assets/svg/CrossIcon';
+import { cn, useIsMobile } from '@/lib'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
+import CrossIcon from '@/assets/svg/CrossIcon'
 
 // Overlay container variants
-const modalVariants = cva(
-  'fixed inset-0 z-[9999] flex',
-  {
-    variants: {
-      overlay: {
-        default: 'bg-black/70',
-        blur: 'bg-black/70 backdrop-blur-sm',
-        dark: 'bg-black/70',
-      },
-      position: {
-        center: 'items-center justify-center',
-        top: 'items-start justify-center',
-        bottom: 'items-end justify-center',
-        left: 'items-center justify-start',
-        right: 'items-center justify-end',
-      },
+const modalVariants = cva('fixed inset-0 z-[9999] flex', {
+  variants: {
+    overlay: {
+      default: 'bg-black/70',
+      blur: 'bg-black/70 backdrop-blur-sm',
+      dark: 'bg-black/70',
     },
-    defaultVariants: {
-      overlay: 'default',
-      position: 'center',
+    position: {
+      center: 'items-center justify-center',
+      top: 'items-start justify-center',
+      bottom: 'items-end justify-center',
+      left: 'items-center justify-start',
+      right: 'items-center justify-end',
     },
-  }
-);
+  },
+  defaultVariants: {
+    overlay: 'default',
+    position: 'center',
+  },
+})
 
 // Modal content variants
 const modalContentVariants = cva(
@@ -56,32 +56,48 @@ const modalContentVariants = cva(
       },
     },
     compoundVariants: [
-      { animation: 'slide', position: 'bottom', class: 'animate-in slide-in-from-bottom-4 duration-300' },
-      { animation: 'slide', position: 'top', class: 'animate-in slide-in-from-top-4 duration-300' },
-      { animation: 'slide', position: 'left', class: 'animate-in slide-in-from-left-4 duration-300' },
-      { animation: 'slide', position: 'right', class: 'animate-in slide-in-from-right-4 duration-300' },
+      {
+        animation: 'slide',
+        position: 'bottom',
+        class: 'animate-in slide-in-from-bottom-4 duration-300',
+      },
+      {
+        animation: 'slide',
+        position: 'top',
+        class: 'animate-in slide-in-from-top-4 duration-300',
+      },
+      {
+        animation: 'slide',
+        position: 'left',
+        class: 'animate-in slide-in-from-left-4 duration-300',
+      },
+      {
+        animation: 'slide',
+        position: 'right',
+        class: 'animate-in slide-in-from-right-4 duration-300',
+      },
     ],
     defaultVariants: {
       size: 'md',
       position: 'center',
       animation: 'scale',
     },
-  }
-);
+  },
+)
 
 export interface ModalProps
   extends VariantProps<typeof modalVariants>,
     VariantProps<typeof modalContentVariants> {
-  open: boolean;
-  onClose: () => void;
-  children: ReactNode;
-  title?: ReactNode;
-  showCloseButton?: boolean;
-  showSeparator?: boolean;
-  className?: string;
-  overlayClassName?: string;
-  container?: Element;
-  border?: boolean;
+  open: boolean
+  onClose: () => void
+  children: ReactNode
+  title?: ReactNode
+  showCloseButton?: boolean
+  showSeparator?: boolean
+  className?: string
+  overlayClassName?: string
+  container?: Element
+  border?: boolean
 }
 
 export const Modal: FC<ModalProps> = ({
@@ -101,14 +117,21 @@ export const Modal: FC<ModalProps> = ({
   border = false,
 }) => {
   // Body scroll lock
-  useEffect(() => {
-    if (open) document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [open]);
+  const isMobile = useIsMobile()
+  
+  // Click outside handler
+  const modalRef = useClickOutside<HTMLDivElement>(() => {
+    onClose()
+  })
 
-  if (!open) return null;
+  useEffect(() => {
+    if (open) document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [open])
+
+  if (!open) return null
 
   const modalContent = (
     <div
@@ -116,24 +139,42 @@ export const Modal: FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
+      onClick={(e) => {
+        // Stop propagation to prevent event bubbling
+        e.stopPropagation()
+      }}
     >
       <div
+        ref={modalRef}
         className={cn(
           modalContentVariants({ size, position, animation }),
           className,
-          'max-h-[90vh]'
+          'pb-6',
         )}
+        onClick={(e) => {
+          // Stop propagation to prevent the modal content from closing when clicked
+          e.stopPropagation()
+        }}
       >
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 bg-[#071B2F] z-10">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-[#F5F8FA]">
+              <h2
+                id="modal-title"
+                className={cn(
+                  'text-[24px] font-semibold text-[#F5F8FA]',
+                  isMobile && 'text-[20px]',
+                )}
+              >
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
-                onClick={onClose}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onClose()
+                }}
                 className="hover:bg-[#1B456F]/20 rounded-[20px] transition-colors"
                 aria-label="Close modal"
               >
@@ -147,16 +188,20 @@ export const Modal: FC<ModalProps> = ({
 
         <div
           className={cn(
-            'px-6 pb-6 border border-[#1B456F] rounded-[7px] bg-transparent',
+            'mx-6 overflow-y-auto custom-scroll border border-[#1B456F] rounded-[7px] bg-transparent',
             !border && 'border-none',
-            " overflow-y-auto max-h-full pr-2 custom-scroll"
+            'max-h-full pr-2',
           )}
+          onClick={(e) => {
+            // Stop propagation to prevent the content area from closing when clicked
+            e.stopPropagation()
+          }}
         >
           <div className="text-[#F5F8FA]">{children}</div>
         </div>
       </div>
     </div>
-  );
+  )
 
-  return createPortal(modalContent, container || document.body);
-};
+  return createPortal(modalContent, container || document.body)
+}

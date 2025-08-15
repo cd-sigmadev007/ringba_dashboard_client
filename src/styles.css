@@ -1,6 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* Priority color utilities - ensure these are available */
+.bg-priority-highest { background-color: #994141; }
+.bg-priority-high { background-color: #7C5228; }
+.bg-priority-medium { background-color: #B6A11C; }
+.bg-priority-low { background-color: #3B6934; }
+
+.text-priority-highest { color: #994141; }
+.text-priority-high { color: #7C5228; }
+.text-priority-medium { color: #B6A11C; }
+.text-priority-low { color: #3B6934; }
+
+.border-priority-highest { border-color: #994141; }
+.border-priority-high { border-color: #7C5228; }
+.border-priority-medium { border-color: #B6A11C; }
+.border-priority-low { border-color: #3B6934; }
+
 :root {
   /* fonts */
   --font-poppins: Poppins;
@@ -98,6 +114,12 @@
   --success-g-200: #138a00;
   --success-g-100: #daf8d5;
   --error-r-200: #f64e60;
+  
+  /* Priority colors */
+  --priority-highest: #994141;
+  --priority-high: #7C5228;
+  --priority-medium: #B6A11C;
+  --priority-low: #3B6934;
   --color-navbar: #fcfdfd;
   --color-body: #eef3f6;
 

@@ -1,14 +1,14 @@
 // src/layouts/RootLayout.tsx
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { Outlet } from '@tanstack/react-router';
 
-import Styles from '@/styles/index'
 
 // import LoadingBar from 'react-top-loading-bar';
 import Header from './Header';
 import Footer from './Footer';
 import Aside from './Aside';
+import Styles from '@/styles/index'
 
 
 const RootLayout: React.FC = () => {
