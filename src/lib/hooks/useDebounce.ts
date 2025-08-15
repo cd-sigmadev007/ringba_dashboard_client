@@ -2,7 +2,8 @@
  * Custom hooks for debouncing values and callbacks
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type React from 'react'
 
 /**
  * Hook to debounce a value
@@ -11,19 +12,19 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
  * @returns Debounced value
  */
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+    const [debouncedValue, setDebouncedValue] = useState(value)
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value, delay])
 
-  return debouncedValue;
+    return debouncedValue
 }
 
 /**
@@ -33,37 +34,32 @@ export function useDebounce<T>(value: T, delay: number): T {
  * @param deps - Dependencies array
  * @returns Debounced callback function
  */
-export function useDebounceCallback<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number,
-  deps: React.DependencyList = []
+export function useDebounceCallback<T extends (...args: Array<any>) => any>(
+    callback: T,
+    delay: number,
+    deps: React.DependencyList = []
 ): T {
-  // @ts-ignore
-  const timeoutRef = useRef<NodeJS.Timeout>();
+    // @ts-ignore - NodeJS.Timeout type is not available in browser environment
+    const timeoutRef = useRef<NodeJS.Timeout>()
 
-  const debouncedCallback = useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+    const debouncedCallback = useCallback(
+        (...args: Parameters<T>) => {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+                callback(...args)
+            }, delay)
+        },
+        [callback, delay, ...deps]
+    ) as T
 
-      timeoutRef.current = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    },
-    [callback, delay, ...deps]
-  ) as T;
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            clearTimeout(timeoutRef.current)
+        }
+    }, [])
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  return debouncedCallback;
+    return debouncedCallback
 }
 
 /**
@@ -73,24 +69,24 @@ export function useDebounceCallback<T extends (...args: any[]) => any>(
  * @returns Object with debouncedSearchTerm and isSearching state
  */
 export function useDebounceSearch(searchTerm: string, delay: number = 300) {
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  const [isSearching, setIsSearching] = useState(false);
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm)
+    const [isSearching, setIsSearching] = useState(false)
 
-  useEffect(() => {
-    setIsSearching(true);
-    
-    const handler = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setIsSearching(false);
-    }, delay);
+    useEffect(() => {
+        setIsSearching(true)
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm, delay]);
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm)
+            setIsSearching(false)
+        }, delay)
 
-  return {
-    debouncedSearchTerm,
-    isSearching,
-  };
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [searchTerm, delay])
+
+    return {
+        debouncedSearchTerm,
+        isSearching,
+    }
 }

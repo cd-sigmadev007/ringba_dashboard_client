@@ -4,10 +4,10 @@
  */
 
 // UI Components
-export * from './ui';
+export * from './ui'
 
 // Common Components
-export * from './common';
+export * from './common'
 
 // Legacy components (to be migrated)
-export { default as Logo } from './logo';
+export { default as Logo } from './logo'

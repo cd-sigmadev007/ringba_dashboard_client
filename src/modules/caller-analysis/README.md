@@ -39,9 +39,11 @@ caller-analysis/
 ## 🧩 Components
 
 ### Status
+
 **Purpose**: Visual status indicator for call outcomes
 **Props**: `status: string`
-**Features**: 
+**Features**:
+
 - Color-coded status display
 - Theme-aware styling
 - Support for multiple status types
@@ -51,9 +53,11 @@ caller-analysis/
 ```
 
 ### Campaign
+
 **Purpose**: Display campaign type indicators
 **Props**: `campaign: string`
 **Features**:
+
 - Visual icons for H, P, ⚠️ campaign types
 - Theme-aware colors
 - Flexible campaign combinations
@@ -63,40 +67,40 @@ caller-analysis/
 ```
 
 ### FilterPills
+
 **Purpose**: Show applied filters with removal capability
 **Props**: `filters: FilterState`, `onRemoveFilter: RemoveFilterCallbacks`
 **Features**:
+
 - Individual filter removal
 - Formatted display text
 - Theme-consistent styling
 
 ```tsx
-<FilterPills 
-  filters={filters} 
-  onRemoveFilter={removeFilters} 
-/>
+<FilterPills filters={filters} onRemoveFilter={removeFilters} />
 ```
 
 ### FiltersSection
+
 **Purpose**: Container for all filter controls
 **Props**: `filters: FilterState`, `onFiltersChange: FilterChangeCallbacks`
 **Features**:
+
 - Multiple filter types
 - Responsive layout
 - Real-time filtering
 
 ```tsx
-<FiltersSection 
-  filters={filters}
-  onFiltersChange={updateFilters}
-/>
+<FiltersSection filters={filters} onFiltersChange={updateFilters} />
 ```
 
 ## 🎣 Custom Hooks
 
 ### useCallerAnalysis
+
 **Purpose**: Centralized state management and filtering logic
-**Returns**: 
+**Returns**:
+
 - `filters`: Current filter state
 - `filteredData`: Filtered call data
 - `updateFilters`: Filter update functions
@@ -106,6 +110,7 @@ caller-analysis/
 - `totalRecords`: Total data count
 
 **Features**:
+
 - Real-time data filtering
 - Multiple filter types support
 - Optimized re-renders with useMemo
@@ -113,60 +118,65 @@ caller-analysis/
 
 ```tsx
 const {
-  filters,
-  filteredData,
-  updateFilters,
-  removeFilters,
-  clearAllFilters,
-  hasActiveFilters,
-  totalRecords
-} = useCallerAnalysis();
+    filters,
+    filteredData,
+    updateFilters,
+    removeFilters,
+    clearAllFilters,
+    hasActiveFilters,
+    totalRecords,
+} = useCallerAnalysis()
 ```
 
 ### useTableColumns
+
 **Purpose**: Table column definitions and cell renderers
 **Returns**: `ColumnDef<CallData>[]`
 **Features**:
+
 - Responsive column layouts
 - Custom cell renderers
 - Theme-aware styling
 - Action button integration
 
 ```tsx
-const columns = useTableColumns();
+const columns = useTableColumns()
 ```
 
 ## 📊 Data Types
 
 ### CallData
+
 ```typescript
 interface CallData {
-  id: string;
-  callerId: string;
-  lastCall: string;
-  duration: string;
-  lifetimeRevenue: number;
-  campaign: string;
-  action: string;
-  status: string;
+    id: string
+    callerId: string
+    lastCall: string
+    duration: string
+    lifetimeRevenue: number
+    campaign: string
+    action: string
+    status: string
 }
 ```
 
 ### FilterState
+
 ```typescript
 interface FilterState {
-  dateRange: { from?: Date; to?: Date };
-  campaignFilter: string[];
-  statusFilter: string[];
-  durationFilter: string;
-  durationRange: { min?: number; max?: number };
-  searchQuery: string;
+    dateRange: { from?: Date; to?: Date }
+    campaignFilter: string[]
+    statusFilter: string[]
+    durationFilter: string
+    durationRange: { min?: number; max?: number }
+    searchQuery: string
 }
 ```
 
 ## 🔧 Utilities
 
 ### Filter Functions
+
 - `parseDuration(duration: string): number` - Convert duration string to seconds
 - `matchesCampaignFilter(campaign, filters)` - Campaign filter logic
 - `matchesStatusFilter(status, filters)` - Status filter logic
@@ -176,6 +186,7 @@ interface FilterState {
 ## 🎯 Features
 
 ### Advanced Filtering
+
 - **Multiple Selection**: Campaign and Status filters support multiple values
 - **Date Range**: Calendar-based date filtering
 - **Duration Range**: Min/max duration filtering with custom input
@@ -183,18 +194,21 @@ interface FilterState {
 - **Real-time**: Instant filtering as users interact
 
 ### Filter Pills
+
 - **Visual Feedback**: Applied filters shown as removable pills
 - **Individual Removal**: Click X to remove specific filters
 - **Formatted Display**: Human-readable filter descriptions
 - **Theme Integration**: Consistent with design system
 
 ### Data Visualization
+
 - **Status Badges**: Color-coded call status indicators
 - **Campaign Icons**: Visual campaign type representation
 - **Revenue Charts**: Lifetime revenue progress bars
 - **Action Buttons**: Quick access to call actions
 
 ### Responsive Design
+
 - **Mobile First**: Optimized for mobile devices
 - **Flexible Layout**: Adapts to different screen sizes
 - **Touch Friendly**: Large touch targets for mobile
@@ -203,43 +217,46 @@ interface FilterState {
 ## 🚀 Usage
 
 ### Basic Implementation
+
 ```tsx
-import { CallerAnalysisPage } from '@/modules/caller-analysis';
+import { CallerAnalysisPage } from '@/modules/caller-analysis'
 
 // Use in routing
 const routes = [
-  {
-    path: '/caller-analysis',
-    component: CallerAnalysisPage
-  }
-];
+    {
+        path: '/caller-analysis',
+        component: CallerAnalysisPage,
+    },
+]
 ```
 
 ### Custom Implementation
+
 ```tsx
-import { 
-  CallerAnalysisContainer,
-  useCallerAnalysis,
-  Status 
-} from '@/modules/caller-analysis';
+import {
+    CallerAnalysisContainer,
+    useCallerAnalysis,
+    Status,
+} from '@/modules/caller-analysis'
 
 // Use components individually
 function CustomAnalysis() {
-  const { filteredData } = useCallerAnalysis();
-  
-  return (
-    <div>
-      {filteredData.map(call => (
-        <Status key={call.id} status={call.status} />
-      ))}
-    </div>
-  );
+    const { filteredData } = useCallerAnalysis()
+
+    return (
+        <div>
+            {filteredData.map((call) => (
+                <Status key={call.id} status={call.status} />
+            ))}
+        </div>
+    )
 }
 ```
 
 ## 🧪 Testing
 
 ### Component Tests
+
 ```bash
 # Test individual components
 npm test Status
@@ -247,6 +264,7 @@ npm test FilterPills
 ```
 
 ### Hook Tests
+
 ```bash
 # Test custom hooks
 npm test useCallerAnalysis
@@ -254,6 +272,7 @@ npm test useTableColumns
 ```
 
 ### Integration Tests
+
 ```bash
 # Test full module
 npm test caller-analysis
@@ -309,6 +328,7 @@ UI Update
 ## 📝 Changelog
 
 ### v1.0.0
+
 - Initial modular implementation
 - Advanced filtering system
 - Responsive design

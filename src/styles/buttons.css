@@ -1,39 +1,38 @@
 @reference "tailwindcss";
 @layer components {
+    .custom-btn {
+        @apply transition-all duration-100 ease-in;
+    }
 
-  .custom-btn {
-    @apply transition-all duration-100 ease-in;
-  }
+    .theme-dark .statics-btn {
+        @apply bg-[#1B456F] text-[#F5F8FA] active:bg-[#007FFF] border-transparent;
+    }
 
-  .theme-dark .statics-btn {
-    @apply bg-[#1B456F] text-[#F5F8FA] active:bg-[#007FFF] border-transparent;
-  }
+    .theme-light .statics-btn {
+        @apply bg-transparent text-[#007FFF] active:bg-[#007FFF] active:text-[#F5F8FA] border-[#007FFF];
+    }
 
-  .theme-light .statics-btn {
-    @apply bg-transparent text-[#007FFF] active:bg-[#007FFF] active:text-[#F5F8FA] border-[#007FFF];
-  }
+    .statics-btn .icon {
+        @apply transition-all duration-100 ease-in;
+    }
 
-  .statics-btn .icon {
-    @apply transition-all duration-100 ease-in;
-  }
+    .theme-dark .statics-btn .icon {
+        @apply fill-[#F5F8FA];
+    }
 
-  .theme-dark .statics-btn .icon {
-    @apply fill-[#F5F8FA];
-  }
+    .theme-light .statics-btn .icon {
+        @apply fill-[#007FFF] group-active:fill-[#F5F8FA];
+    }
 
-  .theme-light .statics-btn .icon {
-    @apply fill-[#007FFF] group-active:fill-[#F5F8FA];
-  }
+    .theme-light .statics-btn:active .icon {
+        @apply fill-[#F5F8FA];
+    }
 
-  .theme-light .statics-btn:active .icon {
-    @apply fill-[#F5F8FA];
-  }
+    .theme-dark .option-btn-selected {
+        @apply text-[#F5F8FA] !border-[#007FFF] bg-[#002B57];
+    }
 
-  .theme-dark .option-btn-selected {
-    @apply text-[#F5F8FA] !border-[#007FFF] bg-[#002B57];
-  }
-
-  .theme-light .option-btn-selected {
-    @apply text-[#007FFF] !border-[#007FFF] bg-[#F0F5FF];
-  }
+    .theme-light .option-btn-selected {
+        @apply text-[#007FFF] !border-[#007FFF] bg-[#F0F5FF];
+    }
 }

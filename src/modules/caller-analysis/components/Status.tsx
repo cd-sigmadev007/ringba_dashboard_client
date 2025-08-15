@@ -1,98 +1,122 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import type { StatusItem } from '@/modules'
+import {
+    PRIORITY_COLORS,
+    PRIORITY_INLINE_STYLES,
+    Priority,
+    STATUS_PRIORITY_MAP,
+} from '@/modules'
 import { cn } from '@/lib'
-
-// Priority enum
-export enum Priority {
-  LOW = 0,
-  MEDIUM = 1,
-  HIGH = 2,
-  HIGHEST = 3,
-}
-
-// Priority Tailwind color mapping
-const priorityColors: Record<Priority, string> = {
-  [Priority.HIGHEST]: 'bg-priority-highest text-white', // highest = red
-  [Priority.HIGH]: 'bg-priority-high text-white', // high = orange/brown
-  [Priority.MEDIUM]: 'bg-priority-medium text-white', // medium = yellow
-  [Priority.LOW]: 'bg-priority-low text-white', // low = green
-}
-
-// Priority inline styles as fallback
-const priorityInlineStyles: Record<Priority, React.CSSProperties> = {
-  [Priority.HIGHEST]: { backgroundColor: '#994141', color: 'white' },
-  [Priority.HIGH]: { backgroundColor: '#7C5228', color: 'white' },
-  [Priority.MEDIUM]: { backgroundColor: '#B6A11C', color: 'white' },
-  [Priority.LOW]: { backgroundColor: '#3B6934', color: 'white' },
-}
-
-// Priority label mapping
-const priorityLabels: Record<Priority, string> = {
-  [Priority.HIGHEST]: 'Highest',
-  [Priority.HIGH]: 'High',
-  [Priority.MEDIUM]: 'Medium',
-  [Priority.LOW]: 'Low',
-}
-
-// Status to priority mapping
-export const statusPriorityMap: Record<string, Priority> = {
-  'High-Quality Un-billed (Critical)': Priority.HIGHEST,
-  'Chargeback Risk (Critical)': Priority.HIGHEST,
-  'Wrong Appliance Category': Priority.HIGH,
-  'Wrong Pest Control Category': Priority.HIGH,
-  'Short Call (<90s)': Priority.HIGH,
-  'Buyer Hung Up': Priority.HIGH,
-  'Immediate Hangup (<10s)': Priority.HIGH,
-  'No Coverage (ZIP)': Priority.HIGH,
-  'Competitor Mentioned': Priority.MEDIUM,
-  'Booking Intent': Priority.MEDIUM,
-  'Warranty/Status Inquiry': Priority.MEDIUM,
-  'Positive Sentiment': Priority.LOW,
-  'Negative Sentiment': Priority.LOW,
-  'Repeat Customer': Priority.LOW,
-  'Technical Terms Used': Priority.LOW,
-}
+import Tooltip from '../../../components/common/Tooltip'
 
 export interface StatusProps {
-  status: Array<Map<string, string>> | string
-  truncate?: boolean
-  enablePillOverflow?: boolean
+    status:
+    | Array<Map<string, string>>
+    | string
+    | Array<string>
+    | Array<StatusItem>
+    truncate?: boolean
+    enablePillOverflow?: boolean
+    sortByPriority?: boolean
+    sortDirection?: 'asc' | 'desc'
+}
+
+// Simple utility functions to avoid import issues
+const createStatusItem = (status: string, id?: string): StatusItem => ({
+    id: id || `status-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    title: status,
+    priority: STATUS_PRIORITY_MAP[status] ?? Priority.LOW,
+})
+
+const sortByPriority = <T extends { priority: Priority }>(
+    items: Array<T>
+): Array<T> => {
+    return [...items].sort((a, b) => b.priority - a.priority)
 }
 
 export const Status: React.FC<StatusProps> = ({
-                                                status,
-                                                truncate = true,
-                                                enablePillOverflow = false,
-                                              }) => {
-  // Convert status to array if it's a string
-  const statusArray = typeof status === 'string' ? [status] : Array.from(status)
+    status,
+    truncate = false,
+    enablePillOverflow = false,
+    sortByPriority: shouldSort = true,
+    sortDirection = 'desc',
+}) => {
+    // Convert and process status data
+    const processedStatusItems = useMemo((): Array<StatusItem> => {
+        if (Array.isArray(status)) {
+            if (status.length === 0) return []
 
-  return (
-    <div className={cn('flex gap-2', enablePillOverflow && 'overflow-x-auto')}>
-      {statusArray.map((tag, index) => {
-        const tagString = typeof tag === 'string' ? tag : tag.get('title') || ''
-        const priority = statusPriorityMap[tagString] ?? Priority.LOW
-        const colorClasses = priorityColors[priority]
-        const inlineStyles = priorityInlineStyles[priority]
+            const firstItem = status[0]
 
-        // Debug logging
-        console.log('Status tag:', tagString, 'Priority:', priority, 'Classes:', colorClasses, 'Styles:', inlineStyles)
+            // If it's already StatusItem array
+            if (typeof firstItem === 'object' && 'priority' in firstItem) {
+                return status as Array<StatusItem>
+            }
+            // If it's string array, convert to StatusItem
+            if (typeof firstItem === 'string') {
+                return status.map((tag, index) =>
+                    createStatusItem(tag as string, `status-${index}`)
+                )
+            }
+            // If it's Map array, convert to StatusItem
+            if (firstItem instanceof Map) {
+                return status.map((tag, index) => {
+                    const tagString =
+                        (tag as Map<string, string>).get('title') || ''
+                    return createStatusItem(tagString, `status-${index}`)
+                })
+            }
+        }
 
-        return (
-          <span
+        // If it's a string, convert to single StatusItem array
+        if (typeof status === 'string') {
+            return [createStatusItem(status)]
+        }
+
+        // Fallback: empty array
+        return []
+    }, [status])
+
+    // Sort by priority if requested
+    const sortedStatusItems = useMemo(() => {
+        if (!shouldSort) return processedStatusItems
+
+        return sortDirection === 'desc'
+            ? sortByPriority(processedStatusItems)
+            : processedStatusItems.sort((a, b) => a.priority - b.priority)
+    }, [processedStatusItems, shouldSort, sortDirection])
+
+    return (
+        <div
             className={cn(
-              'flex items-center px-2 py-1 rounded-[13px] text-xs whitespace-nowrap',
-              colorClasses,
-              truncate && 'truncate'
+                'flex gap-2 max-w-full overflow-hidden',
+                enablePillOverflow && 'overflow-x-auto'
             )}
-            style={inlineStyles}
-            key={index}
-          >
-            {tagString}
-          </span>
-        )
-      })}
-    </div>
-  )
+        >
+            {sortedStatusItems.map((statusItem) => {
+                const { id, title, priority } = statusItem
+                const colorClasses = PRIORITY_COLORS[priority]
+                const inlineStyles = PRIORITY_INLINE_STYLES[priority]
+
+                return (
+                    <span
+                        key={id}
+                        className={cn(
+                            'flex items-center px-2 py-1 rounded-[13px] text-xs whitespace-nowrap flex-shrink-0',
+                            colorClasses,
+                            truncate && 'truncate'
+                        )}
+                        style={inlineStyles}
+                        title={`Priority: ${priority}`}
+                    >
+                        <Tooltip id={id} tooltipText={title}>
+                            {truncate ? title.slice(0, 8) + '...' : title}
+                        </Tooltip>
+                    </span>
+                )
+            })}
+        </div>
+    )
 }
 
 export default Status

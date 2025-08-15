@@ -2,7 +2,7 @@
  * Custom hook for detecting clicks outside of an element
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'
 
 /**
  * Hook that triggers a callback when clicking outside of the referenced element
@@ -10,24 +10,24 @@ import { useEffect, useRef } from 'react';
  * @returns Ref to attach to the element
  */
 export function useClickOutside<T extends HTMLElement = HTMLElement>(
-  callback: () => void
+    callback: () => void
 ): React.RefObject<T | null> {
-  const ref = useRef<T>(null);
+    const ref = useRef<T>(null)
 
-  useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        callback();
-      }
-    };
+    useEffect(() => {
+        const handleClick = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                callback()
+            }
+        }
 
-    document.addEventListener('mousedown', handleClick);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, [callback]);
+        document.addEventListener('mousedown', handleClick)
+        return () => {
+            document.removeEventListener('mousedown', handleClick)
+        }
+    }, [callback])
 
-  return ref;
+    return ref
 }
 
 /**
@@ -35,21 +35,24 @@ export function useClickOutside<T extends HTMLElement = HTMLElement>(
  * @param callback - Function to call when escape is pressed
  * @param enabled - Whether the hook is enabled (default: true)
  */
-export function useEscapeKey(callback: () => void, enabled: boolean = true): void {
-  useEffect(() => {
-    if (!enabled) return;
+export function useEscapeKey(
+    callback: () => void,
+    enabled: boolean = true
+): void {
+    useEffect(() => {
+        if (!enabled) return
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        callback();
-      }
-    };
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                callback()
+            }
+        }
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [callback, enabled]);
+        document.addEventListener('keydown', handleKeyDown)
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [callback, enabled])
 }
 
 /**
@@ -59,11 +62,11 @@ export function useEscapeKey(callback: () => void, enabled: boolean = true): voi
  * @returns Ref to attach to the element
  */
 export function useCloseOnOutsideClick<T extends HTMLElement = HTMLElement>(
-  callback: () => void,
-  enabled: boolean = true
+    callback: () => void,
+    enabled: boolean = true
 ): React.RefObject<T | null> {
-  const ref = useClickOutside<T>(enabled ? callback : () => {});
-  useEscapeKey(callback, enabled);
-  
-  return ref;
+    const ref = useClickOutside<T>(enabled ? callback : () => {})
+    useEscapeKey(callback, enabled)
+
+    return ref
 }

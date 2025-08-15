@@ -8,8 +8,8 @@
  * @returns Boolean indicating if email is valid
  */
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
 }
 
 /**
@@ -18,9 +18,9 @@ export function isValidEmail(email: string): boolean {
  * @returns Boolean indicating if address format is valid
  */
 export function isValidWalletAddress(address: string): boolean {
-  // Basic Ethereum address validation (0x followed by 40 hex characters)
-  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-  return ethAddressRegex.test(address);
+    // Basic Ethereum address validation (0x followed by 40 hex characters)
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/
+    return ethAddressRegex.test(address)
 }
 
 /**
@@ -29,12 +29,12 @@ export function isValidWalletAddress(address: string): boolean {
  * @returns Boolean indicating if URL is valid
  */
 export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
+    try {
+        new URL(url)
+        return true
+    } catch {
+        return false
+    }
 }
 
 /**
@@ -43,8 +43,8 @@ export function isValidUrl(url: string): boolean {
  * @returns Boolean indicating if phone number is valid
  */
 export function isValidPhone(phone: string): boolean {
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-  return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+    const phoneRegex = /^[+]?[1-9]\d{0,15}$/
+    return phoneRegex.test(phone.replace(/[\s\-()]/g, ''))
 }
 
 /**
@@ -53,52 +53,52 @@ export function isValidPhone(phone: string): boolean {
  * @returns Object with validation results
  */
 export function validatePassword(password: string): {
-  isValid: boolean;
-  errors: string[];
-  strength: 'weak' | 'medium' | 'strong';
+    isValid: boolean
+    errors: Array<string>
+    strength: 'weak' | 'medium' | 'strong'
 } {
-  const errors: string[] = [];
-  let score = 0;
+    const errors: Array<string> = []
+    let score = 0
 
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
-  } else {
-    score += 1;
-  }
+    if (password.length < 8) {
+        errors.push('Password must be at least 8 characters long')
+    } else {
+        score += 1
+    }
 
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  } else {
-    score += 1;
-  }
+    if (!/[a-z]/.test(password)) {
+        errors.push('Password must contain at least one lowercase letter')
+    } else {
+        score += 1
+    }
 
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  } else {
-    score += 1;
-  }
+    if (!/[A-Z]/.test(password)) {
+        errors.push('Password must contain at least one uppercase letter')
+    } else {
+        score += 1
+    }
 
-  if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  } else {
-    score += 1;
-  }
+    if (!/\d/.test(password)) {
+        errors.push('Password must contain at least one number')
+    } else {
+        score += 1
+    }
 
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  } else {
-    score += 1;
-  }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        errors.push('Password must contain at least one special character')
+    } else {
+        score += 1
+    }
 
-  let strength: 'weak' | 'medium' | 'strong' = 'weak';
-  if (score >= 4) strength = 'strong';
-  else if (score >= 2) strength = 'medium';
+    let strength: 'weak' | 'medium' | 'strong' = 'weak'
+    if (score >= 4) strength = 'strong'
+    else if (score >= 2) strength = 'medium'
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-    strength,
-  };
+    return {
+        isValid: errors.length === 0,
+        errors,
+        strength,
+    }
 }
 
 /**
@@ -108,10 +108,10 @@ export function validatePassword(password: string): {
  * @returns Error message or null if valid
  */
 export function validateRequired(value: any, fieldName: string): string | null {
-  if (value === null || value === undefined || value === '') {
-    return `${fieldName} is required`;
-  }
-  return null;
+    if (value === null || value === undefined || value === '') {
+        return `${fieldName} is required`
+    }
+    return null
 }
 
 /**
@@ -122,14 +122,14 @@ export function validateRequired(value: any, fieldName: string): string | null {
  * @returns Error message or null if valid
  */
 export function validateMinLength(
-  value: string,
-  minLength: number,
-  fieldName: string
+    value: string,
+    minLength: number,
+    fieldName: string
 ): string | null {
-  if (value.length < minLength) {
-    return `${fieldName} must be at least ${minLength} characters long`;
-  }
-  return null;
+    if (value.length < minLength) {
+        return `${fieldName} must be at least ${minLength} characters long`
+    }
+    return null
 }
 
 /**
@@ -140,14 +140,14 @@ export function validateMinLength(
  * @returns Error message or null if valid
  */
 export function validateMaxLength(
-  value: string,
-  maxLength: number,
-  fieldName: string
+    value: string,
+    maxLength: number,
+    fieldName: string
 ): string | null {
-  if (value.length > maxLength) {
-    return `${fieldName} must not exceed ${maxLength} characters`;
-  }
-  return null;
+    if (value.length > maxLength) {
+        return `${fieldName} must not exceed ${maxLength} characters`
+    }
+    return null
 }
 
 /**
@@ -156,11 +156,14 @@ export function validateMaxLength(
  * @param fieldName - Name of the field for error message
  * @returns Error message or null if valid
  */
-export function validateNumeric(value: string, fieldName: string): string | null {
-  if (isNaN(Number(value))) {
-    return `${fieldName} must be a valid number`;
-  }
-  return null;
+export function validateNumeric(
+    value: string,
+    fieldName: string
+): string | null {
+    if (isNaN(Number(value))) {
+        return `${fieldName} must be a valid number`
+    }
+    return null
 }
 
 /**
@@ -171,14 +174,14 @@ export function validateNumeric(value: string, fieldName: string): string | null
  * @returns Error message or null if valid
  */
 export function validateMinValue(
-  value: number,
-  minValue: number,
-  fieldName: string
+    value: number,
+    minValue: number,
+    fieldName: string
 ): string | null {
-  if (value < minValue) {
-    return `${fieldName} must be at least ${minValue}`;
-  }
-  return null;
+    if (value < minValue) {
+        return `${fieldName} must be at least ${minValue}`
+    }
+    return null
 }
 
 /**
@@ -189,12 +192,12 @@ export function validateMinValue(
  * @returns Error message or null if valid
  */
 export function validateMaxValue(
-  value: number,
-  maxValue: number,
-  fieldName: string
+    value: number,
+    maxValue: number,
+    fieldName: string
 ): string | null {
-  if (value > maxValue) {
-    return `${fieldName} must not exceed ${maxValue}`;
-  }
-  return null;
+    if (value > maxValue) {
+        return `${fieldName} must not exceed ${maxValue}`
+    }
+    return null
 }

@@ -109,20 +109,22 @@ modules/caller-analysis/
 ### Adding a New Module
 
 1. **Create module directory structure**:
-   ```bash
-   mkdir -p src/modules/[module-name]/{components,containers,hooks,pages,data,utils,types}
-   ```
+
+    ```bash
+    mkdir -p src/modules/[module-name]/{components,containers,hooks,pages,data,utils,types}
+    ```
 
 2. **Create index files**:
-   ```bash
-   touch src/modules/[module-name]/{components,containers,hooks,pages}/index.ts
-   touch src/modules/[module-name]/index.ts
-   ```
+
+    ```bash
+    touch src/modules/[module-name]/{components,containers,hooks,pages}/index.ts
+    touch src/modules/[module-name]/index.ts
+    ```
 
 3. **Follow the established patterns**:
-   - Use the caller-analysis module as a reference
-   - Maintain consistent naming conventions
-   - Export everything through index files
+    - Use the caller-analysis module as a reference
+    - Maintain consistent naming conventions
+    - Export everything through index files
 
 ### Development Workflow
 
@@ -136,16 +138,19 @@ modules/caller-analysis/
 ## 🧪 Testing Strategy
 
 ### Component Testing
+
 - Test components in isolation
 - Mock external dependencies
 - Focus on user interactions
 
 ### Hook Testing
+
 - Test custom hooks with `@testing-library/react-hooks`
 - Verify state changes and side effects
 - Mock external dependencies
 
 ### Utility Testing
+
 - Unit test pure functions
 - Test edge cases and error handling
 - Maintain high coverage
@@ -153,6 +158,7 @@ modules/caller-analysis/
 ## 📦 Dependencies
 
 ### Core Dependencies
+
 - **React 18**: UI library
 - **TypeScript**: Type safety
 - **TanStack Router**: Routing
@@ -162,6 +168,7 @@ modules/caller-analysis/
 - **Zustand**: State management
 
 ### Development Dependencies
+
 - **Vite**: Build tool
 - **ESLint**: Code linting
 - **Prettier**: Code formatting

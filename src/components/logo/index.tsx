@@ -1,10 +1,10 @@
-import { type FC } from 'react';
-import { useThemeStore } from '../../store/themeStore';
+import { useThemeStore } from '../../store/themeStore'
+import type { FC } from 'react'
 import { DarkLogo, LightLogo } from '@/assets/svg'
 
 const Logo: FC = () => {
-    const { theme } = useThemeStore();
-    const isDark = theme === 'dark';
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
     return (
         <div>
             {isDark ? (
@@ -13,7 +13,7 @@ const Logo: FC = () => {
                 <LightLogo className="h-8 w-auto" />
             )}
         </div>
-    );
-};
+    )
+}
 
-export default Logo;
+export default Logo

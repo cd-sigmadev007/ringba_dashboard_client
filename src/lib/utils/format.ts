@@ -10,14 +10,14 @@
  * @returns Formatted address string
  */
 export function formatAddress(
-  address: string,
-  startChars: number = 6,
-  endChars: number = 4
+    address: string,
+    startChars: number = 6,
+    endChars: number = 4
 ): string {
-  if (!address) return '';
-  if (address.length <= startChars + endChars) return address;
-  
-  return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
+    if (!address) return ''
+    if (address.length <= startChars + endChars) return address
+
+    return `${address.slice(0, startChars)}...${address.slice(-endChars)}`
 }
 
 /**
@@ -28,14 +28,14 @@ export function formatAddress(
  * @returns Formatted number string
  */
 export function formatNumber(
-  value: number,
-  decimals: number = 2,
-  locale: string = 'en-US'
+    value: number,
+    decimals: number = 2,
+    locale: string = 'en-US'
 ): string {
-  return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
+    return new Intl.NumberFormat(locale, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    }).format(value)
 }
 
 /**
@@ -46,14 +46,14 @@ export function formatNumber(
  * @returns Formatted currency string
  */
 export function formatCurrency(
-  value: number,
-  currency: string = 'USD',
-  locale: string = 'en-US'
+    value: number,
+    currency: string = 'USD',
+    locale: string = 'en-US'
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(value);
+    return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+    }).format(value)
 }
 
 /**
@@ -64,16 +64,16 @@ export function formatCurrency(
  * @returns Formatted date string
  */
 export function formatDate(
-  date: Date | string,
-  options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  },
-  locale: string = 'en-US'
+    date: Date | string,
+    options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    },
+    locale: string = 'en-US'
 ): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return new Intl.DateTimeFormat(locale, options).format(dateObj);
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    return new Intl.DateTimeFormat(locale, options).format(dateObj)
 }
 
 /**
@@ -83,28 +83,28 @@ export function formatDate(
  * @returns Formatted relative time string
  */
 export function formatRelativeTime(
-  date: Date | string,
-  locale: string = 'en-US'
+    date: Date | string,
+    locale: string = 'en-US'
 ): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000)
 
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+    const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
 
-  if (diffInSeconds < 60) {
-    return rtf.format(-diffInSeconds, 'second');
-  } else if (diffInSeconds < 3600) {
-    return rtf.format(-Math.floor(diffInSeconds / 60), 'minute');
-  } else if (diffInSeconds < 86400) {
-    return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour');
-  } else if (diffInSeconds < 2592000) {
-    return rtf.format(-Math.floor(diffInSeconds / 86400), 'day');
-  } else if (diffInSeconds < 31536000) {
-    return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month');
-  } else {
-    return rtf.format(-Math.floor(diffInSeconds / 31536000), 'year');
-  }
+    if (diffInSeconds < 60) {
+        return rtf.format(-diffInSeconds, 'second')
+    } else if (diffInSeconds < 3600) {
+        return rtf.format(-Math.floor(diffInSeconds / 60), 'minute')
+    } else if (diffInSeconds < 86400) {
+        return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour')
+    } else if (diffInSeconds < 2592000) {
+        return rtf.format(-Math.floor(diffInSeconds / 86400), 'day')
+    } else if (diffInSeconds < 31536000) {
+        return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month')
+    } else {
+        return rtf.format(-Math.floor(diffInSeconds / 31536000), 'year')
+    }
 }
 
 /**
@@ -113,8 +113,8 @@ export function formatRelativeTime(
  * @returns Capitalized string
  */
 export function capitalize(str: string): string {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    if (!str) return ''
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 /**
@@ -123,10 +123,10 @@ export function capitalize(str: string): string {
  * @returns Title case string
  */
 export function toTitleCase(str: string): string {
-  return str
-    .split(' ')
-    .map(word => capitalize(word))
-    .join(' ');
+    return str
+        .split(' ')
+        .map((word) => capitalize(word))
+        .join(' ')
 }
 
 /**
@@ -137,10 +137,10 @@ export function toTitleCase(str: string): string {
  * @returns Truncated text
  */
 export function truncateText(
-  text: string,
-  maxLength: number,
-  suffix: string = '...'
+    text: string,
+    maxLength: number,
+    suffix: string = '...'
 ): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - suffix.length) + suffix;
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength - suffix.length) + suffix
 }

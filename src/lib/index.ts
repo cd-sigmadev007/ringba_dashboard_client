@@ -4,13 +4,13 @@
  */
 
 // Types
-export * from './types';
+export * from './types'
 
 // Utilities
-export * from './utils';
+export * from './utils'
 
 // Hooks
-export * from './hooks';
+export * from './hooks'
 
 // Constants
-export * from './constants';
+export * from './constants'

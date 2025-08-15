@@ -1,11 +1,10 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
-  RouterProvider,
-  createRootRoute,
-  createRouter,
+    RouterProvider,
+    createRootRoute,
+    createRouter,
 } from '@tanstack/react-router'
-import TableDemo from './routes/demo.table.tsx'
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 
@@ -16,47 +15,48 @@ import reportWebVitals from './reportWebVitals.ts'
 import RootLayout from './layout/Index.tsx'
 
 // Initialize theme on app startup
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.classList.add(savedTheme === 'dark' ? 'theme-dark' : 'theme-light');
+const savedTheme = localStorage.getItem('theme') || 'light'
+document.documentElement.classList.add(
+    savedTheme === 'dark' ? 'theme-dark' : 'theme-light'
+)
 
 const rootRoute = createRootRoute({
-  component: RootLayout,
+    component: RootLayout,
 })
 
 const routeTree = rootRoute.addChildren([
-  TableDemo(rootRoute),
-  TanStackQueryDemo(rootRoute),
-  CallerAnalysis(rootRoute),
+    TanStackQueryDemo(rootRoute),
+    CallerAnalysis(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 const router = createRouter({
-  routeTree,
-  context: {
-    ...TanStackQueryProviderContext,
-  },
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
+    routeTree,
+    context: {
+        ...TanStackQueryProviderContext,
+    },
+    defaultPreload: 'intent',
+    scrollRestoration: true,
+    defaultStructuralSharing: true,
+    defaultPreloadStaleTime: 0,
 })
 
 declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+    interface Register {
+        router: typeof router
+    }
 }
 
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
-    <StrictMode>
-      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
-      </TanStackQueryProvider.Provider>
-    </StrictMode>,
-  )
+    const root = ReactDOM.createRoot(rootElement)
+    root.render(
+        <StrictMode>
+            <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+                <RouterProvider router={router} />
+            </TanStackQueryProvider.Provider>
+        </StrictMode>
+    )
 }
 
 // If you want to start measuring performance in your app, pass a function

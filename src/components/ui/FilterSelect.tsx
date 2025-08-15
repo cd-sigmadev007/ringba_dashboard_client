@@ -3,28 +3,24 @@ import { twMerge } from 'tailwind-merge'
 import clsx from 'clsx'
 import { get, isEqual } from 'lodash'
 import { Modal } from './Modal'
-import { cn, useClickOutside, useIsMobile  } from '@/lib'
-import { useThemeStore } from '@/store/themeStore.ts'
-import {
-  CheckboxIcon,
-  ChevronDownDark,
-  ChevronDownLight,
-} from '@/assets/svg'
+import { cn, useClickOutside, useIsMobile } from '@/lib'
+import { useThemeStore } from '@/store/themeStore'
+import { CheckboxIcon, ChevronDownDark, ChevronDownLight } from '@/assets/svg'
 
 export interface SelectOption {
-  title: string
-  value: string
-  icon?: string
-  soon?: boolean
+    title: string
+    value: string
+    icon?: string
+    soon?: boolean
 }
 
 interface FilterSelectProps {
-  className?: string
-  defaultValue?: SelectOption
-  filterList?: Array<SelectOption>
-  setFilter?: (value: string | Array<string>) => void
-  multiple?: boolean
-  selectedValues?: Array<string>
+    className?: string
+    defaultValue?: SelectOption
+    filterList?: Array<SelectOption>
+    setFilter?: (value: string | Array<string>) => void
+    multiple?: boolean
+    selectedValues?: Array<string>
 }
 
 /**
@@ -32,235 +28,245 @@ interface FilterSelectProps {
  * It respects the global theme and semantic Tailwind colour tokens defined in `tailwind.config.ts`.
  */
 const FilterSelect: React.FC<FilterSelectProps> = ({
-  className,
-  defaultValue = { title: '', value: '' },
-  filterList = [{ title: '', value: '' }],
-  setFilter = () => undefined,
-  multiple = false,
-  selectedValues = [],
+    className,
+    defaultValue = { title: '', value: '' },
+    filterList = [{ title: '', value: '' }],
+    setFilter = () => undefined,
+    multiple = false,
+    selectedValues = [],
 }) => {
-  const [openSelect, setOpenSelect] = useState(false)
-  const [selected, setSelected] = useState<SelectOption>(defaultValue)
-  const [multiSelected, setMultiSelected] = useState<Array<string>>(selectedValues)
-  const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>(
-    'bottom',
-  )
-  const theme = useThemeStore((s) => s.theme) // 'dark' | 'light'
-  const isMobile = useIsMobile()
-  const selectRef = useClickOutside<HTMLDivElement>(() => {
-    // Only close on click outside for desktop (when not using mobile modal)
-    if (!isMobile) {
-      setOpenSelect(false)
+    const [openSelect, setOpenSelect] = useState(false)
+    const [selected, setSelected] = useState<SelectOption>(defaultValue)
+    const [multiSelected, setMultiSelected] =
+        useState<Array<string>>(selectedValues)
+    const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>(
+        'bottom'
+    )
+    const theme = useThemeStore((s) => s.theme) // 'dark' | 'light'
+    const isMobile = useIsMobile()
+    const selectRef = useClickOutside<HTMLDivElement>(() => {
+        // Only close on click outside for desktop (when not using mobile modal)
+        if (!isMobile) {
+            setOpenSelect(false)
+        }
+    })
+
+    // Check available space and position dropdown accordingly
+    useEffect(() => {
+        if (openSelect && !isMobile && selectRef.current) {
+            const rect = selectRef.current.getBoundingClientRect()
+            const spaceBelow = window.innerHeight - rect.bottom
+            const spaceAbove = rect.top
+            const dropdownHeight = Math.min(filterList.length * 40 + 20, 320) // Approximate height
+
+            if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+                setDropdownPosition('top')
+            } else {
+                setDropdownPosition('bottom')
+            }
+        }
+    }, [openSelect, isMobile, filterList.length])
+
+    useEffect(() => {
+        if (!multiple) {
+            setOpenSelect(false)
+            setFilter(get(selected, 'value'))
+        }
+    }, [selected])
+
+    useEffect(() => {
+        if (multiple) {
+            setFilter(multiSelected)
+        }
+    }, [multiSelected])
+
+    const handleOptionClick = (option: SelectOption) => {
+        if (multiple) {
+            const newSelected = multiSelected.includes(option.value)
+                ? multiSelected.filter((v) => v !== option.value)
+                : [...multiSelected, option.value]
+            setMultiSelected(newSelected)
+        } else {
+            setSelected(option)
+            setOpenSelect(false)
+        }
     }
-  })
 
-  // Check available space and position dropdown accordingly
-  useEffect(() => {
-    if (openSelect && !isMobile && selectRef.current) {
-      const rect = selectRef.current.getBoundingClientRect()
-      const spaceBelow = window.innerHeight - rect.bottom
-      const spaceAbove = rect.top
-      const dropdownHeight = Math.min(filterList.length * 40 + 20, 320) // Approximate height
-
-      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-        setDropdownPosition('top')
-      } else {
-        setDropdownPosition('bottom')
-      }
+    const getDisplayText = () => {
+        if (multiple) {
+            if (multiSelected.length === 0) return defaultValue.title
+            if (multiSelected.length === 1) {
+                const option = filterList.find(
+                    (opt) => opt.value === multiSelected[0]
+                )
+                return option?.title || defaultValue.title
+            }
+            return `${multiSelected.length} selected`
+        }
+        return selected.title
     }
-  }, [openSelect, isMobile, filterList.length])
 
-  useEffect(() => {
-    if (!multiple) {
-      setOpenSelect(false)
-      setFilter(get(selected, 'value'))
-    }
-  }, [selected])
+    /**
+     * Helpers – colour classes based on current theme.
+     */
+    const isDark = theme === 'dark'
 
-  useEffect(() => {
-    if (multiple) {
-      setFilter(multiSelected)
-    }
-  }, [multiSelected])
+    // Main trigger styles
+    const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
+    const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+    const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
+    const triggerBorderClosed = 'border-transparent'
+    const triggerHover = isDark
+        ? 'hover:border-[#007FFF]'
+        : 'hover:border-[#007FFF]'
 
-  const handleOptionClick = (option: SelectOption) => {
-    if (multiple) {
-      const newSelected = multiSelected.includes(option.value)
-        ? multiSelected.filter((v) => v !== option.value)
-        : [...multiSelected, option.value]
-      setMultiSelected(newSelected)
-    } else {
-      setSelected(option)
-      setOpenSelect(false)
-    }
-  }
+    // Dropdown styles
+    const dropdownBg = isDark ? 'bg-[#002B57]' : 'bg-white'
+    const dropdownShadow = isDark
+        ? 'shadow-[0_10px_35px_rgba(0,0,0,0.30)]'
+        : 'shadow-[0_10px_35px_rgba(55,71,109,0.10)]'
 
-  const getDisplayText = () => {
-    if (multiple) {
-      if (multiSelected.length === 0) return defaultValue.title
-      if (multiSelected.length === 1) {
-        const option = filterList.find((opt) => opt.value === multiSelected[0])
-        return option?.title || defaultValue.title
-      }
-      return `${multiSelected.length} selected`
-    }
-    return selected.title
-  }
+    // Option styles
+    const optionText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+    const optionHover = isDark ? 'hover:bg-[#1B456C]' : 'hover:bg-[#F5F8FA]'
+    const optionSelected = isDark ? 'bg-[#1B456C]' : 'bg-[#E3F2FD]'
 
-  /**
-   * Helpers – colour classes based on current theme.
-   */
-  const isDark = theme === 'dark'
+    const disabledText = isDark ? 'text-[#5E6278]' : 'text-[#A1A5B7]'
 
-  // Main trigger styles
-  const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
-  const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-  const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
-  const triggerBorderClosed = 'border-transparent'
-  const triggerHover = isDark
-    ? 'hover:border-[#007FFF]'
-    : 'hover:border-[#007FFF]'
-
-  // Dropdown styles
-  const dropdownBg = isDark ? 'bg-[#002B57]' : 'bg-white'
-  const dropdownShadow = isDark
-    ? 'shadow-[0_10px_35px_rgba(0,0,0,0.30)]'
-    : 'shadow-[0_10px_35px_rgba(55,71,109,0.10)]'
-
-  // Option styles
-  const optionText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-  const optionHover = isDark ? 'hover:bg-[#1B456C]' : 'hover:bg-[#F5F8FA]'
-  const optionSelected = isDark ? 'bg-[#1B456C]' : 'bg-[#E3F2FD]'
-
-  const disabledText = isDark ? 'text-[#5E6278]' : 'text-[#A1A5B7]'
-
-  // Content that will be used in both desktop dropdown and mobile modal
-  const optionsContent = (
-    <ul
-      className={cn(
-        'flex flex-col gap-y-1 max-h-50 text-xs p-2.5',
-        isMobile && 'p-0',
-        !isMobile && 'overflow-y-auto custom-scroll',
-      )}
-    >
-      {filterList.map((item: SelectOption) => (
-        <li
-          key={item.value}
-          className={clsx(
-            'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
-            optionText,
-            (multiple
-              ? multiSelected.includes(item.value)
-              : isEqual(item.value, selected.value)) && optionSelected,
-            item.soon && disabledText,
-            !item.soon && optionHover,
-          )}
-          onClick={() => {
-            if (!item.soon) handleOptionClick(item)
-          }}
-        >
-          {/* Checkbox indicator for all items */}
-          <div className="flex items-center justify-center w-5 h-5">
-            <CheckboxIcon
-              checked={
-                multiple
-                  ? multiSelected.includes(item.value)
-                  : isEqual(item.value, selected.value)
-              }
-              isDark={isDark}
-            />
-          </div>
-
-          {item.icon && (
-            <img src={item.icon} alt={item.title} className="w-5 h-5" />
-          )}
-          <span className="flex-1">{item.title}</span>
-          {item.soon && (
-            <span className="text-xs px-2 py-1 rounded bg-yellow-500 text-black ml-auto">
-              Soon
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
-  )
-
-  return (
-    <div ref={selectRef} className="relative w-full font-medium">
-      {/* Trigger */}
-      <div
-        className={twMerge(
-          clsx(
-            'h-10 cursor-pointer w-full flex gap-x-2.5 justify-between items-center py-[9px] text-xs px-[16px] rounded-[7px] border transition-all duration-200',
-            triggerBg,
-            triggerText,
-            openSelect ? triggerBorderOpen : triggerBorderClosed,
-            triggerHover,
-            className,
-          ),
-        )}
-        onClick={() => setOpenSelect((prev) => !prev)}
-      >
-        <span className="flex items-center gap-x-2.5">
-          {!multiple && get(selected, 'icon') && (
-            <img
-              src={get(selected, 'icon') as string}
-              alt={get(selected, 'title')}
-              className="w-5 h-5"
-            />
-          )}
-          <span>{getDisplayText()}</span>
-        </span>
-        {/* Chevron */}
-        {isDark ? (
-          <ChevronDownDark
-            className={clsx(
-              'transition-transform duration-200',
-              openSelect && 'rotate-180',
+    // Content that will be used in both desktop dropdown and mobile modal
+    const optionsContent = (
+        <ul
+            className={cn(
+                'flex flex-col gap-y-1 max-h-50 text-xs p-2.5',
+                isMobile && 'p-0',
+                !isMobile && 'overflow-y-auto custom-scroll'
             )}
-          />
-        ) : (
-          <ChevronDownLight
-            className={clsx(
-              'transition-transform duration-200',
-              openSelect && 'rotate-180',
-            )}
-          />
-        )}
-      </div>
-
-      {/* Desktop dropdown */}
-      {!isMobile && openSelect && (
-        <div
-          className={clsx(
-            'w-full absolute rounded-[7px] z-40 backdrop-blur-[25px]',
-            dropdownPosition === 'bottom' ? 'mt-2' : 'mb-2 bottom-full',
-            dropdownBg,
-            dropdownShadow,
-          )}
         >
-          {optionsContent}
+            {filterList.map((item: SelectOption) => (
+                <li
+                    key={item.value}
+                    className={clsx(
+                        'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
+                        optionText,
+                        (multiple
+                            ? multiSelected.includes(item.value)
+                            : isEqual(item.value, selected.value)) &&
+                            optionSelected,
+                        item.soon && disabledText,
+                        !item.soon && optionHover
+                    )}
+                    onClick={() => {
+                        if (!item.soon) handleOptionClick(item)
+                    }}
+                >
+                    {/* Checkbox indicator for all items */}
+                    <div className="flex items-center justify-center w-5 h-5">
+                        <CheckboxIcon
+                            checked={
+                                multiple
+                                    ? multiSelected.includes(item.value)
+                                    : isEqual(item.value, selected.value)
+                            }
+                            isDark={isDark}
+                        />
+                    </div>
+
+                    {item.icon && (
+                        <img
+                            src={item.icon}
+                            alt={item.title}
+                            className="w-5 h-5"
+                        />
+                    )}
+                    <span className="flex-1">{item.title}</span>
+                    {item.soon && (
+                        <span className="text-xs px-2 py-1 rounded bg-yellow-500 text-black ml-auto">
+                            Soon
+                        </span>
+                    )}
+                </li>
+            ))}
+        </ul>
+    )
+
+    return (
+        <div ref={selectRef} className="relative w-full font-medium">
+            {/* Trigger */}
+            <div
+                className={twMerge(
+                    clsx(
+                        'h-10 cursor-pointer w-full flex gap-x-2.5 justify-between items-center py-[9px] text-xs px-[16px] rounded-[7px] border transition-all duration-200',
+                        triggerBg,
+                        triggerText,
+                        openSelect ? triggerBorderOpen : triggerBorderClosed,
+                        triggerHover,
+                        className
+                    )
+                )}
+                onClick={() => setOpenSelect((prev) => !prev)}
+            >
+                <span className="flex items-center gap-x-2.5">
+                    {!multiple && get(selected, 'icon') && (
+                        <img
+                            src={get(selected, 'icon') as string}
+                            alt={get(selected, 'title')}
+                            className="w-5 h-5"
+                        />
+                    )}
+                    <span>{getDisplayText()}</span>
+                </span>
+                {/* Chevron */}
+                {isDark ? (
+                    <ChevronDownDark
+                        className={clsx(
+                            'transition-transform duration-200',
+                            openSelect && 'rotate-180'
+                        )}
+                    />
+                ) : (
+                    <ChevronDownLight
+                        className={clsx(
+                            'transition-transform duration-200',
+                            openSelect && 'rotate-180'
+                        )}
+                    />
+                )}
+            </div>
+
+            {/* Desktop dropdown */}
+            {!isMobile && openSelect && (
+                <div
+                    className={clsx(
+                        'w-full absolute rounded-[7px] z-40 backdrop-blur-[25px]',
+                        dropdownPosition === 'bottom'
+                            ? 'mt-2'
+                            : 'mb-2 bottom-full',
+                        dropdownBg,
+                        dropdownShadow
+                    )}
+                >
+                    {optionsContent}
+                </div>
+            )}
+
+            {/* Mobile modal */}
+            {isMobile && (
+                <Modal
+                    open={openSelect}
+                    onClose={() => setOpenSelect(false)}
+                    title={multiple ? 'Select Options' : 'Select Option'}
+                    size="sm"
+                    className="w-full"
+                    position="bottom"
+                    animation="slide"
+                    border={false}
+                    showCloseButton={true}
+                >
+                    <div className="flex-1">{optionsContent}</div>
+                </Modal>
+            )}
         </div>
-      )}
-
-      {/* Mobile modal */}
-      {isMobile && (
-        <Modal
-          open={openSelect}
-          onClose={() => setOpenSelect(false)}
-          title={multiple ? 'Select Options' : 'Select Option'}
-          size="sm"
-          className="w-full"
-          position="bottom"
-          animation="slide"
-          border={false}
-          showCloseButton={true}
-        >
-          <div className="flex-1">{optionsContent}</div>
-        </Modal>
-      )}
-    </div>
-  )
+    )
 }
 
 export default FilterSelect

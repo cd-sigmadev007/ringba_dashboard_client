@@ -1,26 +1,24 @@
-import React, { type FC } from 'react';
-import Logo from '../components/logo';
-import { get, map } from 'lodash';
-import { socialLinks } from './utils/social-links';
-import { Link } from '@tanstack/react-router';
-import { useThemeStore } from '../store/themeStore';
-import clsx from 'clsx';
+import React from 'react'
+import { get, map } from 'lodash'
+import { Link } from '@tanstack/react-router'
+import clsx from 'clsx'
+import { useThemeStore } from '../store/themeStore'
+import Logo from '../components/logo'
+import { socialLinks } from './utils/social-links'
+import type { FC } from 'react'
 
 interface SocialLink {
-    link: string;
-    icon: React.ReactNode;
+    link: string
+    icon: React.ReactNode
 }
 
 const Footer: FC = () => {
-    const { theme } = useThemeStore();
-    const isDark = theme === 'dark';
-    
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
+
     return (
         <footer
-            className={clsx(
-                "w-full",
-                isDark ? 'bg-[#001E3C]' : 'bg-white'
-            )}
+            className={clsx('w-full', isDark ? 'bg-[#001E3C]' : 'bg-white')}
         >
             {/* Desktop Layout */}
             <div className="hidden lg:flex items-center justify-between px-12 py-6">
@@ -32,21 +30,24 @@ const Footer: FC = () => {
                             <Logo />
                         </Link>
                     </div>
-                    
+
                     {/* Social Icons */}
                     <div className="flex items-center gap-[14px]">
-                        {map(socialLinks as SocialLink[], (item, index) => (
-                            <div key={index} className="w-4 h-4">
-                                <a
-                                    rel="noreferrer"
-                                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                                    href={get(item, 'link', '#')}
-                                    target="_blank"
-                                >
-                                    {get(item, 'icon')}
-                                </a>
-                            </div>
-                        ))}
+                        {map(
+                            socialLinks as Array<SocialLink>,
+                            (item, index) => (
+                                <div key={index} className="w-4 h-4">
+                                    <a
+                                        rel="noreferrer"
+                                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                                        href={get(item, 'link', '#')}
+                                        target="_blank"
+                                    >
+                                        {get(item, 'icon')}
+                                    </a>
+                                </div>
+                            )
+                        )}
                     </div>
                 </div>
 
@@ -54,40 +55,42 @@ const Footer: FC = () => {
                 <div className="flex flex-col items-end gap-[7px]">
                     {/* Legal Links */}
                     <div className="flex items-center gap-[14px]">
-                        <span 
+                        <span
                             className={clsx(
-                                "!text-sm cursor-pointer hover:opacity-80 transition-opacity",
+                                '!text-sm cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
                             Terms
                         </span>
-                        <span 
+                        <span
                             className={clsx(
-                                "!text-sm cursor-pointer hover:opacity-80 transition-opacity",
+                                '!text-sm cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
                             Privacy Policy
                         </span>
-                        <span 
+                        <span
                             className={clsx(
-                                "!text-sm cursor-pointer hover:opacity-80 transition-opacity",
+                                '!text-sm cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
                             Cookie Policy
                         </span>
                     </div>
-                    
+
                     {/* Copyright */}
-                    <p 
+                    <p
                         className={clsx(
-                            "!text-sm !text-center",
+                            '!text-sm !text-center',
                             isDark ? '!text-[#7E8299]' : '!text-[#7E8299]'
                         )}
                     >
-                        © 2023 Insidefi.io All rights reserved by Clickdee Mediashare OÜ, 6 sepapaja, Harijumma, Tallinn, 15551, Estonia
+                        © 2023 Insidefi.io All rights reserved by Clickdee
+                        Mediashare OÜ, 6 sepapaja, Harijumma, Tallinn, 15551,
+                        Estonia
                     </p>
                 </div>
             </div>
@@ -97,24 +100,27 @@ const Footer: FC = () => {
                 {/* Logo and Social Icons */}
                 <div className="flex flex-col items-center gap-6">
                     {/* Logo */}
-                        <Link to="/">
-                            <Logo />
-                        </Link>
-                    
+                    <Link to="/">
+                        <Logo />
+                    </Link>
+
                     {/* Social Icons */}
                     <div className="flex items-center gap-[25px]">
-                        {map(socialLinks as SocialLink[], (item, index) => (
-                            <div key={index} className="w-5 h-5">
-                                <a
-                                    rel="noreferrer"
-                                    className="cursor-pointer hover:opacity-80 transition-opacity"
-                                    href={get(item, 'link', '#')}
-                                    target="_blank"
-                                >
-                                    {get(item, 'icon')}
-                                </a>
-                            </div>
-                        ))}
+                        {map(
+                            socialLinks as Array<SocialLink>,
+                            (item, index) => (
+                                <div key={index} className="w-5 h-5">
+                                    <a
+                                        rel="noreferrer"
+                                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                                        href={get(item, 'link', '#')}
+                                        target="_blank"
+                                    >
+                                        {get(item, 'icon')}
+                                    </a>
+                                </div>
+                            )
+                        )}
                     </div>
                 </div>
 
@@ -122,25 +128,25 @@ const Footer: FC = () => {
                 <div className="flex justify-around gap-[30px]">
                     {/* Legal Section */}
                     <div className="flex flex-col gap-[10px]">
-                        <h3 
+                        <h3
                             className={clsx(
-                                "!text-[25px] font-semibold",
+                                '!text-[25px] font-semibold',
                                 isDark ? '!text-[#EDEDED]' : '!text-[#2B2B2B]'
                             )}
                         >
                             Legal
                         </h3>
-                        <span 
+                        <span
                             className={clsx(
-                                "cursor-pointer hover:opacity-80 transition-opacity",
+                                'cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
                             Terms
                         </span>
-                        <span 
+                        <span
                             className={clsx(
-                                "cursor-pointer hover:opacity-80 transition-opacity",
+                                'cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
@@ -150,58 +156,64 @@ const Footer: FC = () => {
 
                     {/* Company Section */}
                     <div className="flex flex-col gap-[10px]">
-                        <h3 
+                        <h3
                             className={clsx(
-                                "!text-[24px] font-semibold",
+                                '!text-[24px] font-semibold',
                                 isDark ? '!text-[#EDEDED]' : '!text-[#2B2B2B]'
                             )}
                         >
                             Company
                         </h3>
-                        <span 
+                        <span
                             className={clsx(
-                                "cursor-pointer hover:opacity-80 transition-opacity",
+                                'cursor-pointer hover:opacity-80 transition-opacity',
                                 isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
                             )}
                         >
                             Blogs
                         </span>
                         <div className="flex items-center gap-[10px]">
-                            <span 
+                            <span
                                 className={clsx(
-                                    "cursor-pointer hover:opacity-80 transition-opacity",
-                                    isDark ? '!text-[#A1A5B7]' : '!text-[#A1A5B7]'
+                                    'cursor-pointer hover:opacity-80 transition-opacity',
+                                    isDark
+                                        ? '!text-[#A1A5B7]'
+                                        : '!text-[#A1A5B7]'
                                 )}
                             >
                                 Join Beta
                             </span>
                             <div className="bg-[#002B57] rounded-[7px] px-[6px] py-[1px]">
-                                <span className="!text-xs !text-[#42A0FF]">Live</span>
+                                <span className="!text-xs !text-[#42A0FF]">
+                                    Live
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Divider */}
-                <div 
+                <div
                     className={clsx(
-                        "w-full h-px",
+                        'w-full h-px',
                         isDark ? 'bg-[#1B456F]' : 'bg-[#E5E5E5]'
                     )}
                 />
 
                 {/* Copyright */}
-                <p 
+                <p
                     className={clsx(
-                        "!text-sm !text-center leading-relaxed",
+                        '!text-sm !text-center leading-relaxed',
                         isDark ? '!text-[#7E8299]' : '!text-[#7E8299]'
                     )}
                 >
-                    © 2023 Insidefi.io All rights reserved by Clickdee Mediashare OÜ, 6 sepapaja, Harijumma, Tallinn, 15551, Estonia
+                    © 2023 Insidefi.io All rights reserved by Clickdee
+                    Mediashare OÜ, 6 sepapaja, Harijumma, Tallinn, 15551,
+                    Estonia
                 </p>
             </div>
         </footer>
-    );
-};
+    )
+}
 
-export default Footer;
+export default Footer

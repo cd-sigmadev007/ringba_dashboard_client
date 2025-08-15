@@ -1,245 +1,288 @@
 @reference "tailwindcss";
 
 @layer components {
-  .theme-dark .table-container {
-    @apply border border-[color:var(--primary-002-b-57-p-500,#002B57)] rounded-[10px];
-  }
+    .theme-dark .table-container {
+        @apply border border-[color:var(--primary-002-b-57-p-500,#002B57)] rounded-[10px];
+    }
 
-  .theme-light .table-container {
-    @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
-  }
+    .theme-light .table-container {
+        @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
+    }
 
-  .theme-dark .single-table {
-    @apply rounded-[10px] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
-  }
+    .theme-dark .single-table {
+        @apply rounded-[10px] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
+    }
 
-  .theme-light .single-table {
-    @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
-  }
+    .theme-light .single-table {
+        @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)] shadow-[0_0_10px_0_rgba(0,0,0,0.03)];
+    }
 
-  .single-table {
-    @apply md:rounded-[10px] z-[15];
-  }
+    .single-table {
+        @apply md:rounded-[10px] z-[15];
+    }
 
-  .theme-dark .single-table thead {
-    @apply text-[#A1A5B7] text-[14px] font-semibold tracking-[0.42px] whitespace-nowrap;
-  }
+    .theme-dark .single-table thead {
+        @apply text-[#A1A5B7] text-[14px] font-semibold tracking-[0.42px] whitespace-nowrap;
+    }
 
-  .theme-light .single-table thead {
-    @apply text-[#5E6278] text-[14px] font-semibold tracking-[0.42px] bg-[#F5F8FA] whitespace-nowrap;
-  }
+    .theme-light .single-table thead {
+        @apply text-[#5E6278] text-[14px] font-semibold tracking-[0.42px] bg-[#F5F8FA] whitespace-nowrap;
+    }
 
-  .theme-dark .single-table td,
-  .theme-light .single-table td {
-    @apply whitespace-nowrap;
-  }
+    .theme-dark .single-table td,
+    .theme-light .single-table td {
+        @apply whitespace-nowrap;
+    }
 
-  .theme-dark .single-table thead tr,
-  .table-header {
-    @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)];
-  }
-  
-  .theme-dark .single-table thead tr:first-child th:first-child {
-    @apply rounded-tl-[10px];
-  }
-  
-  .theme-dark .single-table thead tr:first-child th:last-child {
-    @apply rounded-tr-[10px];
-  }
+    .theme-dark .single-table thead tr,
+    .table-header {
+        @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)];
+    }
 
-  .theme-light .single-table thead tr,
-  .table-header {
-    @apply border-b !border-[#F0F5FF];
-  }
-  
-  .theme-light .single-table thead tr:first-child th:first-child {
-    @apply rounded-tl-[10px];
-  }
-  
-  .theme-light .single-table thead tr:first-child th:last-child {
-    @apply rounded-tr-[10px];
-  }
+    .theme-dark .single-table thead tr:first-child th:first-child {
+        @apply rounded-tl-[10px];
+    }
 
-  .theme-dark .table-header {
-    @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)];
-  }
+    .theme-dark .single-table thead tr:first-child th:last-child {
+        @apply rounded-tr-[10px];
+    }
 
-  .theme-light .table-header {
-    @apply border-b !border-[#F0F5FF] bg-[var(--Neutrals-g-10,#FFF)];
-  }
+    .theme-light .single-table thead tr,
+    .table-header {
+        @apply border-b !border-[#F0F5FF];
+    }
 
-  .theme-dark .single-table tr:not(:last-child) {
-    @apply border-b border-[#132F4C];
-  }
+    .theme-light .single-table thead tr:first-child th:first-child {
+        @apply rounded-tl-[10px];
+    }
 
-  .theme-light .single-table tr:not(:last-child) {
-    @apply border-b border-[#F0F5FF];
-  }
+    .theme-light .single-table thead tr:first-child th:last-child {
+        @apply rounded-tr-[10px];
+    }
 
-  .theme-dark .single-table tbody tr {
-    @apply hover:bg-[#002B57];
-  }
+    .theme-dark .table-header {
+        @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)];
+    }
 
-  .theme-light .single-table tbody tr {
-    @apply hover:bg-[#F0F5FF];
-  }
+    .theme-light .table-header {
+        @apply rounded-[10px] bg-[var(--Neutrals-g-10,#FFF)];
+    }
 
-  .not-multi tbody tr:last-child td:first-child {
-    @apply rounded-bl-[10px];
-  }
+    .theme-dark .single-table tr:not(:last-child) {
+        @apply border-b border-[#132F4C];
+    }
 
-  .not-multi tbody tr:last-child td:last-child {
-    @apply rounded-br-[10px];
-  }
-  
-  .theme-dark .single-table tbody tr:last-child td:first-child {
-    @apply rounded-bl-[10px];
-  }
-  
-  .theme-dark .single-table tbody tr:last-child td:last-child {
-    @apply rounded-br-[10px];
-  }
-  
-  .theme-light .single-table tbody tr:last-child td:first-child {
-    @apply rounded-bl-[10px];
-  }
-  
-  .theme-light .single-table tbody tr:last-child td:last-child {
-    @apply rounded-br-[10px];
-  }
-  
-  .theme-light .single-table tbody tr:last-child td:first-child {
-    @apply rounded-bl-[10px];
-  }
-  
-  .theme-light .single-table tbody tr:last-child td:last-child {
-    @apply rounded-br-[10px];
-  }
+    .theme-light .single-table tr:not(:last-child) {
+        @apply border-b border-[#F0F5FF];
+    }
 
-  .theme-dark .single-table .sticky-column {
-    @apply bg-[#001E3C] border-[#002B57] drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
-  }
+    .theme-dark .single-table tbody tr {
+        @apply hover:bg-[#002B57];
+    }
 
-  .theme-light .single-table .sticky-column {
-    @apply bg-white drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
-  }
+    .theme-light .single-table tbody tr {
+        @apply hover:bg-[#F0F5FF];
+    }
 
-  .theme-dark .single-table .sticky-column-th {
-    @apply bg-[#001E3C] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
-  }
+    .not-multi tbody tr:last-child td:first-child {
+        @apply rounded-bl-[10px];
+    }
 
-  .theme-light .single-table .sticky-column-th {
-    @apply bg-[#F5F8FA] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
-  }
+    .not-multi tbody tr:last-child td:last-child {
+        @apply rounded-br-[10px];
+    }
 
-  /* Add box shadow only when table is scrollable */
-  .table-scrollable .sticky-column,
-  .table-scrollable .sticky-column-th {
-    box-shadow: 14px 0 10px 0 rgba(0, 0, 0, 0.20);
-  }
+    .theme-dark .single-table tbody tr:last-child td:first-child {
+        @apply rounded-bl-[10px];
+    }
 
-  /* Ensure sticky columns maintain position */
-  .sticky-column,
-  .sticky-column-th {
-    position: sticky !important;
-    left: 0 !important;
-  }
+    .theme-dark .single-table tbody tr:last-child td:last-child {
+        @apply rounded-br-[10px];
+    }
 
-  /* Prevent table from collapsing sticky columns */
-  .single-table {
-    table-layout: auto;
-  }
+    .theme-light .single-table tbody tr:last-child td:first-child {
+        @apply rounded-bl-[10px];
+    }
 
-  /* Ensure proper z-index stacking - sticky header behind first header */
-  .sticky-column-th {
-    z-index: 5 !important;
-  }
+    .theme-light .single-table tbody tr:last-child td:last-child {
+        @apply rounded-br-[10px];
+    }
 
-  .sticky-column {
-    z-index: 5 !important;
-  }
+    .theme-light .single-table tbody tr:last-child td:first-child {
+        @apply rounded-bl-[10px];
+    }
 
-  /* First header should be above sticky header */
-  .single-table thead tr th:first-child {
-    z-index: 10 !important;
-  }
+    .theme-light .single-table tbody tr:last-child td:last-child {
+        @apply rounded-br-[10px];
+    }
 
-  /* Table container overflow handling */
-  .table-container {
-    position: relative;
-  }
+    .theme-dark .single-table .sticky-column {
+        @apply bg-[#001E3C] border-[#002B57] drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
+    }
 
-  /* Ensure sticky columns don't get cut off */
-  .table-scrollable {
-    position: relative;
-  }
+    .theme-light .single-table .sticky-column {
+        @apply bg-white drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
+    }
 
-  /* Prevent sticky column from scrolling at the end */
-  .table-scrollable .single-table {
-    min-width: max-content;
-  }
+    .theme-dark .single-table .sticky-column-th {
+        @apply bg-[#001E3C] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
+    }
 
-  .theme-dark .filter-select-dark {
-    @apply bg-[#001E3C] hover:border-[#0254a5] focus:border-[#0254a5] text-[#f5f8fa];
-  }
+    .theme-light .single-table .sticky-column-th {
+        @apply bg-[#F5F8FA] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
+    }
 
-  .theme-light .filter-select-dark {
-    @apply bg-white border-[#E0E0E0] hover:border-[#007FFF] focus:border-[#007FFF] text-[#3f4254];
-  }
+    /* Add box shadow only when table is scrollable */
+    .table-scrollable .sticky-column,
+    .table-scrollable .sticky-column-th {
+        box-shadow: 14px 0 10px 0 rgba(0, 0, 0, 0.2);
+    }
 
-  .theme-dark .filter-select {
-    @apply bg-[#002B57] hover:border-[#0254a5] focus:border-[#0254a5] text-[#f5f8fa];
-  }
+    /* Ensure sticky columns maintain position */
+    .sticky-column,
+    .sticky-column-th {
+        position: sticky !important;
+        left: 0 !important;
+    }
 
-  .theme-light .filter-select {
-    @apply bg-white border-[#E0E0E0] hover:border-[#007FFF] focus:border-[#007FFF] text-[#3f4254];
-  }
+    /* Prevent table from collapsing sticky columns */
+    .single-table {
+        table-layout: auto;
+    }
 
-  .theme-dark .filter-select-open {
-    @apply border-[#0254a5];
-  }
+    /* Ensure proper z-index stacking - sticky header behind first header */
+    .sticky-column-th {
+        z-index: 5 !important;
+    }
 
-  .theme-light .filter-select-open {
-    @apply border-[#007FFF];
-  }
+    .sticky-column {
+        z-index: 5 !important;
+    }
 
-  .theme-dark .filter-select-disable {
-    @apply bg-[#002B57] border-[#1B456F] hover:border-[#1B456F] text-[#5E6278];
-  }
+    /* First header should be above sticky header */
+    .single-table thead tr th:first-child {
+        z-index: 10 !important;
+    }
 
-  .theme-light .filter-select-disable {
-    @apply bg-[#ECECEC] border-[#ECECEC] hover:border-[#ECECEC] text-[#A1A5B7];
-  }
+    /* Table container overflow handling */
+    .table-container {
+        position: relative;
+    }
 
-  .theme-dark .table-filter-list {
-    @apply bg-[#002B57];
-  }
+    /* Ensure sticky columns don't get cut off */
+    .table-scrollable {
+        position: relative;
+    }
 
-  .theme-light .table-filter-list {
-    @apply bg-white;
-  }
+    /* Prevent sticky column from scrolling at the end */
+    .table-scrollable .single-table {
+        min-width: max-content;
+    }
 
-  .theme-dark .table-filter-item {
-    @apply transition-all duration-300 ease-out hover:bg-[#1B456F];
-  }
+    /* Consistent borders for all columns */
+    .single-table th,
+    .single-table td {
+        /* border-right: 1px solid !important; */
+        border-bottom: 1px solid !important;
+    }
 
-  .theme-light .table-filter-item {
-    @apply hover:bg-[#F0F5FF];
-  }
+    /* Dark theme borders */
+    .theme-dark .single-table th,
+    .theme-dark .single-table td {
+        border-color: #1B456F !important;
+    }
 
-  .theme-dark .table-filter-item-disable {
-    @apply text-[#A1A5B7];
-  }
+    /* Light theme borders */
+    .theme-light .single-table th,
+    .theme-light .single-table td {
+        border-color: #E0E0E0 !important;
+    }
 
-  .theme-light .table-filter-item-disable {
-    @apply text-[#3F4254] opacity-50;
-  }
+    /* Ensure sticky columns have proper borders */
+    .sticky-column,
+    .sticky-column-th {
+        /* border-right: 2px solid !important; */
+        border-bottom: 1px solid !important;
+        z-index: 999 !important;
+        position: sticky !important;
+        left: 0 !important;
+    }
 
-  .theme-dark .filter-item-selected {
-    @apply bg-[#1B456F];
-  }
+    /* Dark theme sticky column borders */
+    .theme-dark .sticky-column,
+    .theme-dark .sticky-column-th {
+        border-right-color: #1B456F !important;
+        border-bottom-color: #132F4C !important;
+    }
 
-  .theme-light .filter-item-selected {
-    @apply bg-[#F0F5FF];
-  }
+    /* Light theme sticky column borders */
+    .theme-light .sticky-column,
+    .theme-light .sticky-column-th {
+        border-right-color: #E0E0E0 !important;
+        border-bottom-color: #F0F5FF !important;
+    }
+
+    .theme-dark .filter-select-dark {
+        @apply bg-[#001E3C] hover:border-[#0254a5] focus:border-[#0254a5] text-[#f5f8fa];
+    }
+
+    .theme-light .filter-select-dark {
+        @apply bg-white border-[#E0E0E0] hover:border-[#007FFF] focus:border-[#007FFF] text-[#3f4254];
+    }
+
+    .theme-dark .filter-select {
+        @apply bg-[#002B57] hover:border-[#0254a5] focus:border-[#0254a5] text-[#f5f8fa];
+    }
+
+    .theme-light .filter-select {
+        @apply bg-white border-[#E0E0E0] hover:border-[#007FFF] focus:border-[#007FFF] text-[#3f4254];
+    }
+
+    .theme-dark .filter-select-open {
+        @apply border-[#0254a5];
+    }
+
+    .theme-light .filter-select-open {
+        @apply border-[#007FFF];
+    }
+
+    .theme-dark .filter-select-disable {
+        @apply bg-[#002B57] border-[#1B456F] hover:border-[#1B456F] text-[#5E6278];
+    }
+
+    .theme-light .filter-select-disable {
+        @apply bg-[#ECECEC] border-[#ECECEC] hover:border-[#ECECEC] text-[#A1A5B7];
+    }
+
+    .theme-dark .table-filter-list {
+        @apply bg-[#002B57];
+    }
+
+    .theme-light .table-filter-list {
+        @apply bg-white;
+    }
+
+    .theme-dark .table-filter-item {
+        @apply transition-all duration-300 ease-out hover:bg-[#1B456F];
+    }
+
+    .theme-light .table-filter-item {
+        @apply hover:bg-[#F0F8FF];
+    }
+
+    .theme-dark .table-filter-item-disable {
+        @apply text-[#A1A5B7];
+    }
+
+    .theme-light .table-filter-item-disable {
+        @apply text-[#3F4254] opacity-50;
+    }
+
+    .theme-dark .filter-item-selected {
+        @apply bg-[#1B456F];
+    }
+
+    .theme-light .filter-item-selected {
+        @apply bg-[#F0F8FF];
+    }
 }

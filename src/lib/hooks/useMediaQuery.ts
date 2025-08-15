@@ -3,7 +3,7 @@
  * Custom hook to detect media query matches
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react'
 
 /**
  * Hook to track media query matches
@@ -11,40 +11,41 @@ import { useState, useEffect } from 'react';
  * @returns boolean indicating if the media query matches
  */
 export const useMediaQuery = (query: string): boolean => {
-  const [matches, setMatches] = useState<boolean>(false);
+    const [matches, setMatches] = useState<boolean>(false)
 
-  useEffect(() => {
-    // Check if window is available (SSR safety)
-    if (typeof window === 'undefined') {
-      return;
-    }
+    useEffect(() => {
+        // Check if window is available (SSR safety)
+        if (typeof window === 'undefined') {
+            return
+        }
 
-    const mediaQuery = window.matchMedia(query);
-    
-    // Set initial value
-    setMatches(mediaQuery.matches);
+        const mediaQuery = window.matchMedia(query)
 
-    // Create event listener function
-    const handleChange = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+        // Set initial value
+        setMatches(mediaQuery.matches)
 
-    // Add listener
-    mediaQuery.addEventListener('change', handleChange);
+        // Create event listener function
+        const handleChange = (event: MediaQueryListEvent) => {
+            setMatches(event.matches)
+        }
 
-    // Cleanup
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [query]);
+        // Add listener
+        mediaQuery.addEventListener('change', handleChange)
 
-  return matches;
-};
+        // Cleanup
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange)
+        }
+    }, [query])
+
+    return matches
+}
 
 /**
  * Common breakpoint hooks
  */
-export const useIsMobile = () => useMediaQuery('(max-width: 767px)');
-export const useIsTablet = () => useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
-export const useIsDesktop = () => useMediaQuery('(min-width: 1024px)');
-export const useIsMobileOrTablet = () => useMediaQuery('(max-width: 1023px)');
+export const useIsMobile = () => useMediaQuery('(max-width: 767px)')
+export const useIsTablet = () =>
+    useMediaQuery('(min-width: 768px) and (max-width: 1023px)')
+export const useIsDesktop = () => useMediaQuery('(min-width: 1024px)')
+export const useIsMobileOrTablet = () => useMediaQuery('(max-width: 1023px)')

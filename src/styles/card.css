@@ -1,22 +1,21 @@
 @reference "tailwindcss";
 
 @layer components {
+    .theme-dark .proposals-card,
+    .theme-light .proposals-card {
+        @apply md:rounded-[10px] md:border;
+    }
 
-  .theme-dark .proposals-card,
-  .theme-light .proposals-card {
-    @apply md:rounded-[10px] md:border;
-  }
+    .theme-dark .proposals-card-hover,
+    .theme-light .proposals-card-hover {
+        @apply transition-all duration-300 hover:border-[#007FFF];
+    }
 
-  .theme-dark .proposals-card-hover,
-  .theme-light .proposals-card-hover {
-    @apply transition-all duration-300 hover:border-[#007FFF];
-  }
+    .theme-dark .proposals-card {
+        @apply border-[#002b57] bg-[#001e3c];
+    }
 
-  .theme-dark .proposals-card {
-    @apply border-[#002b57] bg-[#001e3c];
-  }
-
-  .theme-light .proposals-card {
-    @apply border-transparent bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.03)];
-  }
+    .theme-light .proposals-card {
+        @apply border-transparent bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.03)];
+    }
 }

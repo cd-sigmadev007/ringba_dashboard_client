@@ -1,52 +1,63 @@
 /* Start date button */
 .rdp-range_start .rdp-day_button {
-  background-color: #1B456F;
-  border: 3px solid #132F4C;
+    background-color: #1b456f;
+    border: 3px solid #132f4c;
+}
+
+.rdp-range_start {
+    background: linear-gradient(to right, #132f4c, #132f4c);
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
 }
 
 /* End date button */
 .rdp-range_end .rdp-day_button {
-  background-color: #1B456F;
-  border: 3px solid #132F4C;
-
+    background-color: #1b456f;
+    border: 3px solid #132f4c;
 }
 
 /* Middle range */
 .rdp-range_middle .rdp-day_button {
-  background-color: #132F4C;
+    background-color: #132f4c;
 }
 
 /* Remove background from the outer cell entirely */
 .rdp-range_start,
 .rdp-range_end {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 .rdp-root {
-  --rdp-day-width: 100px;
-  --rdp-day-height: 32px;
-  --rdp-accent-color: #132F4C;
-  --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, #132F4C 50%);
-  --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), #132F4C 50%, transparent 50%);
-  --rdp-range_middle-background-color: #132F4C;
-  --rdp-today-color: #007fff;
-  --rdp-day_button-height: 32px;
-  --rdp-day_button-width: 32px;
+    --rdp-day-width: 100px;
+    --rdp-day-height: 32px;
+    --rdp-accent-color: #132f4c;
+    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction),
+            transparent 50%,
+            #132f4c 50%);
+            
+    --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction),
+            #132f4c 30%,
+            transparent 50%);
+
+    --rdp-range_middle-background-color: #132f4c;
+    --rdp-today-color: #007fff;
+    --rdp-day_button-height: 32px;
+    --rdp-day_button-width: 32px;
 }
 
 /* Change size for all days */
 .rdp-day {
-  color: #EBEBEB;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 150%;
-  text-align: center;
+    color: #ebebeb;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    text-align: center;
 }
 
 /* Center align day buttons */
 .rdp-day_button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
