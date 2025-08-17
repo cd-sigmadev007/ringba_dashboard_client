@@ -684,17 +684,6 @@ input[type='search']::-webkit-search-results-decoration {
     fill: #3f4254;
 }
 
-/* Banner button styles */
-.theme-dark .banner-btn {
-    color: #a1a5b7;
-    border-color: #1b456f;
-}
-
-.theme-light .banner-btn {
-    color: #5e6278;
-    border-color: #e0e0e0;
-}
-
 .theme-dark .card-loading {
     background-color: #001e3c;
 }

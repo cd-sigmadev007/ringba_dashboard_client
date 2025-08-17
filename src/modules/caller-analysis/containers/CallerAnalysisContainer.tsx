@@ -2,9 +2,11 @@ import React from 'react'
 import clsx from 'clsx'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
+import { StatusModal } from '../components/StatusModal'
+import { CallTranscriptModal } from '../components/CallTranscriptModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
-import { Modal, Table } from '@/components/ui'
+import { Modal, Table, AudioPlayer } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { FilterPills, FiltersSection } from '@/modules'
 
@@ -12,9 +14,17 @@ export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const [openModal, setOpenModal] = React.useState(false)
+    const [openStatusModal, setOpenStatusModal] = React.useState(false)
+    const [openTranscriptModal, setOpenTranscriptModal] = React.useState(false)
     const [selectedCaller, setSelectedCaller] = React.useState<CallData | null>(
         null
     )
+    
+    // Audio player state
+    const [audioPlayerVisible, setAudioPlayerVisible] = React.useState(false)
+    const [currentAudioUrl, setCurrentAudioUrl] = React.useState<string>('')
+    const [isPlaying, setIsPlaying] = React.useState(false)
+    const [currentPlayingRow, setCurrentPlayingRow] = React.useState<string | null>(null)
 
     const {
         filters,
@@ -23,11 +33,8 @@ export const CallerAnalysisContainer: React.FC = () => {
         removeFilters,
         clearAllFilters,
         hasActiveFilters,
-        totalRecords,
         isLoading,
     } = useCallerAnalysis()
-
-    const columns = useTableColumns()
 
     const handleRowClick = (row: CallData) => {
         setSelectedCaller(row)
@@ -38,6 +45,53 @@ export const CallerAnalysisContainer: React.FC = () => {
         setOpenModal(false)
         setSelectedCaller(null)
     }
+
+    const handleStatusClick = (callerData: CallData) => {
+        setSelectedCaller(callerData)
+        setOpenStatusModal(true)
+    }
+
+    const handleCloseStatusModal = () => {
+        setOpenStatusModal(false)
+        setSelectedCaller(null)
+    }
+
+    const handleTranscriptClick = (callerData: CallData) => {
+        setSelectedCaller(callerData)
+        setOpenTranscriptModal(true)
+    }
+
+    const handleCloseTranscriptModal = () => {
+        setOpenTranscriptModal(false)
+        setSelectedCaller(null)
+    }
+
+    // Audio player handlers
+    const handlePlayAudio = (audioUrl: string, rowId: string) => {
+        if (currentPlayingRow === rowId) {
+            // Same row clicked - toggle play/pause
+            setIsPlaying(!isPlaying)
+        } else {
+            // Different row clicked - start playing new audio
+            setCurrentAudioUrl(audioUrl)
+            setCurrentPlayingRow(rowId)
+            setIsPlaying(true)
+            setAudioPlayerVisible(true)
+        }
+    }
+
+    const handleCloseAudioPlayer = () => {
+        setAudioPlayerVisible(false)
+        setCurrentAudioUrl('')
+        setIsPlaying(false)
+        setCurrentPlayingRow(null)
+    }
+
+    const handleAudioPlayPause = (playing: boolean) => {
+        setIsPlaying(playing)
+    }
+
+    const columns = useTableColumns(handleStatusClick, handleTranscriptClick, handlePlayAudio, currentPlayingRow, isPlaying)
 
     return (
         <div className="min-h-screen content">
@@ -110,6 +164,8 @@ export const CallerAnalysisContainer: React.FC = () => {
                         className="w-full min-w-[600px] max-w-full"
                     />
                 </div>
+
+                {/* Personal Identification Modal */}
                 <Modal
                     open={openModal}
                     onClose={handleCloseModal}
@@ -118,7 +174,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                     size="full"
                     className={'max-w-[40%]'}
                 >
-                    <div>
+                    <div className="h-full overflow-y-auto custom-scroll">
                         {selectedCaller && (
                             <PersonalIdentification
                                 callerData={selectedCaller}
@@ -126,6 +182,35 @@ export const CallerAnalysisContainer: React.FC = () => {
                         )}
                     </div>
                 </Modal>
+
+                {/* Status Modal */}
+                {selectedCaller && (
+                    <StatusModal
+                        callerData={selectedCaller}
+                        isOpen={openStatusModal}
+                        onClose={handleCloseStatusModal}
+                    />
+                )}
+
+                {/* Call Transcript Modal */}
+                {selectedCaller && (
+                    <CallTranscriptModal
+                        callerData={selectedCaller}
+                        isOpen={openTranscriptModal}
+                        onClose={handleCloseTranscriptModal}
+                    />
+                )}
+
+                {/* Audio Player */}
+                {audioPlayerVisible && (
+                    <AudioPlayer
+                        audioUrl={currentAudioUrl}
+                        isVisible={audioPlayerVisible}
+                        onClose={handleCloseAudioPlayer}
+                        onPlayPause={handleAudioPlayPause}
+                        isPlaying={isPlaying}
+                    />
+                )}
             </div>
         </div>
     )

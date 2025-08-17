@@ -342,3 +342,20 @@ a:hover {
 .theme-light .banner-btn .icon {
     @apply fill-[#5E6278] group-hover:fill-[#5E6278];
 }
+
+/* Banner button styles from frontend */
+.theme-dark .audio-player {
+    @apply border-[#0254a5];
+}
+
+.theme-dark .audio-player .icon {
+    @apply fill-[#F5F8FA] group-hover:fill-white;
+}
+
+.theme-light .audio-player {
+    @apply border-[#e0e0e0];
+}
+
+.theme-light .audio-player .icon {
+    @apply fill-[#5E6278] group-hover:fill-[#5E6278];
+}

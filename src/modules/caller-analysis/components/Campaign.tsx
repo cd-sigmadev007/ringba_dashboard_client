@@ -9,6 +9,11 @@ interface CampaignProps {
 }
 
 export const Campaign: React.FC<CampaignProps> = ({ campaign }) => {
+    // Safety check for undefined/null campaign
+    if (!campaign || typeof campaign !== 'string') {
+        return null
+    }
+    
     // Map campaign letters to images
     const campaignImages = [
         { key: 'M', image: medicareImg, name: 'Medicare' },
@@ -30,16 +35,15 @@ export const Campaign: React.FC<CampaignProps> = ({ campaign }) => {
             {activeCampaigns.map((item, index) => (
                 <Tooltip
                     key={`campaign-${index}`}
-                    id={`campaign-${item.key}-${index}`}
                     tooltipText={item.name}
                 >
                     <div
-                        key={item.key}
-                        className="relative w-6 h-6 rounded-full overflow-hidden"
+                        className="relative w-6 h-6 rounded-full overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                         style={{
                             marginLeft: index > 0 ? '-3px' : '0',
                             zIndex: activeCampaigns.length - index,
                         }}
+                        title={item.name} // Fallback tooltip
                     >
                         <img
                             src={item.image}

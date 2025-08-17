@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Tooltip } from 'react-tooltip'
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
@@ -17,26 +17,43 @@ interface TooltipProps {
 const Index: React.FC<TooltipProps> = ({
     tooltipText,
     children,
-    id = 12,
+    id,
     disable = false,
     className,
     classContainer,
     fragment = false,
     width,
 }) => {
+    // Generate unique ID if none provided
+    const uniqueId = useMemo(() => {
+        if (id) return String(id)
+        // Use crypto.randomUUID() for unique ID generation with fallback
+        try {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return `tooltip-${crypto.randomUUID()}`
+            } else {
+                // Fallback for environments without crypto.randomUUID
+                return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
+            }
+        } catch (error) {
+            // Fallback for any crypto errors
+            return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
+        }
+    }, [id])
+
     return (
         <>
             {fragment ? (
-                <div id={String(id)} style={{ width }}>
+                <div id={uniqueId} style={{ width }}>
                     {children}
                 </div>
             ) : (
-                <div id={String(id)}>{children}</div>
+                <div id={uniqueId}>{children}</div>
             )}
             {!disable && (
                 <Tooltip
                     positionStrategy="fixed"
-                    anchorId={String(id)}
+                    anchorId={uniqueId}
                     style={{
                         backgroundColor: '#5E6278',
                         color: '#F5F8FA',

@@ -2,7 +2,8 @@ import React from 'react'
 import clsx from 'clsx'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
-import { Status } from '@/modules'
+import { useIsMobile } from '@/lib/hooks/useMediaQuery'
+import { PriorityStatusSection } from './PriorityStatusSection'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -13,6 +14,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const isMobile = useIsMobile()
 
     // Mock data based on CSV structure
     const additionalData = {
@@ -55,16 +57,26 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
     // Styles
     const labelClass = clsx(
-        'text-sm w-full max-w-[25%]',
+        'text-sm w-full max-w-[150px] whitespace-nowrap',
         isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
     )
     const valueClass = clsx(
         'text-sm',
         isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     )
+    
+    // Theme-aware border and background classes
+    const borderClass = clsx(
+        'border',
+        isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+    )
+    
+    const containerBgClass = clsx(
+        isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
+    )
 
     return (
-        <div className="w-full">
+        <div className="w-full overflow-y-auto custom-scroll">
             <h2
                 className={clsx(
                     'text-md font-semibold mb-6',
@@ -75,11 +87,14 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
             </h2>
 
             {/* Personal Info + Revenue */}
-            <div className="flex flex-col rounded-sm border border-[#1B456F] mb-6">
+            <div className={clsx('flex flex-col rounded-sm mb-6', containerBgClass, borderClass)}>
                 {personalInfo.map((item, idx) => (
                     <div
                         key={idx}
-                        className="flex p-3.5 border-b border-[#1B456F] items-start gap-x-[32px]"
+                        className={clsx(
+                            'flex p-3.5 items-start gap-x-[32px] border-b last:border-b-0',
+                            isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                        )}
                     >
                         <p className={labelClass}>{item.label}</p>
                         <p className={valueClass}>{item.value}</p>
@@ -87,101 +102,88 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 ))}
 
                 {/* Lifetime Revenue Section inside */}
-                <div className="flex p-3.5 border-b border-[#1B456F] items-start gap-x-[32px]">
+                <div className={clsx(
+                    'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
+                    isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
+                    isMobile ? 'flex-col gap-y-4' : 'flex-row'
+                )}>
                     <p className={labelClass}>Lifetime Revenue</p>
-                    {revenueInfo.map((count, i) => (
-                        <div
-                            key={i}
-                            className="flex flex-col items-start gap-x-[24px] mb-1"
-                        >
-                            <p
+                    <div className={clsx(
+                        'flex',
+                        isMobile ? 'flex-col gap-y-2 self-end' : 'flex-row gap-x-6'
+                    )}>
+                        {revenueInfo.map((count, i) => (
+                            <div
+                                key={i}
                                 className={clsx(
-                                    'text-sm',
-                                    isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                                    'flex flex-col',
+                                    isMobile ? 'justify-between items-start w-full' : 'items-start gap-x-[24px]'
                                 )}
                             >
-                                {count.label}
-                            </p>
-                            <p className={clsx('font-bold', valueClass)}>
-                                {count.value}
-                            </p>
-                        </div>
-                    ))}
+                                <p
+                                    className={clsx(
+                                        'text-sm',
+                                        isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+                                        isMobile ? 'text-xs' : ''
+                                    )}
+                                >
+                                    {count.label}
+                                </p>
+                                <p className={clsx(
+                                    'font-bold', 
+                                    valueClass,
+                                    isMobile ? 'text-sm' : ''
+                                )}>
+                                    {count.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Status Section */}
-                {/* Highest Priority */}
-                <div className="flex flex-col border-b border-[#1B456F]">
-                    <div className="flex p-3.5 items-start gap-x-[32px]">
-                        <p className={labelClass}>Highest Priority</p>
-                        <div className="flex-1">
-                            <Status
-                                status={callerData.status.filter(
-                                    (status) =>
-                                        status ===
-                                            'High-Quality Un-billed (Critical)' ||
-                                        status === 'Chargeback Risk (Critical)'
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PriorityStatusSection
+                    title="Highest Priority"
+                    statuses={callerData.status.filter(
+                        (status) =>
+                            status === 'High-Quality Un-billed (Critical)' ||
+                            status === 'Chargeback Risk (Critical)'
+                    )}
+                />
 
-                {/* High Priority */}
-                <div className="flex flex-col border-b border-[#1B456F]">
-                    <div className="flex p-3.5 items-start gap-x-[32px]">
-                        <p className={labelClass}>High Priority</p>
-                        <div className="flex-1">
-                            <Status
-                                status={callerData.status.filter(
-                                    (status) =>
-                                        status === 'Wrong Appliance Category' ||
-                                        status ===
-                                            'Wrong Pest Control Category' ||
-                                        status === 'Short Call (<90s)' ||
-                                        status === 'Buyer Hung Up' ||
-                                        status === 'Immediate Hangup (<10s)' ||
-                                        status === 'No Coverage (ZIP)'
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PriorityStatusSection
+                    title="High Priority"
+                    statuses={callerData.status.filter(
+                        (status) =>
+                            status === 'Wrong Appliance Category' ||
+                            status === 'Wrong Pest Control Category' ||
+                            status === 'Short Call (<90s)' ||
+                            status === 'Buyer Hung Up' ||
+                            status === 'Immediate Hangup (<10s)' ||
+                            status === 'No Coverage (ZIP)'
+                    )}
+                />
 
-                {/* Medium Priority */}
-                <div className="flex flex-col border-b border-[#1B456F]">
-                    <div className="flex p-3.5 items-start gap-x-[32px]">
-                        <p className={labelClass}>Medium Priority</p>
-                        <div className="flex-1">
-                            <Status
-                                status={callerData.status.filter(
-                                    (status) =>
-                                        status === 'Competitor Mentioned' ||
-                                        status === 'Booking Intent' ||
-                                        status === 'Warranty/Status Inquiry'
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PriorityStatusSection
+                    title="Medium Priority"
+                    statuses={callerData.status.filter(
+                        (status) =>
+                            status === 'Competitor Mentioned' ||
+                            status === 'Booking Intent' ||
+                            status === 'Warranty/Status Inquiry'
+                    )}
+                />
 
-                {/* Low Priority */}
-                <div className="flex flex-col rounded-sm">
-                    <div className="flex p-3.5 items-start gap-x-[32px]">
-                        <p className={labelClass}>Low Priority</p>
-                        <div className="flex-1">
-                            <Status
-                                status={callerData.status.filter(
-                                    (status) =>
-                                        status === 'Positive Sentiment' ||
-                                        status === 'Negative Sentiment' ||
-                                        status === 'Repeat Customer' ||
-                                        status === 'Technical Terms Used'
-                                )}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PriorityStatusSection
+                    title="Low Priority"
+                    statuses={callerData.status.filter(
+                        (status) =>
+                            status === 'Positive Sentiment' ||
+                            status === 'Negative Sentiment' ||
+                            status === 'Repeat Customer' ||
+                            status === 'Technical Terms Used'
+                    )}
+                />
             </div>
         </div>
     )

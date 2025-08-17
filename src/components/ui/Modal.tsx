@@ -7,6 +7,7 @@ import type { VariantProps } from 'class-variance-authority'
 import { cn, useIsMobile } from '@/lib'
 import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import CrossIcon from '@/assets/svg/CrossIcon'
+import { useThemeStore } from '@/store/themeStore'
 
 // Overlay container variants
 const modalVariants = cva('fixed inset-0 z-[9999] flex', {
@@ -32,7 +33,7 @@ const modalVariants = cva('fixed inset-0 z-[9999] flex', {
 
 // Modal content variants
 const modalContentVariants = cva(
-    'relative bg-[#071B2F] border-0 shadow-lg pointer-events-auto',
+    'relative border-0 shadow-lg pointer-events-auto',
     {
         variants: {
             size: {
@@ -59,28 +60,28 @@ const modalContentVariants = cva(
             {
                 animation: 'slide',
                 position: 'bottom',
-                class: 'animate-in slide-in-from-bottom-4 duration-300',
+                className: 'animate-in slide-in-from-bottom duration-300',
             },
             {
                 animation: 'slide',
                 position: 'top',
-                class: 'animate-in slide-in-from-top-4 duration-300',
+                className: 'animate-in slide-in-from-top duration-300',
             },
             {
                 animation: 'slide',
                 position: 'left',
-                class: 'animate-in slide-in-from-left-4 duration-300',
+                className: 'animate-in slide-in-from-left duration-300',
             },
             {
                 animation: 'slide',
                 position: 'right',
-                class: 'animate-in slide-in-from-right-4 duration-300',
+                className: 'animate-in slide-in-from-right duration-300',
             },
         ],
         defaultVariants: {
             size: 'md',
             position: 'center',
-            animation: 'scale',
+            animation: 'fade',
         },
     }
 )
@@ -91,7 +92,7 @@ export interface ModalProps
     open: boolean
     onClose: () => void
     children: ReactNode
-    title?: ReactNode
+    title?: string
     showCloseButton?: boolean
     showSeparator?: boolean
     className?: string
@@ -116,6 +117,9 @@ export const Modal: FC<ModalProps> = ({
     container,
     border = false,
 }) => {
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
+    
     // Body scroll lock
     const isMobile = useIsMobile()
 
@@ -151,6 +155,7 @@ export const Modal: FC<ModalProps> = ({
                 ref={modalRef}
                 className={cn(
                     modalContentVariants({ size, position, animation }),
+                    isDark ? 'bg-[#071B2F]' : 'bg-white',
                     className,
                     'pb-6'
                 )}
@@ -160,12 +165,16 @@ export const Modal: FC<ModalProps> = ({
                 }}
             >
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 bg-[#071B2F] z-10">
+                    <div className={cn(
+                        "flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 z-10",
+                        isDark ? 'bg-[#071B2F]' : 'bg-white'
+                    )}>
                         {title && (
                             <h2
                                 id="modal-title"
                                 className={cn(
-                                    'text-[24px] font-semibold text-[#F5F8FA]',
+                                    'text-[24px] font-semibold',
+                                    isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
                                     isMobile && 'text-[20px]'
                                 )}
                             >
@@ -178,7 +187,10 @@ export const Modal: FC<ModalProps> = ({
                                     e.stopPropagation()
                                     onClose()
                                 }}
-                                className="hover:bg-[#1B456F]/20 rounded-[20px] transition-colors"
+                                className={cn(
+                                    "hover:rounded-[20px] transition-colors",
+                                    isDark ? 'hover:bg-[#1B456F]/20' : 'hover:bg-[#F1F3F4]/80'
+                                )}
                                 aria-label="Close modal"
                             >
                                 <CrossIcon className="w-[30px] h-[30px]" />
@@ -187,20 +199,28 @@ export const Modal: FC<ModalProps> = ({
                     </div>
                 )}
 
-                {showSeparator && <div className="mx-6 h-px bg-[#A1A5B7]" />}
+                {showSeparator && <div className={cn(
+                    "mx-6 h-px",
+                    isDark ? 'bg-[#A1A5B7]' : 'bg-[#E1E5E9]'
+                )} />}
 
                 <div
                     className={cn(
-                        'mx-6 overflow-y-auto custom-scroll border border-[#1B456F] rounded-[7px] bg-transparent',
-                        !border && 'border-none',
-                        'max-h-full pr-2'
+                        'mx-6 overflow-y-auto custom-scroll rounded-[7px]',
+                        border && cn(
+                            'border',
+                            isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                        ),
+                        'max-h-full'
                     )}
                     onClick={(e) => {
                         // Stop propagation to prevent the content area from closing when clicked
                         e.stopPropagation()
                     }}
                 >
-                    <div className="text-[#F5F8FA]">{children}</div>
+                    <div className={cn(
+                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                    )}>{children}</div>
                 </div>
             </div>
         </div>

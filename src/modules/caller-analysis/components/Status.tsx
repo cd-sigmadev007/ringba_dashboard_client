@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import type { StatusItem } from '@/modules'
+
 import {
     PRIORITY_COLORS,
     PRIORITY_INLINE_STYLES,
@@ -89,8 +90,8 @@ export const Status: React.FC<StatusProps> = ({
     return (
         <div
             className={cn(
-                'flex gap-2 max-w-full overflow-hidden',
-                enablePillOverflow && 'overflow-x-auto'
+                'flex gap-2 max-w-full',
+                enablePillOverflow ? 'overflow-x-auto' : 'flex-wrap'
             )}
         >
             {sortedStatusItems.map((statusItem) => {
@@ -109,7 +110,7 @@ export const Status: React.FC<StatusProps> = ({
                         style={inlineStyles}
                         title={`Priority: ${priority}`}
                     >
-                        <Tooltip id={id} tooltipText={title}>
+                        <Tooltip tooltipText={title}>
                             {truncate ? title.slice(0, 8) + '...' : title}
                         </Tooltip>
                     </span>

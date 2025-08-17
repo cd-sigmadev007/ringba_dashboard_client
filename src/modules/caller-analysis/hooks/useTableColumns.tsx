@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import Button from '../../../components/ui/Button'
 import Tooltip from '../../../components/common/Tooltip'
 import Status from '../components/Status'
@@ -9,56 +9,21 @@ import { Campaign } from '@/modules'
 import {
   CopyIcon,
   DocumentIcon,
-  PauseIcon,
   PlayIcon,
   WarningIcon,
+  PauseIcon,
 } from '@/assets/svg'
 import { cn } from '@/lib'
 
-export const useTableColumns = () => {
+export const useTableColumns = (
+  onStatusClick: (callerData: CallData) => void,
+  onTranscriptClick: (callerData: CallData) => void,
+  onPlayAudio: (audioUrl: string, rowId: string) => void,
+  currentPlayingRow: string | null,
+  isPlaying: boolean
+) => {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
-
-  // State to track which rows are playing
-  const [playingRows, setPlayingRows] = useState<Set<string>>(new Set())
-
-  const togglePlayPause = (rowId: string) => {
-    setPlayingRows((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(rowId)) {
-        newSet.delete(rowId)
-      } else {
-        newSet.add(rowId)
-      }
-      return newSet
-    })
-  }
-
-  // Effect to handle table overflow and column widths
-  useEffect(() => {
-    const handleTableOverflow = () => {
-      const table = document.querySelector('.single-table')
-      if (table) {
-        const container = table.closest('.table-overflow-container')
-        if (container) {
-          const isOverflowing = table.scrollWidth > container.clientWidth
-          if (isOverflowing) {
-            container.classList.add('has-overflow')
-          } else {
-            container.classList.remove('has-overflow')
-          }
-        }
-      }
-    }
-
-    // Check on mount and resize
-    handleTableOverflow()
-    window.addEventListener('resize', handleTableOverflow)
-    
-    return () => {
-      window.removeEventListener('resize', handleTableOverflow)
-    }
-  }, [])
 
   return useMemo<Array<ColumnDef<CallData>>>(
     () => [
@@ -72,9 +37,15 @@ export const useTableColumns = () => {
         cell: ({ getValue }) => (
           <div className="flex items-center gap-[10px]">
             <span className="text-sm truncate">{getValue() as string}</span>
-            <Button variant="ghost" className="p-1 min-w-0 h-auto">
-              <CopyIcon />
-            </Button>
+            <Tooltip tooltipText="Copy Caller ID">
+              <Button 
+                variant="ghost" 
+                className="p-1 min-w-0 h-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <CopyIcon />
+              </Button>
+            </Tooltip>
           </div>
         ),
       },
@@ -153,40 +124,47 @@ export const useTableColumns = () => {
         accessorKey: 'action',
         meta: { width: 120 },
         cell: ({ row }) => {
-          const isPlaying = playingRows.has(row.id)
-
           return (
             <div className="flex items-center gap-[5px]">
-              {/* Play/Pause Button */}
-              <Button
-                variant="ghost"
-                className={cn(
-                  'p-1 flex items-center justify-center h-auto w-[24px] h-[25px]',
-                  isPlaying && 'bg-[#1B456F] text-[#F5F8FA]',
-                )}
-                onClick={() => togglePlayPause(row.id)}
-                title={isPlaying ? 'Pause' : 'Play'}
-              >
-                {isPlaying ? <PauseIcon /> : <PlayIcon />}
-              </Button>
+              {/* Play Button */}
+              <Tooltip tooltipText={currentPlayingRow === row.original.id && isPlaying ? 'Pause Call Recording' : 'Play Call Recording'}>
+                <Button
+                  variant="ghost"
+                  className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    // For now, use a mock audio URL - we can replace this with actual audio URLs from your data
+                    onPlayAudio('https://cdn.pixabay.com/audio/2025/06/28/audio_4a05c5cd3b.mp3', row.original.id)
+                  }}
+                >
+                  {currentPlayingRow === row.original.id && isPlaying ? <PauseIcon /> : <PlayIcon />}
+                </Button>
+              </Tooltip>
 
-              {/* Document Button */}
-              <Button
-                variant="ghost"
-                className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                title="View Document"
-              >
-                <DocumentIcon />
-              </Button>
+              {/* Document/Transcript Button */}
+              <Tooltip tooltipText="View Call Transcript">
+                <Button
+                  variant="ghost"
+                  className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onTranscriptClick(row.original)
+                  }}
+                >
+                  <DocumentIcon />
+                </Button>
+              </Tooltip>
 
               {/* Warning Button */}
-              <Button
-                variant="ghost"
-                className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                title="Warning"
-              >
-                <WarningIcon />
-              </Button>
+              <Tooltip tooltipText="View Warning Details">
+                <Button
+                  variant="ghost"
+                  className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <WarningIcon />
+                </Button>
+              </Tooltip>
             </div>
           )
         },
@@ -198,27 +176,32 @@ export const useTableColumns = () => {
           width: 200,
           className: 'status-column'
         } as any,
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const status = getValue() as Array<string>
           return (
-            <>
-              <div className="flex items-center justify-end gap-2 w-full">
-                <Status truncate={true} status={status[0]} />
+            <div 
+              className="flex items-center justify-end gap-2 w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Status truncate={true} status={status[0]} />
+              <Tooltip tooltipText={`View all ${status.length} statuses`}>
                 <span
                   className={cn(      
-                    ' px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5]'
+                    'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
                   )}
-                  title={`+${status.length > 0 ? status.length - 1 : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onStatusClick(row.original)
+                  }}
                 >
                   +{status.length > 0 ? status.length - 1 : ''}
                 </span>
-
-              </div>
-            </>
+              </Tooltip>
+            </div>
           )
         },
       },
     ],
-    [isDark, playingRows, togglePlayPause],
+    [isDark, onStatusClick, onTranscriptClick, onPlayAudio, currentPlayingRow, isPlaying],
   )
 }
