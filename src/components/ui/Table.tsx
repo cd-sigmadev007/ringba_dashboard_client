@@ -120,13 +120,13 @@ const Table = <T,>({
 
         // Check immediately
         checkOverflow()
-        
+
         // Check after a small delay to ensure DOM is fully rendered
         const timeoutId = setTimeout(checkOverflow, 100)
-        
+
         // Check on window resize
         window.addEventListener('resize', checkOverflow)
-        
+
         // Check on scroll events within the container
         const containerElement = containerRef.current
         if (containerElement) {
@@ -180,9 +180,9 @@ const Table = <T,>({
         initialState: {
             pagination: pagination
                 ? {
-                      pageIndex: 0,
-                      pageSize,
-                  }
+                    pageIndex: 0,
+                    pageSize,
+                }
                 : undefined,
         },
     })
@@ -270,7 +270,7 @@ const Table = <T,>({
                 ) : null}
 
                 {/* Table container */}
-                <div 
+                <div
                     className={cn(
                         'overflow-x-auto',
                         isOverflowing && 'table-scrollable'
@@ -310,20 +310,19 @@ const Table = <T,>({
                                                                 .columnDef
                                                                 .meta as any
                                                         )?.sticky
-                                                            ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${
-                                                                isDark ? 'bg-[#001E3C]' : 'bg-[#F5F8FA]'
+                                                            ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${isDark ? 'bg-[#001E3C]' : 'bg-[#F5F8FA]'
                                                             } relative`
                                                             : 'static w-auto',
                                                         isDark
                                                             ? 'text-[#A1A5B7]'
                                                             : 'text-[#5E6278]',
                                                         index === 0 &&
-                                                            'first:rounded-tl-[10px]',
+                                                        'first:rounded-tl-[10px]',
                                                         index ===
-                                                            headerGroup.headers
-                                                                .length -
-                                                                1 &&
-                                                            'last:rounded-tr-[10px]'
+                                                        headerGroup.headers
+                                                            .length -
+                                                        1 &&
+                                                        'last:rounded-tr-[10px]'
                                                     )}
                                                 >
                                                     {header.column.getCanSort() ? (
@@ -421,8 +420,7 @@ const Table = <T,>({
                                                     cell.column.columnDef
                                                         .meta as any
                                                 )?.sticky
-                                                    ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
-                                                        isDark ? 'bg-[#001E3C]' : 'bg-white'
+                                                    ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${isDark ? 'bg-[#001E3C]' : 'bg-white'
                                                     } relative`
                                                     : 'static',
                                                 isDark
@@ -441,123 +439,118 @@ const Table = <T,>({
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination */}
-                {pagination && (
+            </div>
+            {/* Pagination */}
+            {pagination && (
+                <div
+                    className={clsx(
+                        'px-2 py-5 flex items-center justify-between'
+                    )}
+                >
                     <div
                         className={clsx(
-                            'px-5 py-3 flex items-center justify-between border-t',
-                            isDark
-                                ? 'bg-[#071B2F] border-[#1B456F]'
-                                : 'bg-white border-[#E0E0E0]'
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
                         )}
                     >
-                        <div
-                            className={clsx(
-                                'text-sm',
-                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                            )}
-                        >
-                            Showing{' '}
-                            {table.getState().pagination.pageIndex * pageSize +
-                                1}{' '}
-                            to{' '}
-                            {Math.min(
-                                (table.getState().pagination.pageIndex + 1) *
-                                    pageSize,
-                                table.getPrePaginationRowModel().rows.length
-                            )}{' '}
-                            of {table.getPrePaginationRowModel().rows.length}{' '}
-                            entries
-                        </div>
-                        <div className="flex items-center gap-1">
-                            {/* Page Numbers */}
-                            {(() => {
-                                const totalPages = table.getPageCount();
-                                const currentPage = table.getState().pagination.pageIndex + 1;
-                                const maxVisiblePages = 7; // Show max 7 page numbers
-                                
-                                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-                                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                                
-                                // Adjust start page if we're near the end
-                                if (endPage - startPage < maxVisiblePages - 1) {
-                                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                                }
-                                
-                                const pages = [];
-                                
-                                // First page
-                                if (startPage > 1) {
-                                    pages.push(
-                                        <Button
-                                            key="1"
-                                            variant="ghost"
-                                            onClick={() => table.setPageIndex(0)}
-                                            className="px-2 py-1 text-xs"
-                                        >
-                                            1
-                                        </Button>
-                                    );
-                                    
-                                    if (startPage > 2) {
-                                        pages.push(
-                                            <span key="dots1" className={clsx(
-                                                'px-2 text-xs',
-                                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                                            )}>
-                                                ...
-                                            </span>
-                                        );
-                                    }
-                                }
-                                
-                                // Page numbers
-                                for (let i = startPage; i <= endPage; i++) {
-                                    pages.push(
-                                        <Button
-                                            key={i}
-                                            variant={i === currentPage ? "primary" : "ghost"}
-                                            onClick={() => table.setPageIndex(i - 1)}
-                                            className="px-2 py-1 text-xs"
-                                        >
-                                            {i}
-                                        </Button>
-                                    );
-                                }
-                                
-                                // Last page
-                                if (endPage < totalPages) {
-                                    if (endPage < totalPages - 1) {
-                                        pages.push(
-                                            <span key="dots2" className={clsx(
-                                                'px-2 text-xs',
-                                                isDark ? 'text-[#A1A5B7]' : 'text-[#A1A5B7]'
-                                            )}>
-                                                ...
-                                            </span>
-                                        );
-                                    }
-                                    
-                                    pages.push(
-                                        <Button
-                                            key={totalPages}
-                                            variant="ghost"
-                                            onClick={() => table.setPageIndex(totalPages - 1)}
-                                            className="px-2 py-1 text-xs"
-                                        >
-                                            {totalPages}
-                                        </Button>
-                                    );
-                                }
-                                
-                                return pages;
-                            })()}
-
-                        </div>
+                        Showing{' '}
+                        {table.getState().pagination.pageIndex * pageSize +
+                            1}{' '}
+                        to{' '}
+                        {Math.min(
+                            (table.getState().pagination.pageIndex + 1) *
+                            pageSize,
+                            table.getPrePaginationRowModel().rows.length
+                        )}{' '}
+                        of {table.getPrePaginationRowModel().rows.length}{' '}
+                        entries
                     </div>
-                )}
-            </div>
+                    <div className="flex items-center gap-[10px]">
+                        {/* Page Numbers */}
+                        {(() => {
+                            const totalPages = table.getPageCount();
+                            const currentPage = table.getState().pagination.pageIndex + 1;
+                            const maxVisiblePages = 3; // Show max 7 page numbers
+
+                            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                            // Adjust start page if we're near the end
+                            if (endPage - startPage < maxVisiblePages - 1) {
+                                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                            }
+
+                            const pages = [];
+
+                            // First page
+                            if (startPage > 1) {
+                                pages.push(
+                                    <Button
+                                        key="1"
+                                        variant="ghost"
+                                        onClick={() => table.setPageIndex(0)}
+                                        className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
+                                    >
+                                        1
+                                    </Button>
+                                );
+
+                                if (startPage > 2) {
+                                    pages.push(
+                                        <span key="dots1" className={clsx(
+                                            'text-md',
+                                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                                        )}>
+                                            ...
+                                        </span>
+                                    );
+                                }
+                            }
+
+                            // Page numbers
+                            for (let i = startPage; i <= endPage; i++) {
+                                pages.push(
+                                    <Button
+                                        key={i}
+                                        variant={i === currentPage ? "primary" : "secondary"}
+                                        onClick={() => table.setPageIndex(i - 1)}
+                                        className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
+                                    >
+                                        {i}
+                                    </Button>
+                                );
+                            }
+
+                            // Last page
+                            if (endPage < totalPages) {
+                                if (endPage < totalPages - 1) {
+                                    pages.push(
+                                        <span key="dots2" className={clsx(
+                                            'text-md',
+                                            isDark ? 'text-[#A1A5B7]' : 'text-[#A1A5B7]'
+                                        )}>
+                                            ...
+                                        </span>
+                                    );
+                                }
+
+                                pages.push(
+                                    <Button
+                                        key={totalPages}
+                                        variant="secondary"
+                                        onClick={() => table.setPageIndex(totalPages - 1)}
+                                        className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
+                                    >
+                                        {totalPages}
+                                    </Button>
+                                );
+                            }
+
+                            return pages;
+                        })()}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

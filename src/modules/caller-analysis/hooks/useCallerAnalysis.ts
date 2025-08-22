@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import isSameOrAfter from 'dayjs/plugin/isSameOrBefore'
+import isSameOrBefore from 'dayjs/plugin/isSameOrAfter'
 
 import type { CallData, FilterState } from '../types'
-import { useCallerAnalysisApi } from './useCallerAnalysisApi'
+import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import {
     matchesCampaignFilter,
     matchesDurationFilter,
@@ -25,51 +25,51 @@ export const useCallerAnalysis = () => {
         searchQuery: '',
     })
 
-    const [totalRecords, setTotalRecords] = useState(0)
+    const [data, setData] = useState<CallData[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [totalRecords, setTotalRecords] = useState(0)
 
-    const { useGetAllCallers, convertApiDataToCallData } = useCallerAnalysisApi()
-
-    // Fetch data from API without pagination to let Table component handle it
-    const { 
-        data: apiData, 
-        isLoading: apiLoading, 
-        refetch 
-    } = useGetAllCallers(filters, 1, 10000) // Fetch all data for client-side pagination
-
-    // Update loading state and total records
+    // Fetch all data for client-side pagination
     useEffect(() => {
-        setIsLoading(apiLoading)
-        if (apiData?.pagination) {
-            setTotalRecords(apiData.pagination.total)
+        const fetchData = async () => {
+            setIsLoading(true)
+            try {
+                console.log('🔄 Fetching all callers data...')
+                const response = await callerAnalysisApi.getAllCallers({
+                    filters,
+                    page: 1,
+                    limit: 1000, // Fetch 1000 records for client-side pagination
+                })
+                console.log('✅ Data fetched:', response)
+                setData(response.data)
+                setTotalRecords(response.pagination.total)
+            } catch (error) {
+                console.error('❌ Failed to fetch data:', error)
+            } finally {
+                setIsLoading(false)
+            }
         }
-    }, [apiLoading, apiData])
 
-    // Filter data based on current filters and pagination
+        fetchData()
+    }, [filters])
+
+    // Filter data based on current filters
     const filteredData = useMemo(() => {
-        if (!apiData?.data) {
+        console.log('🔍 Filtering data:', { 
+            dataLength: data.length,
+            filters: filters
+        })
+        
+        if (!data.length) {
+            console.log('📄 No data available')
             return []
         }
         
-        const allData = convertApiDataToCallData(apiData.data)
-        
-        // Apply client-side filtering to the fetched data
-        return allData.filter((d: CallData) => {
+        // Apply client-side filtering
+        const filtered = data.filter((d: CallData) => {
             // Search filter (caller ID)
             if (!matchesSearchQuery(d.callerId, filters.searchQuery)) {
                 return false
-            }
-
-            // Date filter
-            if (filters.dateRange.from && filters.dateRange.to) {
-                const dateStr = d.lastCall.split(' ET')[0]
-                const date = dayjs(dateStr, 'MMM DD, hh:mm:ss A')
-                if (
-                    !date.isSameOrAfter(dayjs(filters.dateRange.from)) ||
-                    !date.isSameOrBefore(dayjs(filters.dateRange.to))
-                ) {
-                    return false
-                }
             }
 
             // Campaign filter
@@ -89,7 +89,14 @@ export const useCallerAnalysis = () => {
 
             return true
         })
-    }, [apiData, filters, convertApiDataToCallData])
+        
+        console.log('🔍 Filtered data:', { 
+            original: data.length, 
+            filtered: filtered.length 
+        })
+        
+        return filtered
+    }, [data, filters])
 
     // Filter update functions
     const updateFilters = {
@@ -162,20 +169,37 @@ export const useCallerAnalysis = () => {
         filters.durationRange.min !== undefined ||
         filters.durationRange.max !== undefined
 
-
+    // Refresh function
+    const refetch = () => {
+        const fetchData = async () => {
+            setIsLoading(true)
+            try {
+                const response = await callerAnalysisApi.getAllCallers({
+                    filters,
+                    page: 1,
+                    limit: 1000,
+                })
+                setData(response.data)
+                setTotalRecords(response.pagination.total)
+            } catch (error) {
+                console.error('❌ Failed to refetch data:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchData()
+    }
 
     return {
         filters,
-        filteredData: filteredData, // Return filtered data from API
-        allFilteredData: filteredData, // Keep reference for consistency
+        filteredData,
+        allFilteredData: filteredData,
         updateFilters,
         removeFilters,
         clearAllFilters,
         hasActiveFilters,
-        totalRecords: totalRecords,
+        totalRecords,
         isLoading,
-
-        // Refresh
         refetch,
     }
 }

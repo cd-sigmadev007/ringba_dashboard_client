@@ -10,6 +10,7 @@ import { Modal, Table, AudioPlayer } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { FilterPills, FiltersSection } from '@/modules'
 
+
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -93,6 +94,8 @@ export const CallerAnalysisContainer: React.FC = () => {
         setIsPlaying(playing)
     }
 
+
+
     const columns = useTableColumns(handleStatusClick, handleTranscriptClick, handlePlayAudio, currentPlayingRow, isPlaying)
 
     return (
@@ -175,7 +178,6 @@ export const CallerAnalysisContainer: React.FC = () => {
                         columns={columns}
                         showHeader={true}
                         pagination={true}
-                        pageSize={10}
                         clickableRows={true}
                         onRowClick={handleRowClick}
                         size="medium"
@@ -183,8 +185,6 @@ export const CallerAnalysisContainer: React.FC = () => {
                         className="w-full min-w-[600px] max-w-full"
                     />
                 </div>
-
-
 
                 {/* Personal Identification Modal */}
                 <Modal
