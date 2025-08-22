@@ -1,6 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { useThemeStore } from '@/store/themeStore'
+import { useIsMobile } from '@/lib'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import { Modal } from '@/components/ui'
 import type { CallData } from '../types'
@@ -18,6 +19,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const isMobile = useIsMobile()
 
     // Categorize statuses by priority
     const highestPriorityStatuses = callerData.status.filter(
@@ -56,8 +58,10 @@ export const StatusModal: React.FC<StatusModalProps> = ({
             open={isOpen}
             onClose={onClose}
             title="Status Overview"
-            size="lg"
-            className="max-w-4xl"
+            position={isMobile ? 'bottom' : 'center'}
+            size={isMobile ? 'full' : 'lg'}
+            className={isMobile ? 'max-w-full max-h-[40vh]' : 'max-w-4xl'}
+            animation={isMobile ? 'slide' : 'fade'}
             border={true}
         >
             <div className="space-y-6">

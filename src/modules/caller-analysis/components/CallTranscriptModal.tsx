@@ -1,6 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { useThemeStore } from '@/store/themeStore'
+import { useIsMobile } from '@/lib'
 import { Modal } from '@/components/ui'
 import type { CallData } from '../types'
 
@@ -17,6 +18,7 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const isMobile = useIsMobile()
 
     // Mock transcript data - in real app this would come from API
     const transcriptData = [
@@ -46,8 +48,10 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
             open={isOpen}
             onClose={onClose}
             title="Call Transcript"
-            size="lg"
-            className="max-w-4xl"
+            position={isMobile ? 'bottom' : 'center'}
+            size={isMobile ? 'full' : 'lg'}
+            className={isMobile ? 'max-w-full max-h-[75vh]' : 'max-w-4xl'}
+            animation={isMobile ? 'slide' : 'fade'}
             border={true}
         >
             <div className="space-y-4">

@@ -65,9 +65,10 @@ export class CallerAnalysisApiService {
         params.append('campaign', filters.campaignFilter.join(','))
       }
       
-      if (filters.statusFilter.length > 0) {
-        params.append('status', filters.statusFilter.join(','))
-      }
+      // Status filter disabled - using demo status data for now
+      // if (filters.statusFilter.length > 0) {
+      //   params.append('status', filters.statusFilter.join(','))
+      // }
       
       if (filters.dateRange.from) {
         params.append('dateFrom', filters.dateRange.from.toISOString())

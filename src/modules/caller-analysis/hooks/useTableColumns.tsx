@@ -6,6 +6,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { Campaign } from '@/modules'
+import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
 import {
   CopyIcon,
   DocumentIcon,
@@ -31,7 +32,7 @@ export const useTableColumns = (
         header: 'CALLER ID',
         accessorKey: 'callerId',
         meta: { 
-          sticky: true,
+          sticky: 'left',
           width: 150
         } as any,
         cell: ({ getValue }) => (
@@ -90,26 +91,20 @@ export const useTableColumns = (
         accessorKey: 'lifetimeRevenue',
         meta: { width: 140 },
         cell: ({ getValue }) => {
-          const value = getValue() as number
+          const totalCost = getValue() as number
+          
+          // Demo data for cost breakdown - replace with real API data later
+          const adCost = Math.round(totalCost * 0.35 * 100) / 100 // 35% of total
+          const ringbaCost = Math.round(totalCost * 0.45 * 100) / 100 // 45% of total  
+          const thirdPartyCost = Math.round(totalCost * 0.20 * 100) / 100 // 20% of total
+          
           return (
-            <div className="text-sm">
-              <div
-                className={cn(
-                  'font-semibold',
-                  value > 0 ? 'text-green-500' : 'text-gray-500',
-                )}
-              >
-                ${value.toFixed(2)}
-              </div>
-              <div className="w-16 h-1 bg-gray-200 rounded mt-1">
-                <div
-                  className="h-full bg-blue-500 rounded"
-                  style={{
-                    width: `${Math.min((value / 1000) * 100, 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
+            <LifetimeRevenueBreakdown
+              totalCost={totalCost}
+              adCost={adCost}
+              ringbaCost={ringbaCost}
+              thirdPartyCost={thirdPartyCost}
+            />
           )
         },
       },

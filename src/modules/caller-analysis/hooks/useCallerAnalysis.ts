@@ -10,6 +10,7 @@ import {
     matchesDurationFilter,
     matchesDurationRange,
     matchesSearchQuery,
+    matchesStatusFilter,
 } from '@/modules'
 
 dayjs.extend(isSameOrAfter)
@@ -53,6 +54,28 @@ export const useCallerAnalysis = () => {
         fetchData()
     }, [filters])
 
+    // Helper function to parse lastCall date string to Date object
+    const parseLastCallDate = (lastCall: string): Date | null => {
+        try {
+            // Parse the date string format: "Aug 05, 06:00:00 AM ET"
+            const dateMatch = lastCall.match(/(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/)
+            if (!dateMatch) return null
+            
+            const [, month, day, hour, minute, second, ampm] = dateMatch
+            const monthIndex = new Date(Date.parse(month + " 1, 2000")).getMonth()
+            const year = new Date().getFullYear() // Use current year as fallback
+            
+            let hour24 = parseInt(hour)
+            if (ampm === 'PM' && hour24 !== 12) hour24 += 12
+            if (ampm === 'AM' && hour24 === 12) hour24 = 0
+            
+            return new Date(year, monthIndex, parseInt(day), hour24, parseInt(minute), parseInt(second))
+        } catch (error) {
+            console.error('Error parsing date:', lastCall, error)
+            return null
+        }
+    }
+
     // Filter data based on current filters
     const filteredData = useMemo(() => {
         console.log('🔍 Filtering data:', { 
@@ -75,6 +98,24 @@ export const useCallerAnalysis = () => {
             // Campaign filter
             if (!matchesCampaignFilter(d.campaign, filters.campaignFilter)) {
                 return false
+            }
+
+            // Status filter
+            if (!matchesStatusFilter(d.status, filters.statusFilter)) {
+                return false
+            }
+
+            // Date range filter
+            if (filters.dateRange.from || filters.dateRange.to) {
+                const callDate = parseLastCallDate(d.lastCall)
+                if (callDate) {
+                    if (filters.dateRange.from && callDate < filters.dateRange.from) {
+                        return false
+                    }
+                    if (filters.dateRange.to && callDate > filters.dateRange.to) {
+                        return false
+                    }
+                }
             }
 
             // Duration filter (legacy)

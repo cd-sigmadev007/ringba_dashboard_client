@@ -6,6 +6,7 @@ import { StatusModal } from '../components/StatusModal'
 import { CallTranscriptModal } from '../components/CallTranscriptModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
+import { useIsMobile } from '@/lib'
 import { Modal, Table, AudioPlayer } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { FilterPills, FiltersSection } from '@/modules'
@@ -14,6 +15,7 @@ import { FilterPills, FiltersSection } from '@/modules'
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const isMobile = useIsMobile()
     const [openModal, setOpenModal] = React.useState(false)
     const [openStatusModal, setOpenStatusModal] = React.useState(false)
     const [openTranscriptModal, setOpenTranscriptModal] = React.useState(false)
@@ -172,7 +174,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                 </div>
 
                 {/* Main Table */}
-                <div className="table-overflow-container">
+                <div className="w-full overflow-x-auto">
                     <Table
                         data={filteredData}
                         columns={columns}
@@ -182,7 +184,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                         onRowClick={handleRowClick}
                         size="medium"
                         loading={isLoading}
-                        className="w-full min-w-[600px] max-w-full"
+                        className="w-full"
                     />
                 </div>
 
@@ -190,10 +192,11 @@ export const CallerAnalysisContainer: React.FC = () => {
                 <Modal
                     open={openModal}
                     onClose={handleCloseModal}
-                    position={'right'}
+                    position={isMobile ? 'bottom' : 'right'}
                     title="Caller Details"
-                    size="full"
-                    className={'max-w-[40%]'}
+                    size={isMobile ? 'full' : 'full'}
+                    className={isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'}
+                    animation={isMobile ? 'slide' : 'fade'}
                 >
                     <div className="h-full overflow-y-auto custom-scroll">
                         {selectedCaller && (

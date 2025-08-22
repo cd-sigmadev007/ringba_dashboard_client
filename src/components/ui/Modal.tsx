@@ -157,7 +157,8 @@ export const Modal: FC<ModalProps> = ({
                     modalContentVariants({ size, position, animation }),
                     isDark ? 'bg-[#071B2F]' : 'bg-white',
                     className,
-                    'pb-6'
+                    'pb-6',
+                    isMobile && position === 'bottom' && 'pb-8'
                 )}
                 onClick={(e) => {
                     // Stop propagation to prevent the modal content from closing when clicked
@@ -221,8 +222,13 @@ export const Modal: FC<ModalProps> = ({
                     }}
                 >
                     <div className={cn(
-                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-                    )}>{children}</div>
+                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
+                        isMobile && position === 'bottom' && 'pb-4'
+                    )}>
+                        {children}
+                        {/* Add extra bottom spacing for mobile bottom modals */}
+                        {isMobile && position === 'bottom' && <div className="h-4" />}
+                    </div>
                 </div>
             </div>
         </div>

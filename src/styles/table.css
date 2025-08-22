@@ -167,6 +167,15 @@
     /* Table container overflow handling */
     .table-container {
         position: relative;
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    /* Responsive table wrapper */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Ensure sticky columns don't get cut off */
@@ -177,6 +186,13 @@
     /* Prevent sticky column from scrolling at the end */
     .table-scrollable .single-table {
         min-width: max-content;
+    }
+
+    /* Mobile responsive table */
+    @media (max-width: 768px) {
+        .table-scrollable .single-table {
+            min-width: 100%;
+        }
     }
 
     /* Consistent borders for table cells (not headers) */

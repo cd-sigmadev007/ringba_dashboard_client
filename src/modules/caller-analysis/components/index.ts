@@ -3,4 +3,5 @@ export { Campaign } from './Campaign'
 export { FilterPills } from './FilterPills'
 export { FiltersSection } from './FiltersSection'
 export { ApiDataDemo } from './ApiDataDemo'
+export { LifetimeRevenueBreakdown } from './LifetimeRevenueBreakdown'
 
