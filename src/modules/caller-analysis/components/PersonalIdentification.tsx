@@ -87,7 +87,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
             </h2>
 
             {/* Personal Info + Revenue */}
-            <div className={clsx('flex flex-col rounded-sm mb-6', containerBgClass, borderClass)}>
+            <div className={clsx('flex flex-col rounded-sm', containerBgClass, borderClass)}>
                 {personalInfo.map((item, idx) => (
                     <div
                         key={idx}

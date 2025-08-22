@@ -41,7 +41,7 @@ const modalContentVariants = cva(
                 md: 'max-w-lg',
                 lg: 'max-w-2xl',
                 xl: 'max-w-4xl',
-                full: 'w-full h-full',
+                full: 'w-full h-full max-h-screen', // Ensure full height doesn't exceed viewport
             },
             position: {
                 center: 'rounded-[10px] m-4',
@@ -207,11 +207,13 @@ export const Modal: FC<ModalProps> = ({
                 <div
                     className={cn(
                         'mx-6 overflow-y-auto custom-scroll rounded-[7px]',
+                        size === 'full' 
+                            ? 'h-[90%]' 
+                            : 'max-h-[calc(100vh-200px)]', 
                         border && cn(
                             'border',
                             isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
                         ),
-                        'max-h-full'
                     )}
                     onClick={(e) => {
                         // Stop propagation to prevent the content area from closing when clicked
