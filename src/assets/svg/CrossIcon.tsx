@@ -1,6 +1,6 @@
 import React from 'react'
 import { useThemeStore } from '@/store/themeStore'
-import { cn } from '@/lib'
+// import { cn } from '@/lib'
 
 interface CrossIconProps {
     className?: string
