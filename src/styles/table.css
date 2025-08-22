@@ -179,21 +179,23 @@
         min-width: max-content;
     }
 
-    /* Consistent borders for all columns */
-    .single-table th,
+    /* Consistent borders for table cells (not headers) */
     .single-table td {
         /* border-right: 1px solid !important; */
         border-bottom: 1px solid !important;
     }
 
+    /* Remove bottom border from last row to prevent double border with pagination */
+    .single-table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
     /* Dark theme borders */
-    .theme-dark .single-table th,
     .theme-dark .single-table td {
         border-color: #1B456F !important;
     }
 
     /* Light theme borders */
-    .theme-light .single-table th,
     .theme-light .single-table td {
         border-color: #E0E0E0 !important;
     }

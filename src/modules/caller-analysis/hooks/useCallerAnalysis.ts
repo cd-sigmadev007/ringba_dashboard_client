@@ -4,13 +4,12 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 
 import type { CallData, FilterState } from '../types'
+import { useCallerAnalysisApi } from './useCallerAnalysisApi'
 import {
-    callData,
     matchesCampaignFilter,
     matchesDurationFilter,
     matchesDurationRange,
     matchesSearchQuery,
-    matchesStatusFilter,
 } from '@/modules'
 
 dayjs.extend(isSameOrAfter)
@@ -26,20 +25,36 @@ export const useCallerAnalysis = () => {
         searchQuery: '',
     })
 
+    const [totalRecords, setTotalRecords] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
 
-    // Simulate initial data loading
+    const { useGetAllCallers, convertApiDataToCallData } = useCallerAnalysisApi()
+
+    // Fetch data from API without pagination to let Table component handle it
+    const { 
+        data: apiData, 
+        isLoading: apiLoading, 
+        refetch 
+    } = useGetAllCallers(filters, 1, 10000) // Fetch all data for client-side pagination
+
+    // Update loading state and total records
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false)
-        }, 1500)
+        setIsLoading(apiLoading)
+        if (apiData?.pagination) {
+            setTotalRecords(apiData.pagination.total)
+        }
+    }, [apiLoading, apiData])
 
-        return () => clearTimeout(timer)
-    }, [])
-
-    // Filter data based on current filters
+    // Filter data based on current filters and pagination
     const filteredData = useMemo(() => {
-        return callData.filter((d: CallData) => {
+        if (!apiData?.data) {
+            return []
+        }
+        
+        const allData = convertApiDataToCallData(apiData.data)
+        
+        // Apply client-side filtering to the fetched data
+        return allData.filter((d: CallData) => {
             // Search filter (caller ID)
             if (!matchesSearchQuery(d.callerId, filters.searchQuery)) {
                 return false
@@ -62,11 +77,6 @@ export const useCallerAnalysis = () => {
                 return false
             }
 
-            // Status filter
-            if (!matchesStatusFilter(d.status, filters.statusFilter)) {
-                return false
-            }
-
             // Duration filter (legacy)
             if (!matchesDurationFilter(d.duration, filters.durationFilter)) {
                 return false
@@ -79,24 +89,27 @@ export const useCallerAnalysis = () => {
 
             return true
         })
-    }, [filters])
+    }, [apiData, filters, convertApiDataToCallData])
 
     // Filter update functions
     const updateFilters = {
-        dateRange: (dateRange: { from?: Date; to?: Date }) =>
-            setFilters((prev) => ({ ...prev, dateRange })),
+        dateRange: (dateRange: { from?: Date; to?: Date }) => {
+            setFilters((prev) => ({ ...prev, dateRange }))
+        },
 
-        campaign: (value: string | Array<string>) =>
+        campaign: (value: string | Array<string>) => {
             setFilters((prev) => ({
                 ...prev,
                 campaignFilter: Array.isArray(value) ? value : [value],
-            })),
+            }))
+        },
 
-        status: (value: string | Array<string>) =>
+        status: (value: string | Array<string>) => {
             setFilters((prev) => ({
                 ...prev,
                 statusFilter: Array.isArray(value) ? value : [value],
-            })),
+            }))
+        },
 
         durationRange: (durationRange: { min?: number; max?: number }) =>
             setFilters((prev) => ({ ...prev, durationRange })),
@@ -149,14 +162,20 @@ export const useCallerAnalysis = () => {
         filters.durationRange.min !== undefined ||
         filters.durationRange.max !== undefined
 
+
+
     return {
         filters,
-        filteredData,
+        filteredData: filteredData, // Return filtered data from API
+        allFilteredData: filteredData, // Keep reference for consistency
         updateFilters,
         removeFilters,
         clearAllFilters,
         hasActiveFilters,
-        totalRecords: callData.length,
+        totalRecords: totalRecords,
         isLoading,
+
+        // Refresh
+        refetch,
     }
 }

@@ -16,6 +16,7 @@ import TableLoader from './TableLoader'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { useThemeStore } from '@/store/themeStore.ts'
 import { cn } from '@/lib'
+import Button from './Button'
 
 interface TableProps<T = any> {
     /**
@@ -402,10 +403,10 @@ const Table = <T,>({
                                 <tr
                                     key={row.id}
                                     className={clsx(
-                                        'transition-all duration-300 ease-linear group tr border-b last:border-b-0',
+                                        'transition-all duration-300 ease-linear group tr',
                                         isDark
-                                            ? 'border-[#1B456F] hover:bg-[#001E3C]/50'
-                                            : 'border-[#ECECEC] hover:bg-[#F5F8FA]/50',
+                                            ? 'hover:bg-[#001E3C]/50'
+                                            : 'hover:bg-[#F5F8FA]/50',
                                         clickableRows && 'cursor-pointer'
                                     )}
                                     onClick={() => handleRowClick(row.original)}
@@ -445,10 +446,10 @@ const Table = <T,>({
                 {pagination && (
                     <div
                         className={clsx(
-                            'px-5 py-3 flex items-center justify-between',
+                            'px-5 py-3 flex items-center justify-between border-t',
                             isDark
-                                ? 'bg-[#001E3C] border-[#1B456F]'
-                                : 'bg-[#F5F8FA] border-[#ECECEC]'
+                                ? 'bg-[#071B2F] border-[#1B456F]'
+                                : 'bg-white border-[#E0E0E0]'
                         )}
                     >
                         <div
@@ -469,39 +470,90 @@ const Table = <T,>({
                             of {table.getPrePaginationRowModel().rows.length}{' '}
                             entries
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                className={clsx(
-                                    'px-3 py-1 rounded-md text-sm font-medium transition-colors',
-                                    table.getCanPreviousPage()
-                                        ? isDark
-                                            ? 'bg-[#132F4C] text-[#F5F8FA] hover:bg-[#1B456F]'
-                                            : 'bg-[#007FFF] text-white hover:bg-[#0254A5]'
-                                        : isDark
-                                          ? 'bg-[#132F4C]/50 text-[#7E8299] cursor-not-allowed'
-                                          : 'bg-[#E0E0E0] text-[#A1A5B7] cursor-not-allowed'
-                                )}
-                                onClick={() => table.previousPage()}
-                                disabled={!table.getCanPreviousPage()}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                className={clsx(
-                                    'px-3 py-1 rounded-md text-sm font-medium transition-colors',
-                                    table.getCanNextPage()
-                                        ? isDark
-                                            ? 'bg-[#132F4C] text-[#F5F8FA] hover:bg-[#1B456F]'
-                                            : 'bg-[#007FFF] text-white hover:bg-[#0254A5]'
-                                        : isDark
-                                          ? 'bg-[#132F4C]/50 text-[#7E8299] cursor-not-allowed'
-                                          : 'bg-[#E0E0E0] text-[#A1A5B7] cursor-not-allowed'
-                                )}
-                                onClick={() => table.nextPage()}
-                                disabled={!table.getCanNextPage()}
-                            >
-                                Next
-                            </button>
+                        <div className="flex items-center gap-1">
+                            {/* Page Numbers */}
+                            {(() => {
+                                const totalPages = table.getPageCount();
+                                const currentPage = table.getState().pagination.pageIndex + 1;
+                                const maxVisiblePages = 7; // Show max 7 page numbers
+                                
+                                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                                
+                                // Adjust start page if we're near the end
+                                if (endPage - startPage < maxVisiblePages - 1) {
+                                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                                }
+                                
+                                const pages = [];
+                                
+                                // First page
+                                if (startPage > 1) {
+                                    pages.push(
+                                        <Button
+                                            key="1"
+                                            variant="ghost"
+                                            onClick={() => table.setPageIndex(0)}
+                                            className="px-2 py-1 text-xs"
+                                        >
+                                            1
+                                        </Button>
+                                    );
+                                    
+                                    if (startPage > 2) {
+                                        pages.push(
+                                            <span key="dots1" className={clsx(
+                                                'px-2 text-xs',
+                                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                                            )}>
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                }
+                                
+                                // Page numbers
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(
+                                        <Button
+                                            key={i}
+                                            variant={i === currentPage ? "primary" : "ghost"}
+                                            onClick={() => table.setPageIndex(i - 1)}
+                                            className="px-2 py-1 text-xs"
+                                        >
+                                            {i}
+                                        </Button>
+                                    );
+                                }
+                                
+                                // Last page
+                                if (endPage < totalPages) {
+                                    if (endPage < totalPages - 1) {
+                                        pages.push(
+                                            <span key="dots2" className={clsx(
+                                                'px-2 text-xs',
+                                                isDark ? 'text-[#A1A5B7]' : 'text-[#A1A5B7]'
+                                            )}>
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    
+                                    pages.push(
+                                        <Button
+                                            key={totalPages}
+                                            variant="ghost"
+                                            onClick={() => table.setPageIndex(totalPages - 1)}
+                                            className="px-2 py-1 text-xs"
+                                        >
+                                            {totalPages}
+                                        </Button>
+                                    );
+                                }
+                                
+                                return pages;
+                            })()}
+
                         </div>
                     </div>
                 )}

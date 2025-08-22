@@ -34,6 +34,8 @@ export const CallerAnalysisContainer: React.FC = () => {
         clearAllFilters,
         hasActiveFilters,
         isLoading,
+        totalRecords,
+        refetch,
     } = useCallerAnalysis()
 
     const handleRowClick = (row: CallData) => {
@@ -98,22 +100,39 @@ export const CallerAnalysisContainer: React.FC = () => {
             <div className="p-3 sm:p-4 lg:p-8">
                 {/* Header */}
                 <div className="mb-6 sm:mb-8">
-                    <h1
-                        className={clsx(
-                            'text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2',
-                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-                        )}
-                    >
-                        Caller Analysis
-                    </h1>
-                    <p
-                        className={clsx(
-                            'text-xs sm:text-sm',
-                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                        )}
-                    >
-                        Comprehensive call tracking and analysis dashboard
-                    </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1
+                                className={clsx(
+                                    'text-xl sm:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2',
+                                    isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                                )}
+                            >
+                                Caller Analysis
+                            </h1>
+                            <p
+                                className={clsx(
+                                    'text-xs sm:text-sm',
+                                    isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                                )}
+                            >
+                                Real-time caller data from your database
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Button onClick={() => refetch()}>
+                                Refresh Data
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Data Summary */}
+                <div className="mb-6 grid grid-cols-1 gap-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Records</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{totalRecords.toLocaleString()}</div>
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -156,7 +175,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                         columns={columns}
                         showHeader={true}
                         pagination={true}
-                        pageSize={20}
+                        pageSize={10}
                         clickableRows={true}
                         onRowClick={handleRowClick}
                         size="medium"
@@ -164,6 +183,8 @@ export const CallerAnalysisContainer: React.FC = () => {
                         className="w-full min-w-[600px] max-w-full"
                     />
                 </div>
+
+
 
                 {/* Personal Identification Modal */}
                 <Modal

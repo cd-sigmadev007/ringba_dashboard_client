@@ -8,7 +8,7 @@ import {
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
-import CallerAnalysisReal from './routes/caller-analysis-real.tsx'
+
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -30,7 +30,7 @@ const routeTree = rootRoute.addChildren([
     TanStackQueryDemo(rootRoute),
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
-    CallerAnalysisReal(rootRoute),
+
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
