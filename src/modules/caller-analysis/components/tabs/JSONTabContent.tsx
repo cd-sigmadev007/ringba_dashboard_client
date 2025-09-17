@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import clsx from 'clsx'
 import JsonView from '@uiw/react-json-view'
 import { useThemeStore } from '@/store/themeStore'
