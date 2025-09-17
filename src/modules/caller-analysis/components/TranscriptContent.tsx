@@ -1,0 +1,58 @@
+import React from 'react'
+import clsx from 'clsx'
+import { useThemeStore } from '@/store/themeStore'
+import { mockTranscriptData } from '@/data/caller-tabs-data'
+import type { TranscriptEntry } from '@/data/caller-tabs-data'
+
+export interface TranscriptContentProps {
+    transcriptData?: TranscriptEntry[]
+    className?: string
+    border?: boolean
+}
+
+export const TranscriptContent: React.FC<TranscriptContentProps> = ({
+    transcriptData = mockTranscriptData,
+    className,
+    border = true
+}) => {
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
+
+    return (
+        <div className={clsx('space-y-4', className)}>
+            {/* Transcript Content */}
+            <div className={clsx(
+                'p-4 rounded-[7px]',
+                border ? (isDark ? 'border border-[#1B456F]' : 'border border-[#E1E5E9]') : 'border-none'
+            )}>
+                <div className="space-y-4">
+                    {transcriptData.map((entry, index) => (
+                        <div key={index} className="flex gap-4">
+                            {/* Timestamp */}
+                            <div className={clsx(
+                                'text-sm font-mono w-16 flex-shrink-0',
+                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                            )}>
+                                {entry.timestamp}
+                            </div>
+                            
+                            {/* Speaker and Text */}
+                            <div className="flex-1">
+                                <div className="flex items-start gap-2">
+                                    <p className={clsx(
+                                        'text-sm leading-relaxed',
+                                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                                    )}>
+                                        {entry.text}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default TranscriptContent

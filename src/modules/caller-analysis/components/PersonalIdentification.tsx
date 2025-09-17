@@ -4,6 +4,9 @@ import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 import { PriorityStatusSection } from './PriorityStatusSection'
+import { Tabs } from '@/components/ui'
+import type { TabItem } from '@/components/ui/Tabs'
+import { TranscriptTabContent, HistoryTabContent, JSONTabContent } from './tabs'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -74,6 +77,24 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     const containerBgClass = clsx(
         isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
     )
+
+    const tabs: TabItem[] = [
+        {
+            id: 'transcription',
+            label: 'Call Transcription',
+            content: <TranscriptTabContent />
+        },
+        {
+            id: 'history',
+            label: 'History',
+            content: <HistoryTabContent />
+        },
+        {
+            id: 'json',
+            label: 'JSON',
+            content: <JSONTabContent callerData={callerData} />
+        }
+    ]
 
     return (
         <div className="w-full overflow-y-auto custom-scroll">
@@ -183,6 +204,14 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                             status === 'Repeat Customer' ||
                             status === 'Technical Terms Used'
                     )}
+                />
+            </div>
+
+            {/* Tabs Section */}
+            <div className="mt-6">
+                <Tabs
+                    tabs={tabs}
+                    defaultActiveTab="transcription"
                 />
             </div>
         </div>
