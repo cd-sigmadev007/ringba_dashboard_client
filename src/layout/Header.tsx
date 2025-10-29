@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
+import { useAuth0 } from '@auth0/auth0-react'
 import Logo from '../components/logo'
 import Button from '../components/ui/Button'
 import { useThemeStore } from '../store/themeStore'
@@ -10,6 +11,7 @@ import {
     SearchIcon,
 } from '../assets/svg'
 import ThemeSwitcher from './utils/theme-switcher'
+import { usePermissions } from '../hooks/usePermissions'
 
 interface HeaderProps {
     setOpenMenu?: (open: boolean) => void
@@ -20,6 +22,8 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const [openSearchBar, setOpenSearchBar] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0()
+    const { role } = usePermissions()
 
     return (
         <>
@@ -64,9 +68,27 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                         {/* Right side buttons */}
                         <div className="flex items-center gap-x-1 lg:gap-x-2.5">
                             <ThemeSwitcher />
-                            <a href="/sign-up" target="_blank">
-                                <Button>Join Beta</Button>
-                            </a>
+                            {isLoading ? (
+                                <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-10 w-20 rounded"></div>
+                            ) : isAuthenticated ? (
+                                <>
+                                    {role && (
+                                        <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
+                                            {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Org Admin' : 'User'}
+                                        </span>
+                                    )}
+                                    <Button
+                                        onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                                        variant="ghost"
+                                    >
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button onClick={() => loginWithRedirect()}>
+                                    Login
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </nav>

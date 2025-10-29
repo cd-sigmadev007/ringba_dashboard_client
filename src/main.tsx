@@ -5,6 +5,7 @@ import {
     createRootRoute,
     createRouter,
 } from '@tanstack/react-router'
+import { Auth0Provider } from '@auth0/auth0-react'
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
@@ -15,6 +16,7 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import reportWebVitals from './reportWebVitals.ts'
 
 import RootLayout from './layout/Index.tsx'
+import CallbackRoute from './routes/callback.tsx'
 
 // Initialize theme on app startup
 const savedTheme = localStorage.getItem('theme') || 'light'
@@ -30,7 +32,7 @@ const routeTree = rootRoute.addChildren([
     TanStackQueryDemo(rootRoute),
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
-
+    CallbackRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
@@ -54,11 +56,31 @@ declare module '@tanstack/react-router' {
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement)
+    
+    const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
+    const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
+    const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE
+    
+    if (!auth0Domain || !auth0ClientId || !auth0Audience) {
+        console.error('Missing Auth0 environment variables. Please check your .env file.')
+    }
+    
     root.render(
         <StrictMode>
-            <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-                <RouterProvider router={router} />
-            </TanStackQueryProvider.Provider>
+            <Auth0Provider
+                domain={auth0Domain || ''}
+                clientId={auth0ClientId || ''}
+                authorizationParams={{
+                    redirect_uri: window.location.origin + '/callback',
+                    audience: auth0Audience,
+                    scope: 'openid profile email',
+                }}
+                cacheLocation="localstorage"
+            >
+                <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+                    <RouterProvider router={router} />
+                </TanStackQueryProvider.Provider>
+            </Auth0Provider>
         </StrictMode>
     )
 }

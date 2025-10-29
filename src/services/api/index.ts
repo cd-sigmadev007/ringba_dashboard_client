@@ -53,23 +53,40 @@ export interface PaginatedApiResponse<T = any> {
   }
 }
 
-// Request Interceptor
-const requestInterceptor = (config: any) => {
-  // Add auth token if available
-  const token = localStorage.getItem('auth_token')
-  if (token) {
+// Request Interceptor Factory
+// Creates an interceptor that accepts getAccessToken function from Auth0
+export const createAuthInterceptor = (getAccessToken: () => Promise<string | undefined>) => {
+  return async (config: any) => {
+    // Get Auth0 access token
+    try {
+      const token = await getAccessToken()
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get access token:', error)
+    }
+
+    // Add request timestamp
     config.headers = {
       ...config.headers,
-      Authorization: `Bearer ${token}`,
+      'X-Request-Timestamp': new Date().toISOString(),
     }
-  }
 
+    return config
+  }
+}
+
+// Default request interceptor (backward compatible)
+const requestInterceptor = (config: any) => {
   // Add request timestamp
   config.headers = {
     ...config.headers,
     'X-Request-Timestamp': new Date().toISOString(),
   }
-
   return config
 }
 
@@ -86,9 +103,8 @@ const errorInterceptor = async (error: any) => {
   if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
     originalRequest._retry = true
     
-    // Clear auth token and redirect to login
-    localStorage.removeItem('auth_token')
-    window.location.href = '/login'
+    // Auth0 will handle redirect via useAuth0 hook
+    // Just reject the error
     return Promise.reject(error)
   }
 
