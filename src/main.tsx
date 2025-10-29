@@ -9,6 +9,7 @@ import { Auth0Provider } from '@auth0/auth0-react'
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
+import DashboardRoute from './routes/dashboard.tsx'
 
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
@@ -29,6 +30,7 @@ const rootRoute = createRootRoute({
 })
 
 const routeTree = rootRoute.addChildren([
+    DashboardRoute(rootRoute),
     TanStackQueryDemo(rootRoute),
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
