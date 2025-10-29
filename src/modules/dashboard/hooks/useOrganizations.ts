@@ -12,10 +12,8 @@ export function useOrganizations() {
   return useQuery({
     queryKey: ['organizations'],
     queryFn: async () => {
-      // Get access token and create authenticated request
       const token = await getAccessTokenSilently()
       
-      // Manually add token to request since we can't modify the singleton
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/api/admin/organizations`,
         {
@@ -66,7 +64,6 @@ export function useCreateOrganization() {
       return response.json()
     },
     onSuccess: () => {
-      // Invalidate and refetch organizations list
       queryClient.invalidateQueries({ queryKey: ['organizations'] })
     },
   })

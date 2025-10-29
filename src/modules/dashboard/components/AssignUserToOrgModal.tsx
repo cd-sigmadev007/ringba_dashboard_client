@@ -39,13 +39,12 @@ export default function AssignUserToOrgModal({
 
     if (!user) return
 
-    // Validation
     if (user.role === 'super_admin') {
       setError('Super admin cannot be assigned to an organization')
       return
     }
 
-    if (user.role !== 'super_admin' && selectedOrgId === null) {
+    if (selectedOrgId === null) {
       setError(
         'Cannot remove organization from org_admin or user. Change role first.'
       )
@@ -155,7 +154,7 @@ export default function AssignUserToOrgModal({
               disabled={
                 assignMutation.isPending ||
                 user.role === 'super_admin' ||
-                (user.role !== 'super_admin' && !selectedOrgId)
+                !selectedOrgId
               }
               className="text-[#F5F8FA] bg-[#007FFF] hover:bg-[#0254A5] active:bg-[#0254A5] py-[9px] px-[15px] rounded-[7px] transition-all duration-300 ease-in-out text-[14px] leading-5 cursor-pointer disabled:cursor-default disabled:opacity-50 disabled:!bg-[#E0E0E0] disabled:text-[#7E8299]"
             >

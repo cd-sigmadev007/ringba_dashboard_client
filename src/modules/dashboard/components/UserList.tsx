@@ -24,7 +24,6 @@ export default function UserList({
   const { data: usersData, isLoading: usersLoading, error: usersError } = useUsers()
   const { data: orgsData } = useOrganizations()
 
-  // Create a map of org_id -> org_name for quick lookup
   const orgMap = useMemo(() => {
     if (!orgsData?.data) return new Map<string, string>()
     return new Map(
@@ -66,7 +65,6 @@ export default function UserList({
           const user = info.row.original
           
           if (!orgId) {
-            // Show "Pending Assignment" badge for users without org (except super admins)
             if (user.role !== 'super_admin') {
               return (
                 <span className="px-2 py-1 text-xs rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">

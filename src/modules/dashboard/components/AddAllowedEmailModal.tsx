@@ -27,7 +27,6 @@ export default function AddAllowedEmailModal({
     e.preventDefault()
     setError(null)
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email.trim())) {
       setError('Please enter a valid email address')
@@ -39,7 +38,6 @@ export default function AddAllowedEmailModal({
         email: email.trim(),
         notes: notes.trim() || undefined,
       })
-      // Reset form and close modal
       setEmail('')
       setNotes('')
       setError(null)

@@ -30,7 +30,6 @@ export default function CreateOrganizationForm({
     e.preventDefault()
     setError(null)
 
-    // Validation
     if (!organizationName.trim()) {
       setError('Organization name is required')
       return
@@ -46,7 +45,6 @@ export default function CreateOrganizationForm({
         name: organizationName.trim(),
       })
       
-      // Reset form and close modal on success
       setOrganizationName('')
       setError(null)
       onClose()
