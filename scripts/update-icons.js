@@ -5,18 +5,17 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const FIGMA_TOKEN =
-    process.env.FIGMA_TOKEN || 'process.env.FIGMA_TOKEN || ""'
-const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY || '2inM9gTGhpchpxmqGYPHV2'
+const FIGMA_TOKEN = process.env.FIGMA_TOKEN
+const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY
 const FIGMA_PAGE_NAME = process.env.FIGMA_PAGE_NAME || 'Page 1'
-
-const SVG_DIR = 'src/svg'
-const ICON_DIR = 'src/icons'
 
 if (!FIGMA_TOKEN || !FIGMA_FILE_KEY) {
     console.error('❌ Missing FIGMA_TOKEN or FIGMA_FILE_KEY in .env')
     process.exit(1)
 }
+
+const SVG_DIR = 'src/svg'
+const ICON_DIR = 'src/icons'
 
 const log = (msg) => console.log(`\x1b[36m${msg}\x1b[0m`)
 
