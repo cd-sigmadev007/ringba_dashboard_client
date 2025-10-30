@@ -4,11 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth0 } from '@auth0/auth0-react'
-import {
-  getAllowedEmails,
-  addAllowedEmail,
-  removeAllowedEmail,
-} from '../services/adminApi'
+// Using direct fetch below; keep imports minimal
 
 export function useAllowedEmails() {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0()

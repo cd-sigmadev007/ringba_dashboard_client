@@ -25,6 +25,9 @@ export interface FrontendCallerData {
   campaign: string;
   action: string;
   status: string[];
+  transcript?: string;
+  audioUrl?: string;
+  revenue?: number | null;
 }
 
 // Query parameters for filtering

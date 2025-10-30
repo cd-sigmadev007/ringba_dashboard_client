@@ -22,10 +22,41 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
         return null
     }
 
-    // Map plain transcript string into a simple TranscriptEntry[]
-    const transcriptEntries: TranscriptEntry[] = callerData.transcript
-        ? [{ timestamp: '00:00', speaker: 'A', text: callerData.transcript }]
-        : []
+    // Parse transcript into speaker-based entries (A/B)
+    const parseTranscript = (raw?: string): TranscriptEntry[] => {
+        if (!raw || typeof raw !== 'string') return []
+
+        // Normalize separators like "A -", "A:", "B -", "B:"
+        let normalized = raw
+            .replace(/\r/g, '')
+            .replace(/\n+/g, '\n')
+            .replace(/\s*A\s*[-:]\s*/g, '\nA: ')
+            .replace(/\s*B\s*[-:]\s*/g, '\nB: ')
+
+        // Split on new lines and keep only non-empty lines
+        const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean)
+        const entries: TranscriptEntry[] = []
+
+        for (const line of lines) {
+            const m = /^(A|B)\s*:\s*(.*)$/.exec(line)
+            if (m) {
+                const speaker = m[1] as 'A' | 'B'
+                const text = m[2].trim()
+                if (text) entries.push({ timestamp: '', speaker, text })
+            } else {
+                // No explicit speaker marker; append to last speaker or default to A
+                if (entries.length > 0) {
+                    entries[entries.length - 1].text += (entries[entries.length - 1].text ? ' ' : '') + line
+                } else {
+                    entries.push({ timestamp: '', speaker: 'A', text: line })
+                }
+            }
+        }
+
+        return entries
+    }
+
+    const transcriptEntries: TranscriptEntry[] = parseTranscript(callerData.transcript)
 
     return (
         <Modal
@@ -38,7 +69,9 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
             animation={isMobile ? 'slide' : 'fade'}
             border={true}
         >
-            <TranscriptContent transcriptData={transcriptEntries} />
+            <div className="space-y-6">
+                <TranscriptContent border={false} transcriptData={transcriptEntries} />
+            </div>
         </Modal>
     )
 }

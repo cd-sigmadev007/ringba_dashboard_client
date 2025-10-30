@@ -2,11 +2,11 @@ import React, { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { get, map } from 'lodash'
 import clsx from 'clsx'
-import Button from '../components/ui/Button'
+import Button from '@/components/ui/Button'
 import Tooltip from '../components/common/Tooltip'
-import { useThemeStore } from '../store/themeStore'
-import ThemeSwitcher from './utils/theme-switcher'
-import { navLinks } from './utils/navLinks'
+import { useThemeStore } from '@/store/themeStore'
+import ThemeSwitcher from '@/layout/utils/theme-switcher'
+import { navLinks } from '@/layout/utils/navLinks'
 
 interface NavLinkItem {
     id?: string

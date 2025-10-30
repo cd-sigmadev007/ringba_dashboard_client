@@ -1,7 +1,8 @@
 import type { CallData, FilterState } from '../types';
 import type { FrontendCallerData, PaginatedResponse, ApiResponse } from '../../../types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const API_BASE_URL = baseUrl.endsWith('/api') ? baseUrl : baseUrl.replace(/\/$/, '') + '/api';
 
 export interface CallerApiResponse {
   success: boolean;
@@ -78,6 +79,12 @@ class CallerApiService {
   // Get caller by phone number
   async getCallerByPhone(phoneNumber: string): Promise<FrontendCallerData> {
     return this.makeRequest<FrontendCallerData>(`/callers/phone/${phoneNumber}`);
+  }
+
+  // Get caller history by phone number
+  async getHistoryByPhone(phoneNumber: string): Promise<{ success: boolean; data: FrontendCallerData[] }> {
+    const encoded = encodeURIComponent(phoneNumber);
+    return this.makeRequest<{ success: boolean; data: FrontendCallerData[] }>(`/callers/phone/${encoded}/history`);
   }
 
   // Get table schema

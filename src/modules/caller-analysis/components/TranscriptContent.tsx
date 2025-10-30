@@ -28,12 +28,14 @@ export const TranscriptContent: React.FC<TranscriptContentProps> = ({
                 <div className="space-y-4">
                     {transcriptData.map((entry, index) => (
                         <div key={index} className="flex gap-4">
-                            {/* Timestamp */}
-                            <div className={clsx(
-                                'text-sm font-mono w-16 flex-shrink-0',
-                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                            )}>
-                                {entry.timestamp}
+                            {/* Speaker badge */}
+                            <div className="w-8 flex-shrink-0 flex items-start justify-center">
+                                <span className={clsx(
+                                    'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold',
+                                    isDark ? 'bg-[#2D596B] text-[#A1A5B7]' : 'bg-[#E1E5E9] text-[#5E6278]'
+                                )}>
+                                    {entry.speaker || 'A'}
+                                </span>
                             </div>
                             
                             {/* Speaker and Text */}

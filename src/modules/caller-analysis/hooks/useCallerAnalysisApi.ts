@@ -45,6 +45,17 @@ export const useCallerAnalysisApi = () => {
     });
   };
 
+  // Get caller history by phone number
+  const useGetCallerHistoryByPhone = (phoneNumber: string) => {
+    return useQuery({
+      queryKey: ['caller', 'phone', 'history', phoneNumber],
+      queryFn: () => callerApiService.getHistoryByPhone(phoneNumber),
+      enabled: !!phoneNumber,
+      staleTime: 1 * 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+    });
+  };
+
   // Get table schema
   const useGetTableSchema = () => {
     return useQuery({
@@ -90,6 +101,7 @@ export const useCallerAnalysisApi = () => {
     useGetAllCallers,
     useGetCallerById,
     useGetCallerByPhone,
+    useGetCallerHistoryByPhone,
     useGetTableSchema,
     useHealthCheck,
     

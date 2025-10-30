@@ -7,6 +7,9 @@ import { PriorityStatusSection } from './PriorityStatusSection'
 import { Tabs } from '@/components/ui'
 import type { TabItem } from '@/components/ui/Tabs'
 import { TranscriptTabContent, HistoryTabContent, JSONTabContent } from './tabs'
+import type { TranscriptEntry, HistoryEntry } from '@/data/caller-tabs-data'
+import { useCallerAnalysisApi } from '../hooks'
+import type { FrontendCallerData } from '@/types/api'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -78,16 +81,39 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
     )
 
+    // Fetch history by phone number
+    const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
+    const { data: historyResp } = useGetCallerHistoryByPhone(callerData.callerId)
+
+    // Map transcript string to entries
+    const transcriptEntries: TranscriptEntry[] = callerData.transcript
+        ? [{ timestamp: '00:00', speaker: 'A', text: callerData.transcript }]
+        : []
+
+    // Map history API rows to HistoryEntry[] used by tab
+    const historyData: HistoryEntry[] = (historyResp?.data || []).map((h: FrontendCallerData) => {
+        // lastCall is like 'Oct 30, 10:21:06 PM ET' -> keep as single date; split time if parsable
+        const dateStr = h.lastCall
+        const rev = Number((h as any).revenue)
+        return {
+            date: dateStr,
+            time: '',
+            duration: h.duration,
+            status: 'Completed',
+            revenue: Number.isFinite(rev) ? rev : 0,
+        }
+    })
+
     const tabs: TabItem[] = [
         {
             id: 'transcription',
             label: 'Call Transcription',
-            content: <TranscriptTabContent />
+            content: <TranscriptTabContent transcriptData={transcriptEntries} />
         },
         {
             id: 'history',
             label: 'History',
-            content: <HistoryTabContent />
+            content: <HistoryTabContent historyData={historyData} />
         },
         {
             id: 'json',
