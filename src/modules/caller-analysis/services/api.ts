@@ -138,6 +138,8 @@ class CallerApiService {
       campaign: apiData.campaign,
       action: apiData.action,
       status: apiData.status,
+      audioUrl: (apiData as any).audioUrl,
+      transcript: (apiData as any).transcript,
     };
   }
 }

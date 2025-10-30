@@ -128,8 +128,8 @@ export const useTableColumns = (
                   className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
                   onClick={(e) => {
                     e.stopPropagation()
-                    // For now, use a mock audio URL - we can replace this with actual audio URLs from your data
-                    onPlayAudio('https://cdn.pixabay.com/audio/2025/06/28/audio_4a05c5cd3b.mp3', row.original.id)
+                    const audioUrl = (row.original as any).audioUrl || ''
+                    onPlayAudio(audioUrl, row.original.id)
                   }}
                 >
                   {currentPlayingRow === row.original.id && isPlaying ? <PauseIcon /> : <PlayIcon />}

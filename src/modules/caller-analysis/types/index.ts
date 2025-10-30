@@ -13,6 +13,8 @@ export interface CallData {
     campaign: string
     action: string
     status: Array<string>
+    audioUrl?: string
+    transcript?: string
 }
 
 export interface FilterState {
