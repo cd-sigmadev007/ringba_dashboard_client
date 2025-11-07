@@ -20,7 +20,7 @@ import RootLayout from './layout/Index.tsx'
 import CallbackRoute from './routes/callback.tsx'
 
 // Initialize theme on app startup
-const savedTheme = localStorage.getItem('theme') || 'light'
+const savedTheme = localStorage.getItem('theme') || 'dark'
 document.documentElement.classList.add(
     savedTheme === 'dark' ? 'theme-dark' : 'theme-light'
 )

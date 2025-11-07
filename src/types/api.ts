@@ -28,6 +28,15 @@ export interface FrontendCallerData {
   transcript?: string;
   audioUrl?: string;
   revenue?: number | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  type?: string | null;
+  address?: string | null;
+  billed?: string | null;
+  latestPayout?: string | null;
+  ringbaCost?: number | null;
+  adCost?: number | null;
 }
 
 // Query parameters for filtering

@@ -22,33 +22,45 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
         return null
     }
 
-    // Parse transcript into speaker-based entries (A/B)
+    // Parse transcript into speaker-based entries (A/B) with timestamps
     const parseTranscript = (raw?: string): TranscriptEntry[] => {
         if (!raw || typeof raw !== 'string') return []
 
-        // Normalize separators like "A -", "A:", "B -", "B:"
-        let normalized = raw
+        // Format: "00:00 A - text,\n00:20 B - text,\n"
+        // Split by newlines first, then parse each line
+        const lines = raw
             .replace(/\r/g, '')
-            .replace(/\n+/g, '\n')
-            .replace(/\s*A\s*[-:]\s*/g, '\nA: ')
-            .replace(/\s*B\s*[-:]\s*/g, '\nB: ')
+            .split('\n')
+            .map(l => l.trim())
+            .filter(Boolean)
 
-        // Split on new lines and keep only non-empty lines
-        const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean)
         const entries: TranscriptEntry[] = []
 
         for (const line of lines) {
-            const m = /^(A|B)\s*:\s*(.*)$/.exec(line)
+            // Match format: "00:00 A - text," or "00:00 A: text," or "A - text,"
+            // Pattern: optional timestamp, speaker (A or B), separator (- or :), text
+            const m = /^(\d{2}:\d{2})?\s*(A|B)\s*[-:]\s*(.*)$/.exec(line)
             if (m) {
-                const speaker = m[1] as 'A' | 'B'
-                const text = m[2].trim()
-                if (text) entries.push({ timestamp: '', speaker, text })
+                const timestamp = m[1] || '00:00'
+                const speaker = m[2] as 'A' | 'B'
+                // Remove trailing comma if present
+                let text = m[3].trim().replace(/,$/, '').trim()
+                if (text) {
+                    entries.push({ timestamp, speaker, text })
+                }
             } else {
                 // No explicit speaker marker; append to last speaker or default to A
                 if (entries.length > 0) {
-                    entries[entries.length - 1].text += (entries[entries.length - 1].text ? ' ' : '') + line
+                    const lastEntry = entries[entries.length - 1]
+                    const additionalText = line.replace(/,$/, '').trim()
+                    if (additionalText) {
+                        lastEntry.text += (lastEntry.text ? ' ' : '') + additionalText
+                    }
                 } else {
-                    entries.push({ timestamp: '', speaker: 'A', text: line })
+                    const text = line.replace(/,$/, '').trim()
+                    if (text) {
+                        entries.push({ timestamp: '00:00', speaker: 'A', text })
+                    }
                 }
             }
         }

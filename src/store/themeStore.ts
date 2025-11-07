@@ -9,9 +9,21 @@ interface ThemeState {
     setTheme: (theme: Theme) => void
 }
 
-export const useThemeStore = create<ThemeState>((set) => ({
-    theme: (localStorage.getItem('theme') as Theme | null) || 'light',
-    toggleTheme: () =>
+export const useThemeStore = create<ThemeState>((set) => {
+    // Initialize theme from localStorage or default to 'dark'
+    const initialTheme = (localStorage.getItem('theme') as Theme | null) || 'dark';
+    
+    // Apply theme class on initialization
+    if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('theme-dark', 'theme-light');
+        document.documentElement.classList.add(
+            initialTheme === 'dark' ? 'theme-dark' : 'theme-light'
+        );
+    }
+    
+    return {
+        theme: initialTheme,
+        toggleTheme: () =>
         set((state) => {
             const newTheme = state.theme === 'light' ? 'dark' : 'light'
             // Remove both classes first
@@ -36,4 +48,5 @@ export const useThemeStore = create<ThemeState>((set) => ({
         localStorage.setItem('theme', theme)
         set({ theme })
     },
-}))
+    };
+})

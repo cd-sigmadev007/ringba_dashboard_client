@@ -22,19 +22,32 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
 
-    // Mock data based on CSV structure
+    // Use real data from API, fallback to defaults if not available
+    // Ensure numeric values are properly converted
+    const ringbaCostValue = callerData.ringbaCost != null 
+        ? (typeof callerData.ringbaCost === 'number' ? callerData.ringbaCost : Number(callerData.ringbaCost))
+        : (Math.round(callerData.lifetimeRevenue * 0.76 * 100) / 100);
+    const adCostValue = callerData.adCost != null
+        ? (typeof callerData.adCost === 'number' ? callerData.adCost : Number(callerData.adCost))
+        : (Math.round(callerData.lifetimeRevenue * 0.24 * 100) / 100);
+    
+    // Ensure totalCost is also a number
+    const totalCostValue = typeof callerData.lifetimeRevenue === 'number' 
+        ? callerData.lifetimeRevenue 
+        : Number(callerData.lifetimeRevenue) || 0;
+    
     const additionalData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@gmail.com',
+        firstName: callerData.firstName || '-',
+        lastName: callerData.lastName || '-',
+        email: callerData.email || '-',
         phoneNumber: callerData.callerId,
-        type: 'Inbound',
-        address: '-',
-        billed: 'No',
-        latestPayout: '-',
-        totalCost: callerData.lifetimeRevenue,
-        ringbaCost: Math.round(callerData.lifetimeRevenue * 0.76 * 100) / 100,
-        adCost: Math.round(callerData.lifetimeRevenue * 0.24 * 100) / 100,
+        type: callerData.type || 'Inbound',
+        address: callerData.address || '-',
+        billed: callerData.billed || 'No',
+        latestPayout: callerData.latestPayout || '-',
+        totalCost: Number.isFinite(totalCostValue) ? totalCostValue : 0,
+        ringbaCost: Number.isFinite(ringbaCostValue) ? ringbaCostValue : 0,
+        adCost: Number.isFinite(adCostValue) ? adCostValue : 0,
     }
 
     // Config array for personal info
@@ -85,10 +98,53 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
     const { data: historyResp } = useGetCallerHistoryByPhone(callerData.callerId)
 
-    // Map transcript string to entries
-    const transcriptEntries: TranscriptEntry[] = callerData.transcript
-        ? [{ timestamp: '00:00', speaker: 'A', text: callerData.transcript }]
-        : []
+    // Parse transcript string to entries with timestamps
+    const parseTranscript = (raw?: string): TranscriptEntry[] => {
+        if (!raw || typeof raw !== 'string') return []
+
+        // Format: "00:00 A - text,\n00:20 B - text,\n"
+        // Split by newlines first, then parse each line
+        const lines = raw
+            .replace(/\r/g, '')
+            .split('\n')
+            .map(l => l.trim())
+            .filter(Boolean)
+
+        const entries: TranscriptEntry[] = []
+
+        for (const line of lines) {
+            // Match format: "00:00 A - text," or "00:00 A: text," or "A - text,"
+            // Pattern: optional timestamp, speaker (A or B), separator (- or :), text
+            const m = /^(\d{2}:\d{2})?\s*(A|B)\s*[-:]\s*(.*)$/.exec(line)
+            if (m) {
+                const timestamp = m[1] || '00:00'
+                const speaker = m[2] as 'A' | 'B'
+                // Remove trailing comma if present
+                let text = m[3].trim().replace(/,$/, '').trim()
+                if (text) {
+                    entries.push({ timestamp, speaker, text })
+                }
+            } else {
+                // No explicit speaker marker; append to last speaker or default to A
+                if (entries.length > 0) {
+                    const lastEntry = entries[entries.length - 1]
+                    const additionalText = line.replace(/,$/, '').trim()
+                    if (additionalText) {
+                        lastEntry.text += (lastEntry.text ? ' ' : '') + additionalText
+                    }
+                } else {
+                    const text = line.replace(/,$/, '').trim()
+                    if (text) {
+                        entries.push({ timestamp: '00:00', speaker: 'A', text })
+                    }
+                }
+            }
+        }
+
+        return entries
+    }
+
+    const transcriptEntries: TranscriptEntry[] = parseTranscript(callerData.transcript)
 
     // Map history API rows to HistoryEntry[] used by tab
     const historyData: HistoryEntry[] = (historyResp?.data || []).map((h: FrontendCallerData) => {
