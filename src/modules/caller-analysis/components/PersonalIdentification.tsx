@@ -22,19 +22,31 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
 
-    // Use real data from API, fallback to defaults if not available
+    // Use real data from API, fallback to 0 if not available
     // Ensure numeric values are properly converted
     const ringbaCostValue = callerData.ringbaCost != null 
         ? (typeof callerData.ringbaCost === 'number' ? callerData.ringbaCost : Number(callerData.ringbaCost))
-        : (Math.round(callerData.lifetimeRevenue * 0.76 * 100) / 100);
+        : 0;
     const adCostValue = callerData.adCost != null
         ? (typeof callerData.adCost === 'number' ? callerData.adCost : Number(callerData.adCost))
-        : (Math.round(callerData.lifetimeRevenue * 0.24 * 100) / 100);
+        : 0;
     
-    // Ensure totalCost is also a number
-    const totalCostValue = typeof callerData.lifetimeRevenue === 'number' 
-        ? callerData.lifetimeRevenue 
-        : Number(callerData.lifetimeRevenue) || 0;
+    // Calculate totalCost from ringbaCost + adCost, or use revenue if available, fallback to 0
+    const totalCostValue = (() => {
+        // If both costs are available, sum them
+        if (ringbaCostValue > 0 && adCostValue > 0) {
+            return ringbaCostValue + adCostValue;
+        }
+        // Otherwise use revenue if available
+        if (callerData.revenue != null) {
+            const revenueValue = typeof callerData.revenue === 'number' 
+                ? callerData.revenue 
+                : Number(callerData.revenue);
+            return Number.isFinite(revenueValue) ? revenueValue : 0;
+        }
+        // Fallback to 0
+        return 0;
+    })();
     
     // Build address from parts
     const buildAddress = (): string => {

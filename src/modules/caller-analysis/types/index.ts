@@ -15,6 +15,7 @@ export interface CallData {
     status: Array<string>
     audioUrl?: string
     transcript?: string
+    revenue?: number | null
     firstName?: string | null
     lastName?: string | null
     email?: string | null

@@ -40,7 +40,7 @@ export const PriorityStatusSection: React.FC<PriorityStatusSectionProps> = ({
                 isMobile ? 'flex-col gap-y-3' : 'flex-row'
             )}>
                 <p className={labelClass}>{title}</p>
-                <div className="flex-1 overflow-x-auto">
+                <div className="flex-1 overflow-x-fixed">
                     <Status
                         enablePillOverflow={enablePillOverflow}
                         status={statuses}
