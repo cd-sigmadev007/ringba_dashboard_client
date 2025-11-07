@@ -20,6 +20,12 @@ export interface CallData {
     email?: string | null
     type?: string | null
     address?: string | null
+    streetNumber?: string | null
+    streetName?: string | null
+    streetType?: string | null
+    city?: string | null
+    state?: string | null
+    zip?: string | null
     billed?: string | null
     latestPayout?: string | null
     ringbaCost?: number | null

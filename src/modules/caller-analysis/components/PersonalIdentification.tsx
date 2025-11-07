@@ -36,13 +36,51 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         ? callerData.lifetimeRevenue 
         : Number(callerData.lifetimeRevenue) || 0;
     
+    // Build address from parts
+    const buildAddress = (): string => {
+        const parts: string[] = [];
+        
+        // Add street number
+        if (callerData.streetNumber && callerData.streetNumber !== 'NA' && callerData.streetNumber.trim()) {
+            parts.push(callerData.streetNumber.trim());
+        }
+        
+        // Add street name
+        if (callerData.streetName && callerData.streetName !== 'NA' && callerData.streetName.trim()) {
+            parts.push(callerData.streetName.trim());
+        }
+        
+        // Add street type
+        if (callerData.streetType && callerData.streetType !== 'NA' && callerData.streetType.trim()) {
+            parts.push(callerData.streetType.trim());
+        }
+        
+        // Join street parts
+        const street = parts.length > 0 ? parts.join(' ') : null;
+        
+        // Build full address
+        const addressParts: string[] = [];
+        if (street) addressParts.push(street);
+        if (callerData.city && callerData.city !== 'NA' && callerData.city.trim()) {
+            addressParts.push(callerData.city.trim());
+        }
+        if (callerData.state && callerData.state !== 'NA' && callerData.state.trim()) {
+            addressParts.push(callerData.state.trim());
+        }
+        if (callerData.zip && callerData.zip !== 'NA' && callerData.zip.trim()) {
+            addressParts.push(callerData.zip.trim());
+        }
+        
+        return addressParts.length > 0 ? addressParts.join(', ') : (callerData.address || '-');
+    };
+    
     const additionalData = {
         firstName: callerData.firstName || '-',
         lastName: callerData.lastName || '-',
         email: callerData.email || '-',
         phoneNumber: callerData.callerId,
         type: callerData.type || 'Inbound',
-        address: callerData.address || '-',
+        address: buildAddress(),
         billed: callerData.billed || 'No',
         latestPayout: callerData.latestPayout || '-',
         totalCost: Number.isFinite(totalCostValue) ? totalCostValue : 0,
