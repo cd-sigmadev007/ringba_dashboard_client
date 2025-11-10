@@ -162,17 +162,48 @@ class CallerApiService {
 
     // Convert API response to frontend CallData format
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
+        // Parse duration from seconds string to formatted "Xm Ys" format
+        const formatDuration = (duration: string | number): string => {
+            if (!duration && duration !== 0) return '00m 00s'
+            const seconds = typeof duration === 'string' ? parseFloat(duration) : duration
+            if (isNaN(seconds) || seconds < 0) return '00m 00s'
+            const minutes = Math.floor(seconds / 60)
+            const remainingSeconds = Math.floor(seconds % 60)
+            return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
+        }
+
+        // Parse numeric value from string or number
+        const parseNumeric = (value: string | number | null | undefined): number => {
+            if (value === null || value === undefined) return 0
+            if (typeof value === 'number') return isNaN(value) ? 0 : value
+            if (typeof value === 'string') {
+                const parsed = parseFloat(value)
+                return isNaN(parsed) ? 0 : parsed
+            }
+            return 0
+        }
+
+        // Calculate lifetimeRevenue from ringbaCost + adCost
+        const ringbaCost = parseNumeric(apiData.ringbaCost)
+        const adCost = parseNumeric(apiData.adCost)
+        const calculatedLTR = ringbaCost + adCost
+        
+        // Use calculated LTR if available, otherwise fall back to lifetimeRevenue from API
+        const lifetimeRevenue = calculatedLTR > 0 ? calculatedLTR : parseNumeric(apiData.lifetimeRevenue)
+
         return {
             id: apiData.id,
             callerId: apiData.callerId,
             lastCall: apiData.lastCall,
-            duration: apiData.duration,
-            lifetimeRevenue: apiData.lifetimeRevenue,
+            duration: formatDuration(apiData.duration),
+            lifetimeRevenue,
             campaign: apiData.campaign,
             action: apiData.action,
             status: apiData.status,
             audioUrl: (apiData as any).audioUrl,
             transcript: (apiData as any).transcript,
+            ringbaCost,
+            adCost,
         }
     }
 }

@@ -144,3 +144,35 @@ export function truncateText(
     if (text.length <= maxLength) return text
     return text.slice(0, maxLength - suffix.length) + suffix
 }
+
+/**
+ * Formats duration from seconds (string or number) to "Xm Ys" format
+ * @param duration - Duration in seconds as string or number
+ * @returns Formatted duration string (e.g., "03m 25s")
+ */
+export function formatDuration(duration: string | number): string {
+    if (!duration && duration !== 0) return '00m 00s'
+    
+    const seconds = typeof duration === 'string' ? parseFloat(duration) : duration
+    if (isNaN(seconds) || seconds < 0) return '00m 00s'
+    
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = Math.floor(seconds % 60)
+    
+    return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
+}
+
+/**
+ * Parses a numeric value from string or number, handling both float and string inputs
+ * @param value - Value as string or number
+ * @returns Parsed number, or 0 if invalid
+ */
+export function parseNumeric(value: string | number | null | undefined): number {
+    if (value === null || value === undefined) return 0
+    if (typeof value === 'number') return isNaN(value) ? 0 : value
+    if (typeof value === 'string') {
+        const parsed = parseFloat(value)
+        return isNaN(parsed) ? 0 : parsed
+    }
+    return 0
+}

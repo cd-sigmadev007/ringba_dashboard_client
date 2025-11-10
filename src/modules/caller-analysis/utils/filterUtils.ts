@@ -1,10 +1,27 @@
 import type { DurationRange } from '@/components'
 
 // Helper function to parse duration string to seconds
-export const parseDuration = (duration: string): number => {
+// Handles both "Xm Ys" format and seconds string/number
+export const parseDuration = (duration: string | number): number => {
+    if (typeof duration === 'number') {
+        return duration
+    }
+    
+    if (!duration) return 0
+    
+    // Try to parse as "Xm Ys" format first
     const match = duration.match(/(\d+)m\s+(\d+)s/)
-    if (!match) return 0
-    return parseInt(match[1]) * 60 + parseInt(match[2])
+    if (match) {
+        return parseInt(match[1]) * 60 + parseInt(match[2])
+    }
+    
+    // If not in "Xm Ys" format, try parsing as seconds string
+    const seconds = parseFloat(duration)
+    if (!isNaN(seconds)) {
+        return seconds
+    }
+    
+    return 0
 }
 
 // Campaign filter matching logic

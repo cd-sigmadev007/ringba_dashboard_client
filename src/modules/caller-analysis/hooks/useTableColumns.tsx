@@ -66,9 +66,11 @@ export const useTableColumns = (
                 header: 'DURATION',
                 accessorKey: 'duration',
                 meta: { width: 100 },
-                cell: ({ getValue }) => (
-                    <span className="text-sm">{getValue() as string}</span>
-                ),
+                cell: ({ getValue }) => {
+                    const duration = getValue() as string
+                    // Duration is already formatted in the API conversion, but handle edge cases
+                    return <span className="text-sm">{duration || '00m 00s'}</span>
+                },
             },
             {
                 header: (
@@ -95,14 +97,16 @@ export const useTableColumns = (
                 ) as any,
                 accessorKey: 'lifetimeRevenue',
                 meta: { width: 140 },
-                cell: ({ getValue }) => {
-                    const totalCost = getValue() as number
-
-                    // Demo data for cost breakdown - replace with real API data later
-                    const adCost = Math.round(totalCost * 0.35 * 100) / 100 // 35% of total
-                    const ringbaCost = Math.round(totalCost * 0.45 * 100) / 100 // 45% of total
-                    const thirdPartyCost =
-                        Math.round(totalCost * 0.2 * 100) / 100 // 20% of total
+                cell: ({ row }) => {
+                    const totalCost = row.original.lifetimeRevenue || 0
+                    const ringbaCost = row.original.ringbaCost || 0
+                    const adCost = row.original.adCost || 0
+                    
+                    // Calculate third party cost as remainder (if total > ringba + ad)
+                    const calculatedTotal = ringbaCost + adCost
+                    const thirdPartyCost = totalCost > calculatedTotal 
+                        ? Math.round((totalCost - calculatedTotal) * 100) / 100 
+                        : 0
 
                     return (
                         <LifetimeRevenueBreakdown
