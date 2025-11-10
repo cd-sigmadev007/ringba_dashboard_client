@@ -3,6 +3,9 @@
 import { tanstackConfig } from '@tanstack/eslint-config'
 
 export default [
+    {
+        ignores: ['*.config.js', 'scripts/**/*.js'],
+    },
     ...tanstackConfig,
     {
         // Override PNPM rules for package.json

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import Tooltip from '../../../components/common/Tooltip'
+import { Tooltip } from '../../../components/common'
 import type { StatusItem } from '@/modules'
 
 import {

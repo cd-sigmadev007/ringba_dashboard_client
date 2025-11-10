@@ -2,7 +2,7 @@ import React from 'react'
 import medicareImg from '../../../assets/png/medicare.png'
 import applianceImg from '../../../assets/png/appliance.png'
 import pestImg from '../../../assets/png/pest.png'
-import Tooltip from '@/components/common/Tooltip.tsx'
+import { Tooltip } from '@/components/common'
 
 interface CampaignProps {
     campaign: string

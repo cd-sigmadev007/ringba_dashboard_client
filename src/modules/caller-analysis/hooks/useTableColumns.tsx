@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import Button from '../../../components/ui/Button'
-import Tooltip from '../../../components/common/Tooltip'
+import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
 import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
 import type { ColumnDef } from '@tanstack/react-table'
