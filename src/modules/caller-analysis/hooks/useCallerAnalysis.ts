@@ -26,7 +26,7 @@ export const useCallerAnalysis = () => {
         searchQuery: '',
     })
 
-    const [data, setData] = useState<CallData[]>([])
+    const [data, setData] = useState<Array<CallData>>([])
     const [isLoading, setIsLoading] = useState(true)
     const [totalRecords, setTotalRecords] = useState(0)
 
@@ -58,18 +58,29 @@ export const useCallerAnalysis = () => {
     const parseLastCallDate = (lastCall: string): Date | null => {
         try {
             // Parse the date string format: "Aug 05, 06:00:00 AM ET"
-            const dateMatch = lastCall.match(/(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/)
+            const dateMatch = lastCall.match(
+                /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
+            )
             if (!dateMatch) return null
-            
+
             const [, month, day, hour, minute, second, ampm] = dateMatch
-            const monthIndex = new Date(Date.parse(month + " 1, 2000")).getMonth()
+            const monthIndex = new Date(
+                Date.parse(month + ' 1, 2000')
+            ).getMonth()
             const year = new Date().getFullYear() // Use current year as fallback
-            
+
             let hour24 = parseInt(hour)
             if (ampm === 'PM' && hour24 !== 12) hour24 += 12
             if (ampm === 'AM' && hour24 === 12) hour24 = 0
-            
-            return new Date(year, monthIndex, parseInt(day), hour24, parseInt(minute), parseInt(second))
+
+            return new Date(
+                year,
+                monthIndex,
+                parseInt(day),
+                hour24,
+                parseInt(minute),
+                parseInt(second)
+            )
         } catch (error) {
             console.error('Error parsing date:', lastCall, error)
             return null
@@ -78,16 +89,16 @@ export const useCallerAnalysis = () => {
 
     // Filter data based on current filters
     const filteredData = useMemo(() => {
-        console.log('🔍 Filtering data:', { 
+        console.log('🔍 Filtering data:', {
             dataLength: data.length,
-            filters: filters
+            filters: filters,
         })
-        
+
         if (!data.length) {
             console.log('📄 No data available')
             return []
         }
-        
+
         // Apply client-side filtering
         const filtered = data.filter((d: CallData) => {
             // Search filter (caller ID)
@@ -109,10 +120,16 @@ export const useCallerAnalysis = () => {
             if (filters.dateRange.from || filters.dateRange.to) {
                 const callDate = parseLastCallDate(d.lastCall)
                 if (callDate) {
-                    if (filters.dateRange.from && callDate < filters.dateRange.from) {
+                    if (
+                        filters.dateRange.from &&
+                        callDate < filters.dateRange.from
+                    ) {
                         return false
                     }
-                    if (filters.dateRange.to && callDate > filters.dateRange.to) {
+                    if (
+                        filters.dateRange.to &&
+                        callDate > filters.dateRange.to
+                    ) {
                         return false
                     }
                 }
@@ -130,12 +147,12 @@ export const useCallerAnalysis = () => {
 
             return true
         })
-        
-        console.log('🔍 Filtered data:', { 
-            original: data.length, 
-            filtered: filtered.length 
+
+        console.log('🔍 Filtered data:', {
+            original: data.length,
+            filtered: filtered.length,
         })
-        
+
         return filtered
     }, [data, filters])
 

@@ -11,7 +11,6 @@ import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
 import DashboardRoute from './routes/dashboard.tsx'
 
-
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
 import reportWebVitals from './reportWebVitals.ts'
@@ -58,15 +57,17 @@ declare module '@tanstack/react-router' {
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement)
-    
+
     const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
     const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
     const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE
-    
+
     if (!auth0Domain || !auth0ClientId || !auth0Audience) {
-        console.error('Missing Auth0 environment variables. Please check your .env file.')
+        console.error(
+            'Missing Auth0 environment variables. Please check your .env file.'
+        )
     }
-    
+
     root.render(
         <StrictMode>
             <Auth0Provider
@@ -79,7 +80,9 @@ if (rootElement && !rootElement.innerHTML) {
                 }}
                 cacheLocation="localstorage"
             >
-                <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+                <TanStackQueryProvider.Provider
+                    {...TanStackQueryProviderContext}
+                >
                     <RouterProvider router={router} />
                 </TanStackQueryProvider.Provider>
             </Auth0Provider>

@@ -1,9 +1,9 @@
 import React from 'react'
+import { TranscriptContent } from './TranscriptContent'
+import type { CallData } from '../types'
+import type { TranscriptEntry } from '@/data/caller-tabs-data'
 import { useIsMobile } from '@/lib'
 import { Modal } from '@/components/ui'
-import type { CallData } from '../types'
-import { TranscriptContent } from './TranscriptContent'
-import type { TranscriptEntry } from '@/data/caller-tabs-data'
 
 export interface CallTranscriptModalProps {
     callerData: CallData
@@ -14,16 +14,16 @@ export interface CallTranscriptModalProps {
 export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
     callerData,
     isOpen,
-    onClose
+    onClose,
 }) => {
     const isMobile = useIsMobile()
 
-    if (!isOpen || !callerData) {
+    if (!isOpen) {
         return null
     }
 
     // Parse transcript into speaker-based entries (A/B) with timestamps
-    const parseTranscript = (raw?: string): TranscriptEntry[] => {
+    const parseTranscript = (raw?: string): Array<TranscriptEntry> => {
         if (!raw || typeof raw !== 'string') return []
 
         // Format: "00:00 A - text,\n00:20 B - text,\n"
@@ -31,10 +31,10 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
         const lines = raw
             .replace(/\r/g, '')
             .split('\n')
-            .map(l => l.trim())
+            .map((l) => l.trim())
             .filter(Boolean)
 
-        const entries: TranscriptEntry[] = []
+        const entries: Array<TranscriptEntry> = []
 
         for (const line of lines) {
             // Match format: "00:00 A - text," or "00:00 A: text," or "A - text,"
@@ -44,7 +44,7 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
                 const timestamp = m[1] || '00:00'
                 const speaker = m[2] as 'A' | 'B'
                 // Remove trailing comma if present
-                let text = m[3].trim().replace(/,$/, '').trim()
+                const text = m[3].trim().replace(/,$/, '').trim()
                 if (text) {
                     entries.push({ timestamp, speaker, text })
                 }
@@ -54,7 +54,8 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
                     const lastEntry = entries[entries.length - 1]
                     const additionalText = line.replace(/,$/, '').trim()
                     if (additionalText) {
-                        lastEntry.text += (lastEntry.text ? ' ' : '') + additionalText
+                        lastEntry.text +=
+                            (lastEntry.text ? ' ' : '') + additionalText
                     }
                 } else {
                     const text = line.replace(/,$/, '').trim()
@@ -68,7 +69,9 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
         return entries
     }
 
-    const transcriptEntries: TranscriptEntry[] = parseTranscript(callerData.transcript)
+    const transcriptEntries: Array<TranscriptEntry> = parseTranscript(
+        callerData.transcript
+    )
 
     return (
         <Modal
@@ -82,7 +85,10 @@ export const CallTranscriptModal: React.FC<CallTranscriptModalProps> = ({
             border={true}
         >
             <div className="space-y-6">
-                <TranscriptContent border={false} transcriptData={transcriptEntries} />
+                <TranscriptContent
+                    border={false}
+                    transcriptData={transcriptEntries}
+                />
             </div>
         </Modal>
     )

@@ -9,7 +9,7 @@ export interface TabItem {
 }
 
 export interface TabsProps {
-    tabs: TabItem[]
+    tabs: Array<TabItem>
     defaultActiveTab?: string
     className?: string
     tabsClassName?: string
@@ -23,30 +23,29 @@ export const Tabs: React.FC<TabsProps> = ({
     className,
     tabsClassName,
     contentClassName,
-    onChange
+    onChange,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
-    const [activeTab, setActiveTab] = useState(defaultActiveTab || tabs[0]?.id || '')
+
+    const [activeTab, setActiveTab] = useState(
+        defaultActiveTab || tabs[0]?.id || ''
+    )
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId)
         onChange?.(tabId)
     }
 
-    const activeTabContent = tabs.find(tab => tab.id === activeTab)?.content
+    const activeTabContent = tabs.find((tab) => tab.id === activeTab)?.content
 
     return (
         <div className={clsx('w-full', className)}>
             {/* Tab Headers */}
-            <div className={clsx(
-                'flex items-center gap-2.5',
-                tabsClassName
-            )}>
+            <div className={clsx('flex items-center gap-2.5', tabsClassName)}>
                 {tabs.map((tab) => {
                     const isActive = tab.id === activeTab
-                    
+
                     return (
                         <button
                             key={tab.id}
@@ -55,12 +54,16 @@ export const Tabs: React.FC<TabsProps> = ({
                                 'px-2.5 py-3 text-sm font-medium transition-colors duration-200 flex items-center justify-center relative',
                                 isActive && [
                                     // Active tab styles - blue bottom border
-                                    isDark ? 'text-[#F5F8FA]' : 'text-[#F5F8FA]',
-                                    'border-b-2 border-[#007FFF]'
+                                    isDark
+                                        ? 'text-[#F5F8FA]'
+                                        : 'text-[#F5F8FA]',
+                                    'border-b-2 border-[#007FFF]',
                                 ],
                                 !isActive && [
                                     // Inactive tab styles
-                                    isDark ? 'text-[#7E8299]' : 'text-[#7E8299]',
+                                    isDark
+                                        ? 'text-[#7E8299]'
+                                        : 'text-[#7E8299]',
                                 ]
                             )}
                         >
@@ -71,10 +74,7 @@ export const Tabs: React.FC<TabsProps> = ({
             </div>
 
             {/* Tab Content */}
-            <div className={clsx(
-                'w-full',
-                contentClassName
-            )}>
+            <div className={clsx('w-full', contentClassName)}>
                 {activeTabContent}
             </div>
         </div>

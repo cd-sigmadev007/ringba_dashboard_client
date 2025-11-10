@@ -4,12 +4,12 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import Button from '../../../components/ui/Button'
 import CrossIcon from '../../../assets/svg/CrossIcon'
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
 import { campaignOptions, statusOptions } from '../data/mockData'
 import type { FilterState } from '../types'
 import type { DurationRange } from '../../../components/ui/DurationRangeFilter'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 interface FilterPillsProps {
     filters: FilterState
@@ -112,7 +112,9 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                 >
                     <p>
                         Date:{' '}
-                        {dayjs.tz(filters.dateRange.from, 'America/New_York').format('MMM DD, YYYY')}
+                        {dayjs
+                            .tz(filters.dateRange.from, 'America/New_York')
+                            .format('MMM DD, YYYY')}
                         {filters.dateRange.to &&
                             ` - ${dayjs.tz(filters.dateRange.to, 'America/New_York').format('MMM DD, YYYY')}`}
                     </p>

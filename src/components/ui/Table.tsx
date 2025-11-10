@@ -13,10 +13,10 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import clsx from 'clsx'
 import TableLoader from './TableLoader'
+import Button from './Button'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { useThemeStore } from '@/store/themeStore.ts'
 import { cn } from '@/lib'
-import Button from './Button'
 
 interface TableProps<T = any> {
     /**
@@ -180,9 +180,9 @@ const Table = <T,>({
         initialState: {
             pagination: pagination
                 ? {
-                    pageIndex: 0,
-                    pageSize,
-                }
+                      pageIndex: 0,
+                      pageSize,
+                  }
                 : undefined,
         },
     })
@@ -278,8 +278,8 @@ const Table = <T,>({
                 >
                     <table
                         className={cn(
-                            "table-auto w-full single-table relative",
-                            isOverflowing && "table-scrollable"
+                            'table-auto w-full single-table relative',
+                            isOverflowing && 'table-scrollable'
                         )}
                         style={{
                             minWidth: isOverflowing ? 'max-content' : 'auto',
@@ -310,19 +310,22 @@ const Table = <T,>({
                                                                 .columnDef
                                                                 .meta as any
                                                         )?.sticky
-                                                            ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${isDark ? 'bg-[#001E3C]' : 'bg-[#F5F8FA]'
-                                                            } relative`
+                                                            ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${
+                                                                  isDark
+                                                                      ? 'bg-[#001E3C]'
+                                                                      : 'bg-[#F5F8FA]'
+                                                              } relative`
                                                             : 'static w-auto',
                                                         isDark
                                                             ? 'text-[#A1A5B7]'
                                                             : 'text-[#5E6278]',
                                                         index === 0 &&
-                                                        'first:rounded-tl-[10px]',
+                                                            'first:rounded-tl-[10px]',
                                                         index ===
-                                                        headerGroup.headers
-                                                            .length -
-                                                        1 &&
-                                                        'last:rounded-tr-[10px]'
+                                                            headerGroup.headers
+                                                                .length -
+                                                                1 &&
+                                                            'last:rounded-tr-[10px]'
                                                     )}
                                                 >
                                                     {header.column.getCanSort() ? (
@@ -420,8 +423,11 @@ const Table = <T,>({
                                                     cell.column.columnDef
                                                         .meta as any
                                                 )?.sticky
-                                                    ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${isDark ? 'bg-[#001E3C]' : 'bg-white'
-                                                    } relative`
+                                                    ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
+                                                          isDark
+                                                              ? 'bg-[#001E3C]'
+                                                              : 'bg-white'
+                                                      } relative`
                                                     : 'static',
                                                 isDark
                                                     ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]'
@@ -454,12 +460,11 @@ const Table = <T,>({
                         )}
                     >
                         Showing{' '}
-                        {table.getState().pagination.pageIndex * pageSize +
-                            1}{' '}
+                        {table.getState().pagination.pageIndex * pageSize + 1}{' '}
                         to{' '}
                         {Math.min(
                             (table.getState().pagination.pageIndex + 1) *
-                            pageSize,
+                                pageSize,
                             table.getPrePaginationRowModel().rows.length
                         )}{' '}
                         of {table.getPrePaginationRowModel().rows.length}{' '}
@@ -468,19 +473,29 @@ const Table = <T,>({
                     <div className="flex items-center gap-[10px]">
                         {/* Page Numbers */}
                         {(() => {
-                            const totalPages = table.getPageCount();
-                            const currentPage = table.getState().pagination.pageIndex + 1;
-                            const maxVisiblePages = 3; // Show max 7 page numbers
+                            const totalPages = table.getPageCount()
+                            const currentPage =
+                                table.getState().pagination.pageIndex + 1
+                            const maxVisiblePages = 3 // Show max 7 page numbers
 
-                            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-                            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                            let startPage = Math.max(
+                                1,
+                                currentPage - Math.floor(maxVisiblePages / 2)
+                            )
+                            const endPage = Math.min(
+                                totalPages,
+                                startPage + maxVisiblePages - 1
+                            )
 
                             // Adjust start page if we're near the end
                             if (endPage - startPage < maxVisiblePages - 1) {
-                                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                                startPage = Math.max(
+                                    1,
+                                    endPage - maxVisiblePages + 1
+                                )
                             }
 
-                            const pages = [];
+                            const pages = []
 
                             // First page
                             if (startPage > 1) {
@@ -493,17 +508,22 @@ const Table = <T,>({
                                     >
                                         1
                                     </Button>
-                                );
+                                )
 
                                 if (startPage > 2) {
                                     pages.push(
-                                        <span key="dots1" className={clsx(
-                                            'text-md',
-                                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                                        )}>
+                                        <span
+                                            key="dots1"
+                                            className={clsx(
+                                                'text-md',
+                                                isDark
+                                                    ? 'text-[#A1A5B7]'
+                                                    : 'text-[#5E6278]'
+                                            )}
+                                        >
                                             ...
                                         </span>
-                                    );
+                                    )
                                 }
                             }
 
@@ -512,41 +532,54 @@ const Table = <T,>({
                                 pages.push(
                                     <Button
                                         key={i}
-                                        variant={i === currentPage ? "primary" : "secondary"}
-                                        onClick={() => table.setPageIndex(i - 1)}
+                                        variant={
+                                            i === currentPage
+                                                ? 'primary'
+                                                : 'secondary'
+                                        }
+                                        onClick={() =>
+                                            table.setPageIndex(i - 1)
+                                        }
                                         className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
                                     >
                                         {i}
                                     </Button>
-                                );
+                                )
                             }
 
                             // Last page
                             if (endPage < totalPages) {
                                 if (endPage < totalPages - 1) {
                                     pages.push(
-                                        <span key="dots2" className={clsx(
-                                            'text-md',
-                                            isDark ? 'text-[#A1A5B7]' : 'text-[#A1A5B7]'
-                                        )}>
+                                        <span
+                                            key="dots2"
+                                            className={clsx(
+                                                'text-md',
+                                                isDark
+                                                    ? 'text-[#A1A5B7]'
+                                                    : 'text-[#A1A5B7]'
+                                            )}
+                                        >
                                             ...
                                         </span>
-                                    );
+                                    )
                                 }
 
                                 pages.push(
                                     <Button
                                         key={totalPages}
                                         variant="secondary"
-                                        onClick={() => table.setPageIndex(totalPages - 1)}
+                                        onClick={() =>
+                                            table.setPageIndex(totalPages - 1)
+                                        }
                                         className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
                                     >
                                         {totalPages}
                                     </Button>
-                                );
+                                )
                             }
 
-                            return pages;
+                            return pages
                         })()}
                     </div>
                 </div>

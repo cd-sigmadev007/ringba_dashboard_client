@@ -1,144 +1,143 @@
 /* Ace Editor - Cobalt Blue Theme Customization */
 
 .json-editor-dark .ace_editor {
-  background-color: #001e3c !important;
-  color: #f5f8fa !important;
+    background-color: #001e3c !important;
+    color: #f5f8fa !important;
 }
 
 .json-editor-light .ace_editor {
-  background-color: #ffffff !important;
-  color: #3f4254 !important;
+    background-color: #ffffff !important;
+    color: #3f4254 !important;
 }
 
 /* Dark theme - Cobalt blue syntax highlighting */
 .json-editor-dark .ace_gutter {
-  background-color: #001e3c !important;
-  color: #a1a5b7 !important;
-  border-right: 1px solid #1b456f !important;
+    background-color: #001e3c !important;
+    color: #a1a5b7 !important;
+    border-right: 1px solid #1b456f !important;
 }
 
 .json-editor-dark .ace_gutter-active-line {
-  background-color: #132f4c !important;
+    background-color: #132f4c !important;
 }
 
 .json-editor-dark .ace_line {
-  color: #f5f8fa !important;
+    color: #f5f8fa !important;
 }
 
 /* JSON Key names - Cobalt blue */
 .json-editor-dark .ace_string {
-  color: #66b3ff !important; /* Light cobalt blue for strings */
+    color: #66b3ff !important; /* Light cobalt blue for strings */
 }
 
 .json-editor-dark .ace_keyword {
-  color: #4a9eff !important; /* Bright cobalt blue for keys */
+    color: #4a9eff !important; /* Bright cobalt blue for keys */
 }
 
 /* Numbers - Cobalt blue */
 .json-editor-dark .ace_numeric {
-  color: #5aa3ff !important; /* Cobalt blue for numbers */
+    color: #5aa3ff !important; /* Cobalt blue for numbers */
 }
 
 /* Booleans - Orange */
 .json-editor-dark .ace_constant.ace_language {
-  color: #ff9933 !important; /* Orange for true/false */
+    color: #ff9933 !important; /* Orange for true/false */
 }
 
 /* Null - Gray */
 .json-editor-dark .ace_constant.ace_numeric {
-  color: #a1a5b7 !important; /* Gray for null */
+    color: #a1a5b7 !important; /* Gray for null */
 }
 
 /* Brackets and braces - White */
 .json-editor-dark .ace_paren {
-  color: #f5f8fa !important;
+    color: #f5f8fa !important;
 }
 
 .json-editor-dark .ace_bracket {
-  color: #f5f8fa !important;
+    color: #f5f8fa !important;
 }
 
 .json-editor-dark .ace_brace {
-  color: #f5f8fa !important;
+    color: #f5f8fa !important;
 }
 
 /* Colons and commas - Light gray */
 .json-editor-dark .ace_punctuation {
-  color: #a1a5b7 !important;
+    color: #a1a5b7 !important;
 }
 
 /* Light theme */
 .json-editor-light .ace_gutter {
-  background-color: #ffffff !important;
-  color: #5e6278 !important;
-  border-right: 1px solid #e1e5e9 !important;
+    background-color: #ffffff !important;
+    color: #5e6278 !important;
+    border-right: 1px solid #e1e5e9 !important;
 }
 
 .json-editor-light .ace_gutter-active-line {
-  background-color: #eff2f5 !important;
+    background-color: #eff2f5 !important;
 }
 
 .json-editor-light .ace_line {
-  color: #3f4254 !important;
+    color: #3f4254 !important;
 }
 
 /* JSON Key names - Cobalt blue */
 .json-editor-light .ace_string {
-  color: #0066cc !important; /* Cobalt blue for strings */
+    color: #0066cc !important; /* Cobalt blue for strings */
 }
 
 .json-editor-light .ace_keyword {
-  color: #0047ab !important; /* Deep cobalt blue for keys */
+    color: #0047ab !important; /* Deep cobalt blue for keys */
 }
 
 /* Numbers - Cobalt blue */
 .json-editor-light .ace_numeric {
-  color: #0052a3 !important; /* Cobalt blue for numbers */
+    color: #0052a3 !important; /* Cobalt blue for numbers */
 }
 
 /* Booleans - Orange */
 .json-editor-light .ace_constant.ace_language {
-  color: #cc6600 !important; /* Orange for true/false */
+    color: #cc6600 !important; /* Orange for true/false */
 }
 
 /* Null - Gray */
 .json-editor-light .ace_constant.ace_numeric {
-  color: #999999 !important; /* Gray for null */
+    color: #999999 !important; /* Gray for null */
 }
 
 /* Brackets and braces - Dark */
 .json-editor-light .ace_paren {
-  color: #3f4254 !important;
+    color: #3f4254 !important;
 }
 
 .json-editor-light .ace_bracket {
-  color: #3f4254 !important;
+    color: #3f4254 !important;
 }
 
 .json-editor-light .ace_brace {
-  color: #3f4254 !important;
+    color: #3f4254 !important;
 }
 
 /* Colons and commas - Gray */
 .json-editor-light .ace_punctuation {
-  color: #5e6278 !important;
+    color: #5e6278 !important;
 }
 
 /* Selection */
 .json-editor-dark .ace_selection {
-  background-color: #1b456f !important;
+    background-color: #1b456f !important;
 }
 
 .json-editor-light .ace_selection {
-  background-color: #f0f5ff !important;
+    background-color: #f0f5ff !important;
 }
 
 /* Cursor */
 .json-editor-dark .ace_cursor {
-  color: #f5f8fa !important;
+    color: #f5f8fa !important;
 }
 
 .json-editor-light .ace_cursor {
-  color: #3f4254 !important;
+    color: #3f4254 !important;
 }
-

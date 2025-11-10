@@ -1,10 +1,10 @@
 import React from 'react'
 import clsx from 'clsx'
+import { PriorityStatusSection } from './PriorityStatusSection'
+import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
-import { PriorityStatusSection } from './PriorityStatusSection'
 import { Modal } from '@/components/ui'
-import type { CallData } from '../types'
 
 export interface StatusModalProps {
     callerData: CallData
@@ -15,7 +15,7 @@ export interface StatusModalProps {
 export const StatusModal: React.FC<StatusModalProps> = ({
     callerData,
     isOpen,
-    onClose
+    onClose,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -66,25 +66,27 @@ export const StatusModal: React.FC<StatusModalProps> = ({
         >
             <div className="space-y-6">
                 {/* Status Sections */}
-                <div className={clsx(
-                    'flex flex-col rounded-sm',
-                    isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
-                )}>
+                <div
+                    className={clsx(
+                        'flex flex-col rounded-sm',
+                        isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
+                    )}
+                >
                     <PriorityStatusSection
                         title="Highest Priority"
                         statuses={highestPriorityStatuses}
                     />
-                    
+
                     <PriorityStatusSection
                         title="High Priority"
                         statuses={highPriorityStatuses}
                     />
-                    
+
                     <PriorityStatusSection
                         title="Medium Priority"
                         statuses={mediumPriorityStatuses}
                     />
-                    
+
                     <PriorityStatusSection
                         title="Low Priority"
                         statuses={lowPriorityStatuses}

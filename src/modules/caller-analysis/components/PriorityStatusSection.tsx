@@ -6,7 +6,7 @@ import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 
 export interface PriorityStatusSectionProps {
     title: string
-    statuses: string[]
+    statuses: Array<string>
     className?: string
     enablePillOverflow?: boolean
 }
@@ -15,7 +15,7 @@ export const PriorityStatusSection: React.FC<PriorityStatusSectionProps> = ({
     title,
     statuses,
     className,
-    enablePillOverflow = false
+    enablePillOverflow = false,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -30,15 +30,19 @@ export const PriorityStatusSection: React.FC<PriorityStatusSectionProps> = ({
     if (statuses.length === 0) return null
 
     return (
-        <div className={clsx(
-            'flex flex-col border-b last:border-b-0',
-            isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
-            className
-        )}>
-            <div className={clsx(
-                'flex p-3.5 items-start overflow-x-auto gap-x-[32px]',
-                isMobile ? 'flex-col gap-y-3' : 'flex-row'
-            )}>
+        <div
+            className={clsx(
+                'flex flex-col border-b last:border-b-0',
+                isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
+                className
+            )}
+        >
+            <div
+                className={clsx(
+                    'flex p-3.5 items-start overflow-x-auto gap-x-[32px]',
+                    isMobile ? 'flex-col gap-y-3' : 'flex-row'
+                )}
+            >
                 <p className={labelClass}>{title}</p>
                 <div className="flex-1 overflow-x-fixed">
                     <Status

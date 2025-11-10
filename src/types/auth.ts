@@ -3,8 +3,7 @@
  */
 
 export enum UserRole {
-  SUPER_ADMIN = 'super_admin',
-  ORG_ADMIN = 'org_admin',
-  USER = 'user',
+    SUPER_ADMIN = 'super_admin',
+    ORG_ADMIN = 'org_admin',
+    USER = 'user',
 }
-

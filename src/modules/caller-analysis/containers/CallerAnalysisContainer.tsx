@@ -7,10 +7,9 @@ import { CallTranscriptModal } from '../components/CallTranscriptModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
-import { Modal, Table, AudioPlayer } from '@/components/ui'
+import { AudioPlayer, Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { FilterPills, FiltersSection } from '@/modules'
-
 
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
@@ -22,12 +21,14 @@ export const CallerAnalysisContainer: React.FC = () => {
     const [selectedCaller, setSelectedCaller] = React.useState<CallData | null>(
         null
     )
-    
+
     // Audio player state
     const [audioPlayerVisible, setAudioPlayerVisible] = React.useState(false)
     const [currentAudioUrl, setCurrentAudioUrl] = React.useState<string>('')
     const [isPlaying, setIsPlaying] = React.useState(false)
-    const [currentPlayingRow, setCurrentPlayingRow] = React.useState<string | null>(null)
+    const [currentPlayingRow, setCurrentPlayingRow] = React.useState<
+        string | null
+    >(null)
 
     const {
         filters,
@@ -96,9 +97,13 @@ export const CallerAnalysisContainer: React.FC = () => {
         setIsPlaying(playing)
     }
 
-
-
-    const columns = useTableColumns(handleStatusClick, handleTranscriptClick, handlePlayAudio, currentPlayingRow, isPlaying)
+    const columns = useTableColumns(
+        handleStatusClick,
+        handleTranscriptClick,
+        handlePlayAudio,
+        currentPlayingRow,
+        isPlaying
+    )
 
     return (
         <div className="min-h-screen content">
@@ -135,8 +140,12 @@ export const CallerAnalysisContainer: React.FC = () => {
                 {/* Data Summary */}
                 <div className="mb-6 grid grid-cols-1 gap-4">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Records</div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{totalRecords.toLocaleString()}</div>
+                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Total Records
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                            {totalRecords.toLocaleString()}
+                        </div>
                     </div>
                 </div>
 
@@ -195,7 +204,9 @@ export const CallerAnalysisContainer: React.FC = () => {
                     position={isMobile ? 'bottom' : 'right'}
                     title="Caller Details"
                     size={isMobile ? 'full' : 'full'}
-                    className={isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'}
+                    className={
+                        isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'
+                    }
                     animation={isMobile ? 'slide' : 'fade'}
                 >
                     <div className="h-full overflow-y-auto custom-scroll">

@@ -208,12 +208,12 @@
 
     /* Dark theme borders */
     .theme-dark .single-table td {
-        border-color: #1B456F !important;
+        border-color: #1b456f !important;
     }
 
     /* Light theme borders */
     .theme-light .single-table td {
-        border-color: #E0E0E0 !important;
+        border-color: #e0e0e0 !important;
     }
 
     /* Ensure sticky columns have proper borders */
@@ -229,15 +229,15 @@
     /* Dark theme sticky column borders */
     .theme-dark .sticky-column,
     .theme-dark .sticky-column-th {
-        border-right-color: #1B456F !important;
-        border-bottom-color: #132F4C !important;
+        border-right-color: #1b456f !important;
+        border-bottom-color: #132f4c !important;
     }
 
     /* Light theme sticky column borders */
     .theme-light .sticky-column,
     .theme-light .sticky-column-th {
-        border-right-color: #E0E0E0 !important;
-        border-bottom-color: #F0F5FF !important;
+        border-right-color: #e0e0e0 !important;
+        border-bottom-color: #f0f5ff !important;
     }
 
     .theme-dark .filter-select-dark {

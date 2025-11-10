@@ -119,7 +119,7 @@ export const Modal: FC<ModalProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
+
     // Body scroll lock
     const isMobile = useIsMobile()
 
@@ -166,16 +166,20 @@ export const Modal: FC<ModalProps> = ({
                 }}
             >
                 {(title || showCloseButton) && (
-                    <div className={cn(
-                        "flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 z-10",
-                        isDark ? 'bg-[#071B2F]' : 'bg-white'
-                    )}>
+                    <div
+                        className={cn(
+                            'flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 z-10',
+                            isDark ? 'bg-[#071B2F]' : 'bg-white'
+                        )}
+                    >
                         {title && (
                             <h2
                                 id="modal-title"
                                 className={cn(
                                     'text-[24px] font-semibold',
-                                    isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
+                                    isDark
+                                        ? 'text-[#F5F8FA]'
+                                        : 'text-[#3F4254]',
                                     isMobile && 'text-[20px]'
                                 )}
                             >
@@ -189,8 +193,10 @@ export const Modal: FC<ModalProps> = ({
                                     onClose()
                                 }}
                                 className={cn(
-                                    "hover:rounded-[20px] transition-colors",
-                                    isDark ? 'hover:bg-[#1B456F]/20' : 'hover:bg-[#F1F3F4]/80'
+                                    'hover:rounded-[20px] transition-colors',
+                                    isDark
+                                        ? 'hover:bg-[#1B456F]/20'
+                                        : 'hover:bg-[#F1F3F4]/80'
                                 )}
                                 aria-label="Close modal"
                             >
@@ -200,34 +206,43 @@ export const Modal: FC<ModalProps> = ({
                     </div>
                 )}
 
-                {showSeparator && <div className={cn(
-                    "mx-6 h-px",
-                    isDark ? 'bg-[#A1A5B7]' : 'bg-[#E1E5E9]'
-                )} />}
+                {showSeparator && (
+                    <div
+                        className={cn(
+                            'mx-6 h-px',
+                            isDark ? 'bg-[#A1A5B7]' : 'bg-[#E1E5E9]'
+                        )}
+                    />
+                )}
 
                 <div
                     className={cn(
                         'mx-6 overflow-y-auto custom-scroll rounded-[7px]',
-                        size === 'full' 
-                            ? 'h-[90%]' 
-                            : 'max-h-[calc(100vh-200px)]', 
-                        border && cn(
-                            'border',
-                            isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
-                        ),
+                        size === 'full'
+                            ? 'h-[90%]'
+                            : 'max-h-[calc(100vh-200px)]',
+                        border &&
+                            cn(
+                                'border',
+                                isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                            )
                     )}
                     onClick={(e) => {
                         // Stop propagation to prevent the content area from closing when clicked
                         e.stopPropagation()
                     }}
                 >
-                    <div className={cn(
-                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
-                        isMobile && position === 'bottom' && 'pb-4'
-                    )}>
+                    <div
+                        className={cn(
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
+                            isMobile && position === 'bottom' && 'pb-4'
+                        )}
+                    >
                         {children}
                         {/* Add extra bottom spacing for mobile bottom modals */}
-                        {isMobile && position === 'bottom' && <div className="h-4" />}
+                        {isMobile && position === 'bottom' && (
+                            <div className="h-4" />
+                        )}
                     </div>
                 </div>
             </div>

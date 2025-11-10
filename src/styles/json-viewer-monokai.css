@@ -2,96 +2,97 @@
 
 /* Light theme (GitHub-inspired) */
 .json-viewer-light {
-  --w-rjv-background-color: #ffffff;
-  --w-rjv-color: #24292f;
-  --w-rjv-key-string: #0969da;
-  --w-rjv-type-string-color: #0a3069;
-  --w-rjv-type-int-color: #0550ae;
-  --w-rjv-type-float-color: #0550ae;
-  --w-rjv-type-boolean-color: #cf222e;
-  --w-rjv-type-null-color: #8250df;
-  --w-rjv-brackets-color: #24292f;
-  --w-rjv-arrow-color: #656d76;
-  --w-rjv-quotes-color: #0a3069;
-  --w-rjv-edit-color: #d73a49;
-  --w-rjv-info-color: #0550ae;
-  --w-rjv-copied-color: #28a745;
-  --w-rjv-copied-success-color: #28a745;
-  --w-rjv-curlybraces-color: #24292f;
-  --w-rjv-colon-color: #24292f;
+    --w-rjv-background-color: #ffffff;
+    --w-rjv-color: #24292f;
+    --w-rjv-key-string: #0969da;
+    --w-rjv-type-string-color: #0a3069;
+    --w-rjv-type-int-color: #0550ae;
+    --w-rjv-type-float-color: #0550ae;
+    --w-rjv-type-boolean-color: #cf222e;
+    --w-rjv-type-null-color: #8250df;
+    --w-rjv-brackets-color: #24292f;
+    --w-rjv-arrow-color: #656d76;
+    --w-rjv-quotes-color: #0a3069;
+    --w-rjv-edit-color: #d73a49;
+    --w-rjv-info-color: #0550ae;
+    --w-rjv-copied-color: #28a745;
+    --w-rjv-copied-success-color: #28a745;
+    --w-rjv-curlybraces-color: #24292f;
+    --w-rjv-colon-color: #24292f;
 }
 
 /* Dark theme (Monokai) */
 .json-viewer-dark {
-  --w-rjv-background-color: #272822;
-  --w-rjv-color: #f8f8f2;
-  --w-rjv-key-string: #a6e22e;
-  --w-rjv-type-string-color: #e6db74;
-  --w-rjv-type-int-color: #ae81ff;
-  --w-rjv-type-float-color: #ae81ff;
-  --w-rjv-type-boolean-color: #ae81ff;
-  --w-rjv-type-null-color: #f92672;
-  --w-rjv-brackets-color: #f8f8f2;
-  --w-rjv-arrow-color: #f92672;
-  --w-rjv-quotes-color: #e6db74;
-  --w-rjv-edit-color: #f92672;
-  --w-rjv-info-color: #66d9ef;
-  --w-rjv-copied-color: #a6e22e;
-  --w-rjv-copied-success-color: #a6e22e;
-  --w-rjv-curlybraces-color: #f8f8f2;
-  --w-rjv-colon-color: #f8f8f2;
+    --w-rjv-background-color: #272822;
+    --w-rjv-color: #f8f8f2;
+    --w-rjv-key-string: #a6e22e;
+    --w-rjv-type-string-color: #e6db74;
+    --w-rjv-type-int-color: #ae81ff;
+    --w-rjv-type-float-color: #ae81ff;
+    --w-rjv-type-boolean-color: #ae81ff;
+    --w-rjv-type-null-color: #f92672;
+    --w-rjv-brackets-color: #f8f8f2;
+    --w-rjv-arrow-color: #f92672;
+    --w-rjv-quotes-color: #e6db74;
+    --w-rjv-edit-color: #f92672;
+    --w-rjv-info-color: #66d9ef;
+    --w-rjv-copied-color: #a6e22e;
+    --w-rjv-copied-success-color: #a6e22e;
+    --w-rjv-curlybraces-color: #f8f8f2;
+    --w-rjv-colon-color: #f8f8f2;
 }
 
 /* Additional styling for better appearance */
 .json-viewer-container {
-  font-family: "Fira Code", "JetBrains Mono", "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  border-radius: 8px;
-  overflow: auto;
-  max-height: 600px;
-  padding: 20px;
+    font-family:
+        'Fira Code', 'JetBrains Mono', 'SF Mono', Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    border-radius: 8px;
+    overflow: auto;
+    max-height: 600px;
+    padding: 20px;
 }
 
 .json-viewer-light .json-viewer-container {
-  background-color: #ffffff;
+    background-color: #ffffff;
 }
 
 .json-viewer-dark .json-viewer-container {
-  background-color: #272822;
+    background-color: #272822;
 }
 
 /* Scrollbar styling for better integration */
 .json-viewer-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 
 .json-viewer-light .json-viewer-container::-webkit-scrollbar-track {
-  background: #f1f3f4;
-  border-radius: 4px;
+    background: #f1f3f4;
+    border-radius: 4px;
 }
 
 .json-viewer-dark .json-viewer-container::-webkit-scrollbar-track {
-  background: #3e3d32;
-  border-radius: 4px;
+    background: #3e3d32;
+    border-radius: 4px;
 }
 
 .json-viewer-light .json-viewer-container::-webkit-scrollbar-thumb {
-  background: #c1c7cd;
-  border-radius: 4px;
+    background: #c1c7cd;
+    border-radius: 4px;
 }
 
 .json-viewer-light .json-viewer-container::-webkit-scrollbar-thumb:hover {
-  background: #a8b1ba;
+    background: #a8b1ba;
 }
 
 .json-viewer-dark .json-viewer-container::-webkit-scrollbar-thumb {
-  background: #5a5a47;
-  border-radius: 4px;
+    background: #5a5a47;
+    border-radius: 4px;
 }
 
 .json-viewer-dark .json-viewer-container::-webkit-scrollbar-thumb:hover {
-  background: #6a6a57;
+    background: #6a6a57;
 }
-

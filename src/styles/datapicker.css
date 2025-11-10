@@ -31,13 +31,17 @@
     --rdp-day-width: 100px;
     --rdp-day-height: 32px;
     --rdp-accent-color: #132f4c;
-    --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction),
-            transparent 50%,
-            #132f4c 50%);
-            
-    --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction),
-            #132f4c 30%,
-            transparent 50%);
+    --rdp-range_start-background: linear-gradient(
+        var(--rdp-gradient-direction),
+        transparent 50%,
+        #132f4c 50%
+    );
+
+    --rdp-range_end-background: linear-gradient(
+        var(--rdp-gradient-direction),
+        #132f4c 30%,
+        transparent 50%
+    );
 
     --rdp-range_middle-background-color: #132f4c;
     --rdp-today-color: #007fff;

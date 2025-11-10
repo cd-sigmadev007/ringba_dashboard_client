@@ -1,15 +1,15 @@
 import React from 'react'
 import clsx from 'clsx'
+import { useCallerAnalysisApi } from '../hooks'
+import { PriorityStatusSection } from './PriorityStatusSection'
+import { HistoryTabContent, JSONTabContent, TranscriptTabContent } from './tabs'
 import type { CallData } from '../types'
+import type { TabItem } from '@/components/ui/Tabs'
+import type { HistoryEntry, TranscriptEntry } from '@/data/caller-tabs-data'
+import type { FrontendCallerData } from '@/types/api'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
-import { PriorityStatusSection } from './PriorityStatusSection'
 import { Tabs } from '@/components/ui'
-import type { TabItem } from '@/components/ui/Tabs'
-import { TranscriptTabContent, HistoryTabContent, JSONTabContent } from './tabs'
-import type { TranscriptEntry, HistoryEntry } from '@/data/caller-tabs-data'
-import { useCallerAnalysisApi } from '../hooks'
-import type { FrontendCallerData } from '@/types/api'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -24,68 +24,101 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
     // Use real data from API, fallback to 0 if not available
     // Ensure numeric values are properly converted
-    const ringbaCostValue = callerData.ringbaCost != null 
-        ? (typeof callerData.ringbaCost === 'number' ? callerData.ringbaCost : Number(callerData.ringbaCost))
-        : 0;
-    const adCostValue = callerData.adCost != null
-        ? (typeof callerData.adCost === 'number' ? callerData.adCost : Number(callerData.adCost))
-        : 0;
-    
+    const ringbaCostValue =
+        callerData.ringbaCost != null
+            ? typeof callerData.ringbaCost === 'number'
+                ? callerData.ringbaCost
+                : Number(callerData.ringbaCost)
+            : 0
+    const adCostValue =
+        callerData.adCost != null
+            ? typeof callerData.adCost === 'number'
+                ? callerData.adCost
+                : Number(callerData.adCost)
+            : 0
+
     // Calculate totalCost from ringbaCost + adCost, or use revenue if available, fallback to 0
     const totalCostValue = (() => {
         // If both costs are available, sum them
         if (ringbaCostValue > 0 && adCostValue > 0) {
-            return ringbaCostValue + adCostValue;
+            return ringbaCostValue + adCostValue
         }
         // Otherwise use revenue if available
         if (callerData.revenue != null) {
-            const revenueValue = typeof callerData.revenue === 'number' 
-                ? callerData.revenue 
-                : Number(callerData.revenue);
-            return Number.isFinite(revenueValue) ? revenueValue : 0;
+            const revenueValue =
+                typeof callerData.revenue === 'number'
+                    ? callerData.revenue
+                    : Number(callerData.revenue)
+            return Number.isFinite(revenueValue) ? revenueValue : 0
         }
         // Fallback to 0
-        return 0;
-    })();
-    
+        return 0
+    })()
+
     // Build address from parts
     const buildAddress = (): string => {
-        const parts: string[] = [];
-        
+        const parts: Array<string> = []
+
         // Add street number
-        if (callerData.streetNumber && callerData.streetNumber !== 'NA' && callerData.streetNumber.trim()) {
-            parts.push(callerData.streetNumber.trim());
+        if (
+            callerData.streetNumber &&
+            callerData.streetNumber !== 'NA' &&
+            callerData.streetNumber.trim()
+        ) {
+            parts.push(callerData.streetNumber.trim())
         }
-        
+
         // Add street name
-        if (callerData.streetName && callerData.streetName !== 'NA' && callerData.streetName.trim()) {
-            parts.push(callerData.streetName.trim());
+        if (
+            callerData.streetName &&
+            callerData.streetName !== 'NA' &&
+            callerData.streetName.trim()
+        ) {
+            parts.push(callerData.streetName.trim())
         }
-        
+
         // Add street type
-        if (callerData.streetType && callerData.streetType !== 'NA' && callerData.streetType.trim()) {
-            parts.push(callerData.streetType.trim());
+        if (
+            callerData.streetType &&
+            callerData.streetType !== 'NA' &&
+            callerData.streetType.trim()
+        ) {
+            parts.push(callerData.streetType.trim())
         }
-        
+
         // Join street parts
-        const street = parts.length > 0 ? parts.join(' ') : null;
-        
+        const street = parts.length > 0 ? parts.join(' ') : null
+
         // Build full address
-        const addressParts: string[] = [];
-        if (street) addressParts.push(street);
-        if (callerData.city && callerData.city !== 'NA' && callerData.city.trim()) {
-            addressParts.push(callerData.city.trim());
+        const addressParts: Array<string> = []
+        if (street) addressParts.push(street)
+        if (
+            callerData.city &&
+            callerData.city !== 'NA' &&
+            callerData.city.trim()
+        ) {
+            addressParts.push(callerData.city.trim())
         }
-        if (callerData.state && callerData.state !== 'NA' && callerData.state.trim()) {
-            addressParts.push(callerData.state.trim());
+        if (
+            callerData.state &&
+            callerData.state !== 'NA' &&
+            callerData.state.trim()
+        ) {
+            addressParts.push(callerData.state.trim())
         }
-        if (callerData.zip && callerData.zip !== 'NA' && callerData.zip.trim()) {
-            addressParts.push(callerData.zip.trim());
+        if (
+            callerData.zip &&
+            callerData.zip !== 'NA' &&
+            callerData.zip.trim()
+        ) {
+            addressParts.push(callerData.zip.trim())
         }
-        
-        return addressParts.length > 0 ? addressParts.join(', ') : (callerData.address || '-');
-    };
-    
+
+        return addressParts.length > 0
+            ? addressParts.join(', ')
+            : callerData.address || '-'
+    }
+
     const additionalData = {
         firstName: callerData.firstName || '-',
         lastName: callerData.lastName || '-',
@@ -133,23 +166,23 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         'text-sm',
         isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     )
-    
+
     // Theme-aware border and background classes
     const borderClass = clsx(
         'border',
         isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
     )
-    
-    const containerBgClass = clsx(
-        isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
-    )
+
+    const containerBgClass = clsx(isDark ? 'bg-transparent' : 'bg-[#FFFFFF]')
 
     // Fetch history by phone number
     const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
-    const { data: historyResp } = useGetCallerHistoryByPhone(callerData.callerId)
+    const { data: historyResp } = useGetCallerHistoryByPhone(
+        callerData.callerId
+    )
 
     // Parse transcript string to entries with timestamps
-    const parseTranscript = (raw?: string): TranscriptEntry[] => {
+    const parseTranscript = (raw?: string): Array<TranscriptEntry> => {
         if (!raw || typeof raw !== 'string') return []
 
         // Format: "00:00 A - text,\n00:20 B - text,\n"
@@ -157,10 +190,10 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         const lines = raw
             .replace(/\r/g, '')
             .split('\n')
-            .map(l => l.trim())
+            .map((l) => l.trim())
             .filter(Boolean)
 
-        const entries: TranscriptEntry[] = []
+        const entries: Array<TranscriptEntry> = []
 
         for (const line of lines) {
             // Match format: "00:00 A - text," or "00:00 A: text," or "A - text,"
@@ -170,7 +203,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 const timestamp = m[1] || '00:00'
                 const speaker = m[2] as 'A' | 'B'
                 // Remove trailing comma if present
-                let text = m[3].trim().replace(/,$/, '').trim()
+                const text = m[3].trim().replace(/,$/, '').trim()
                 if (text) {
                     entries.push({ timestamp, speaker, text })
                 }
@@ -180,7 +213,8 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                     const lastEntry = entries[entries.length - 1]
                     const additionalText = line.replace(/,$/, '').trim()
                     if (additionalText) {
-                        lastEntry.text += (lastEntry.text ? ' ' : '') + additionalText
+                        lastEntry.text +=
+                            (lastEntry.text ? ' ' : '') + additionalText
                     }
                 } else {
                     const text = line.replace(/,$/, '').trim()
@@ -194,38 +228,44 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         return entries
     }
 
-    const transcriptEntries: TranscriptEntry[] = parseTranscript(callerData.transcript)
+    const transcriptEntries: Array<TranscriptEntry> = parseTranscript(
+        callerData.transcript
+    )
 
     // Map history API rows to HistoryEntry[] used by tab
-    const historyData: HistoryEntry[] = (historyResp?.data || []).map((h: FrontendCallerData) => {
-        // lastCall is like 'Oct 30, 10:21:06 PM ET' -> keep as single date; split time if parsable
-        const dateStr = h.lastCall
-        const rev = Number((h as any).revenue)
-        return {
-            date: dateStr,
-            time: '',
-            duration: h.duration,
-            status: 'Completed',
-            revenue: Number.isFinite(rev) ? rev : 0,
+    const historyData: Array<HistoryEntry> = (historyResp?.data || []).map(
+        (h: FrontendCallerData) => {
+            // lastCall is like 'Oct 30, 10:21:06 PM ET' -> keep as single date; split time if parsable
+            const dateStr = h.lastCall
+            const rev = Number((h as any).revenue)
+            return {
+                date: dateStr,
+                time: '',
+                duration: h.duration,
+                status: 'Completed',
+                revenue: Number.isFinite(rev) ? rev : 0,
+            }
         }
-    })
+    )
 
-    const tabs: TabItem[] = [
+    const tabs: Array<TabItem> = [
         {
             id: 'transcription',
             label: 'Call Transcription',
-            content: <TranscriptTabContent transcriptData={transcriptEntries} />
+            content: (
+                <TranscriptTabContent transcriptData={transcriptEntries} />
+            ),
         },
         {
             id: 'history',
             label: 'History',
-            content: <HistoryTabContent historyData={historyData} />
+            content: <HistoryTabContent historyData={historyData} />,
         },
         {
             id: 'json',
             label: 'JSON',
-            content: <JSONTabContent callerData={callerData} />
-        }
+            content: <JSONTabContent callerData={callerData} />,
+        },
     ]
 
     return (
@@ -240,7 +280,13 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
             </h2>
 
             {/* Personal Info + Revenue */}
-            <div className={clsx('flex flex-col rounded-sm', containerBgClass, borderClass)}>
+            <div
+                className={clsx(
+                    'flex flex-col rounded-sm',
+                    containerBgClass,
+                    borderClass
+                )}
+            >
                 {personalInfo.map((item, idx) => (
                     <div
                         key={idx}
@@ -255,38 +301,50 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 ))}
 
                 {/* Lifetime Revenue Section inside */}
-                <div className={clsx(
-                    'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
-                    isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
-                    isMobile ? 'flex-col gap-y-4' : 'flex-row'
-                )}>
+                <div
+                    className={clsx(
+                        'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
+                        isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
+                        isMobile ? 'flex-col gap-y-4' : 'flex-row'
+                    )}
+                >
                     <p className={labelClass}>Lifetime Revenue</p>
-                    <div className={clsx(
-                        'flex',
-                        isMobile ? 'flex-col gap-y-2 self-end' : 'flex-row gap-x-6'
-                    )}>
+                    <div
+                        className={clsx(
+                            'flex',
+                            isMobile
+                                ? 'flex-col gap-y-2 self-end'
+                                : 'flex-row gap-x-6'
+                        )}
+                    >
                         {revenueInfo.map((count, i) => (
                             <div
                                 key={i}
                                 className={clsx(
                                     'flex flex-col',
-                                    isMobile ? 'justify-between items-start w-full' : 'items-start gap-x-[24px]'
+                                    isMobile
+                                        ? 'justify-between items-start w-full'
+                                        : 'items-start gap-x-[24px]'
                                 )}
                             >
                                 <p
                                     className={clsx(
                                         'text-sm',
-                                        isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+                                        isDark
+                                            ? 'text-[#A1A5B7]'
+                                            : 'text-[#5E6278]',
                                         isMobile ? 'text-xs' : ''
                                     )}
                                 >
                                     {count.label}
                                 </p>
-                                <p className={clsx(
-                                    'font-bold', 
-                                    valueClass,
-                                    isMobile ? 'text-sm' : ''
-                                )}>
+                                <p
+                                    className={clsx(
+                                        'font-bold',
+                                        valueClass,
+                                        isMobile ? 'text-sm' : ''
+                                    )}
+                                >
                                     {count.value}
                                 </p>
                             </div>
@@ -341,10 +399,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
             {/* Tabs Section */}
             <div className="mt-6">
-                <Tabs
-                    tabs={tabs}
-                    defaultActiveTab="transcription"
-                />
+                <Tabs tabs={tabs} defaultActiveTab="transcription" />
             </div>
         </div>
     )

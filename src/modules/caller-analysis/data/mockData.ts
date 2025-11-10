@@ -1,7 +1,7 @@
+import { Priority } from '../types/priority.types'
 import type { StatusItem } from '../types/priority.types'
 import type { CallData } from '../types'
 import type { SelectOption } from '@/components/ui/FilterSelect.tsx'
-import { Priority } from '../types/priority.types'
 
 // Mock data for caller analysis
 // Helper to pick a random status

@@ -10,8 +10,8 @@ import {
     HamburgerMenu,
     SearchIcon,
 } from '../assets/svg'
-import ThemeSwitcher from './utils/theme-switcher'
 import { usePermissions } from '../hooks/usePermissions'
+import ThemeSwitcher from './utils/theme-switcher'
 
 interface HeaderProps {
     setOpenMenu?: (open: boolean) => void
@@ -74,11 +74,22 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                                 <>
                                     {role && (
                                         <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
-                                            {role === 'super_admin' ? 'Super Admin' : role === 'org_admin' ? 'Org Admin' : 'User'}
+                                            {role === 'super_admin'
+                                                ? 'Super Admin'
+                                                : role === 'org_admin'
+                                                  ? 'Org Admin'
+                                                  : 'User'}
                                         </span>
                                     )}
                                     <Button
-                                        onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                                        onClick={() =>
+                                            logout({
+                                                logoutParams: {
+                                                    returnTo:
+                                                        window.location.origin,
+                                                },
+                                            })
+                                        }
                                         variant="ghost"
                                     >
                                         Logout

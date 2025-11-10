@@ -29,13 +29,14 @@ const Index: React.FC<TooltipProps> = ({
         if (id) return String(id)
         // Use crypto.randomUUID() for unique ID generation with fallback
         try {
-            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (crypto.randomUUID) {
                 return `tooltip-${crypto.randomUUID()}`
             } else {
                 // Fallback for environments without crypto.randomUUID
                 return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
             }
-        } catch (error) {
+        } catch {
             // Fallback for any crypto errors
             return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
         }

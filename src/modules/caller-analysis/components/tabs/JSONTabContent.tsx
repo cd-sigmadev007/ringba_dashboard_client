@@ -1,9 +1,9 @@
 import React from 'react'
 import clsx from 'clsx'
 import AceEditor from 'react-ace'
+import type { CallData } from '../../types'
 import { useThemeStore } from '@/store/themeStore'
 import { generateMockJsonData } from '@/data/caller-tabs-data'
-import type { CallData } from '../../types'
 
 // Import Ace Editor modes and themes
 import 'ace-builds/src-noconflict/mode-json'
@@ -22,21 +22,25 @@ export interface JSONTabContentProps {
 export const JSONTabContent: React.FC<JSONTabContentProps> = ({
     callerData,
     jsonData,
-    className
+    className,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
+
     const data = jsonData || generateMockJsonData(callerData)
     const jsonString = JSON.stringify(data, null, 2)
 
     return (
         <div className={clsx('space-y-6 pt-4', className)}>
             {/* JSON Viewer */}
-            <div className={clsx(
-                'rounded-[8px] border overflow-hidden shadow-sm',
-                isDark ? 'border-[#1B456F] shadow-black/20' : 'border-[#E1E5E9] shadow-gray-100'
-            )}>
+            <div
+                className={clsx(
+                    'rounded-[8px] border overflow-hidden shadow-sm',
+                    isDark
+                        ? 'border-[#1B456F] shadow-black/20'
+                        : 'border-[#E1E5E9] shadow-gray-100'
+                )}
+            >
                 <AceEditor
                     mode="json"
                     theme="monokai"
