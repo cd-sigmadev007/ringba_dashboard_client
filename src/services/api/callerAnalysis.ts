@@ -1,6 +1,8 @@
 import { apiClient } from './index'
 import type { PaginatedApiResponse } from './index'
 import type { CallData, FilterState } from '@/modules/caller-analysis/types'
+import type { FrontendCallerData } from '@/types/api'
+import { callerApiService } from '@/modules/caller-analysis/services/api'
 
 // API Endpoints
 export const CALLER_ANALYSIS_ENDPOINTS = {
@@ -26,8 +28,9 @@ export interface GetCallerByPhoneRequest {
     phone: string
 }
 
-// Response Types
-export interface CallerApiResponse extends PaginatedApiResponse<CallData> {}
+// Response Types - API returns FrontendCallerData, we convert to CallData
+export interface CallerApiResponse extends PaginatedApiResponse<FrontendCallerData> {}
+export interface ConvertedCallerApiResponse extends PaginatedApiResponse<CallData> {}
 
 export interface CallerSchemaResponse {
     columns: Array<{
@@ -47,7 +50,7 @@ export class CallerAnalysisApiService {
      */
     static async getAllCallers(
         request: GetCallersRequest = {}
-    ): Promise<CallerApiResponse> {
+    ): Promise<ConvertedCallerApiResponse> {
         const { filters, page = 1, limit = 100 } = request
 
         // Build query parameters
@@ -96,7 +99,15 @@ export class CallerAnalysisApiService {
 
         const url = `${CALLER_ANALYSIS_ENDPOINTS.GET_ALL}?${params.toString()}`
 
-        return apiClient.get<CallerApiResponse>(url)
+        const response = await apiClient.get<CallerApiResponse>(url)
+        
+        // Convert API response to CallData format
+        const convertedData = response.data.map(callerApiService.convertApiResponseToCallData)
+        
+        return {
+            ...response,
+            data: convertedData,
+        }
     }
 
     /**
@@ -109,8 +120,8 @@ export class CallerAnalysisApiService {
             ':id',
             request.id
         )
-        const response = await apiClient.get<{ data: CallData }>(url)
-        return response.data
+        const response = await apiClient.get<{ data: FrontendCallerData }>(url)
+        return callerApiService.convertApiResponseToCallData(response.data)
     }
 
     /**
@@ -123,8 +134,8 @@ export class CallerAnalysisApiService {
             ':phone',
             request.phone
         )
-        const response = await apiClient.get<{ data: CallData }>(url)
-        return response.data
+        const response = await apiClient.get<{ data: FrontendCallerData }>(url)
+        return callerApiService.convertApiResponseToCallData(response.data)
     }
 
     /**

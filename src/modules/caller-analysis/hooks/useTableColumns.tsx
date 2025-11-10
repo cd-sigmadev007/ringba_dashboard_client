@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import Button from '../../../components/ui/Button'
 import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
@@ -15,6 +15,52 @@ import {
     WarningIcon,
 } from '@/assets/svg'
 import { cn } from '@/lib'
+
+// Caller ID cell component with copy functionality
+const CallerIdCell: React.FC<{ callerId: string }> = ({ callerId }) => {
+    const [copied, setCopied] = React.useState(false)
+
+    const handleCopy = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        try {
+            await navigator.clipboard.writeText(callerId)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch (err) {
+            console.error('Failed to copy caller ID:', err)
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea')
+            textArea.value = callerId
+            textArea.style.position = 'fixed'
+            textArea.style.left = '-999999px'
+            document.body.appendChild(textArea)
+            textArea.select()
+            try {
+                document.execCommand('copy')
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+            } catch (fallbackErr) {
+                console.error('Fallback copy failed:', fallbackErr)
+            }
+            document.body.removeChild(textArea)
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-[10px]">
+            <span className="text-sm truncate">{callerId}</span>
+            <Tooltip tooltipText={copied ? 'Copied!' : 'Copy Caller ID'}>
+                <Button
+                    variant="ghost"
+                    className="p-1 min-w-0 h-auto"
+                    onClick={handleCopy}
+                >
+                    <CopyIcon />
+                </Button>
+            </Tooltip>
+        </div>
+    )
+}
 
 export const useTableColumns = (
     onStatusClick: (callerData: CallData) => void,
@@ -36,20 +82,7 @@ export const useTableColumns = (
                     width: 150,
                 } as any,
                 cell: ({ getValue }) => (
-                    <div className="flex items-center gap-[10px]">
-                        <span className="text-sm truncate">
-                            {getValue() as string}
-                        </span>
-                        <Tooltip tooltipText="Copy Caller ID">
-                            <Button
-                                variant="ghost"
-                                className="p-1 min-w-0 h-auto"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <CopyIcon />
-                            </Button>
-                        </Tooltip>
-                    </div>
+                    <CallerIdCell callerId={getValue() as string} />
                 ),
             },
             {
@@ -100,21 +133,25 @@ export const useTableColumns = (
                 accessorKey: 'lifetimeRevenue',
                 meta: { width: 140 },
                 cell: ({ row }) => {
-                    const totalCost = row.original.lifetimeRevenue || 0
+                    // LTR is the sum of all payouts/revenue for this particular call
+                    const ltr = row.original.lifetimeRevenue || 0
+                    
+                    // Total cost = ringbaCost + adCost (handle both string and number)
                     const ringbaCost = row.original.ringbaCost || 0
                     const adCost = row.original.adCost || 0
+                    const totalCost = ringbaCost + adCost
 
-                    // Calculate third party cost as remainder (if total > ringba + ad)
-                    const calculatedTotal = ringbaCost + adCost
+                    // Calculate third party cost as remainder (if LTR > total cost)
                     const thirdPartyCost =
-                        totalCost > calculatedTotal
-                            ? Math.round((totalCost - calculatedTotal) * 100) /
-                              100
+                        ltr > totalCost
+                            ? Math.round((ltr - totalCost) * 100) / 100
                             : 0
 
+                    // Display LTR as the total (sum of all payouts for this call)
+                    // Breakdown shows: ringbaCost + adCost + thirdPartyCost = LTR
                     return (
                         <LifetimeRevenueBreakdown
-                            totalCost={totalCost}
+                            totalCost={ltr}
                             adCost={adCost}
                             ringbaCost={ringbaCost}
                             thirdPartyCost={thirdPartyCost}

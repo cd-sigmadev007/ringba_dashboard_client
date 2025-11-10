@@ -163,11 +163,21 @@ class CallerApiService {
     // Convert API response to frontend CallData format
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
         // Parse duration from seconds string to formatted "Xm Ys" format
-        const formatDuration = (duration: string | number): string => {
-            if (!duration && duration !== 0) return '00m 00s'
-            const seconds =
-                typeof duration === 'string' ? parseFloat(duration) : duration
-            if (isNaN(seconds) || seconds < 0) return '00m 00s'
+        const formatDuration = (duration: string | number | null | undefined): string => {
+            // Handle null, undefined, or empty string
+            if (duration === null || duration === undefined || duration === '') {
+                return '00m 00s'
+            }
+            
+            // Convert to number
+            const seconds = typeof duration === 'string' ? parseFloat(duration) : duration
+            
+            // Check if valid number and >= 0
+            if (isNaN(seconds) || seconds < 0) {
+                return '00m 00s'
+            }
+            
+            // Format as "Xm Ys"
             const minutes = Math.floor(seconds / 60)
             const remainingSeconds = Math.floor(seconds % 60)
             return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
@@ -186,16 +196,20 @@ class CallerApiService {
             return 0
         }
 
-        // Calculate lifetimeRevenue from ringbaCost + adCost
+        // Parse costs
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
-        const calculatedLTR = ringbaCost + adCost
 
-        // Use calculated LTR if available, otherwise fall back to lifetimeRevenue from API
-        const lifetimeRevenue =
-            calculatedLTR > 0
-                ? calculatedLTR
-                : parseNumeric(apiData.lifetimeRevenue)
+        // LTR is the sum of all latest payouts for this particular call
+        // Only use latestPayout field (not revenue or billed)
+        const latestPayout = parseNumeric((apiData as any).latestPayout)
+        const lifetimeRevenueFromAPI = parseNumeric(apiData.lifetimeRevenue)
+        
+        // Calculate LTR as sum of all latest payouts for this call
+        // If lifetimeRevenue is provided, use it; otherwise use latestPayout
+        const lifetimeRevenue = lifetimeRevenueFromAPI > 0 
+            ? lifetimeRevenueFromAPI 
+            : latestPayout
 
         return {
             id: apiData.id,
@@ -208,8 +222,11 @@ class CallerApiService {
             status: apiData.status,
             audioUrl: (apiData as any).audioUrl,
             transcript: (apiData as any).transcript,
+            revenue: parseNumeric(apiData.revenue) > 0 ? parseNumeric(apiData.revenue) : null,
             ringbaCost,
             adCost,
+            billed: (apiData as any).billed,
+            latestPayout: (apiData as any).latestPayout,
         }
     }
 }
