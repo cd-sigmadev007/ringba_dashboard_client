@@ -133,10 +133,10 @@ export const useTableColumns = (
                 accessorKey: 'lifetimeRevenue',
                 meta: { width: 140 },
                 cell: ({ row }) => {
-                    // LTR is the sum of all payouts/revenue for this particular call
+                    // LTR is the sum of all latestPayout for the same callerId (aggregated)
                     const ltr = row.original.lifetimeRevenue || 0
                     
-                    // Total cost = ringbaCost + adCost (handle both string and number)
+                    // Total cost = ringbaCost + adCost (for this call only, used in modal)
                     const ringbaCost = row.original.ringbaCost || 0
                     const adCost = row.original.adCost || 0
                     const totalCost = ringbaCost + adCost
@@ -147,11 +147,11 @@ export const useTableColumns = (
                             ? Math.round((ltr - totalCost) * 100) / 100
                             : 0
 
-                    // Display totalCost (ringbaCost + adCost) in breakdown
-                    // Breakdown shows: ringbaCost + adCost = totalCost
+                    // Display LTR (sum of all latestPayout for same callerId) in breakdown
+                    // Breakdown shows: ringbaCost + adCost + thirdPartyCost = LTR
                     return (
                         <LifetimeRevenueBreakdown
-                            totalCost={totalCost}
+                            totalCost={ltr}
                             adCost={adCost}
                             ringbaCost={ringbaCost}
                             thirdPartyCost={thirdPartyCost}
