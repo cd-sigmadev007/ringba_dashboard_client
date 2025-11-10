@@ -61,16 +61,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: client-dist
-          path: client/dist/
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build client
+        run: npm run build
 
       - name: Deploy to server
-        # Add your deployment steps here
-        # Example: Upload to S3, deploy to Vercel/Netlify, etc.
-        run: |
-          echo "Deployment steps would go here"
-          echo "Example: aws s3 sync, vercel deploy, etc."
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT || 22 }}
+          source: "dist/*"
+          target: "/var/www/ringba/client/dist/"
+          strip_components: 1
+          rm: false
+
+      - name: Restart Nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_SSH_PORT || 22 }}
+          script: |
+            sudo systemctl restart nginx || sudo service nginx restart
+            echo "Nginx restarted successfully"
 
