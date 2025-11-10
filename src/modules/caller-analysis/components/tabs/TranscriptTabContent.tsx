@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import { TranscriptContent } from '../TranscriptContent'
 import { mockTranscriptData } from '@/data/caller-tabs-data'
 import type { TranscriptEntry } from '@/data/caller-tabs-data'
@@ -13,7 +14,7 @@ export const TranscriptTabContent: React.FC<TranscriptTabContentProps> = ({
     className
 }) => {
     return (
-        <div className={className}>
+        <div className={clsx('pt-4', className)}>
             <TranscriptContent 
                 transcriptData={transcriptData} 
                 border={false} 

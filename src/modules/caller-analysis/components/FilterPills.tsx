@@ -1,7 +1,12 @@
 import React from 'react'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import Button from '../../../components/ui/Button'
 import CrossIcon from '../../../assets/svg/CrossIcon'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 import { campaignOptions, statusOptions } from '../data/mockData'
 import type { FilterState } from '../types'
 import type { DurationRange } from '../../../components/ui/DurationRangeFilter'
@@ -107,9 +112,9 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                 >
                     <p>
                         Date:{' '}
-                        {dayjs(filters.dateRange.from).format('MMM DD, YYYY')}
+                        {dayjs.tz(filters.dateRange.from, 'America/New_York').format('MMM DD, YYYY')}
                         {filters.dateRange.to &&
-                            ` - ${dayjs(filters.dateRange.to).format('MMM DD, YYYY')}`}
+                            ` - ${dayjs.tz(filters.dateRange.to, 'America/New_York').format('MMM DD, YYYY')}`}
                     </p>
                     <p onClick={onRemoveFilter.dateRange}>
                         <CrossIcon className="w-[20px] h-[20px]" />

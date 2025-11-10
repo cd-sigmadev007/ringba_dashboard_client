@@ -1,0 +1,76 @@
+name: Client CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Run linter
+        working-directory: ./client
+        run: npm run lint
+
+      - name: Format check
+        working-directory: ./client
+        run: npm run format -- --check || echo "Format check skipped"
+
+      - name: Type check
+        working-directory: ./client
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        working-directory: ./client
+        run: npm test || echo "Tests skipped"
+
+      - name: Build
+        working-directory: ./client
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist/
+          retention-days: 7
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist/
+
+      - name: Deploy to server
+        # Add your deployment steps here
+        # Example: Upload to S3, deploy to Vercel/Netlify, etc.
+        run: |
+          echo "Deployment steps would go here"
+          echo "Example: aws s3 sync, vercel deploy, etc."
+

@@ -17,7 +17,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
     const isDark = theme === 'dark'
 
     return (
-        <div className={clsx('space-y-4 p-4', className)}>
+        <div className={clsx('space-y-4 pt-4', className)}>
             <div className="space-y-3">
                 {historyData.map((call, index) => (
                     <div key={index} className={clsx(
