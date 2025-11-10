@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import clsx from 'clsx'
 import AceEditor from 'react-ace'
 import type { CallData } from '../../types'
 import { useThemeStore } from '@/store/themeStore'
-import { generateMockJsonData } from '@/data/caller-tabs-data'
+import { CopyIcon } from '@/assets/svg'
+import { Tooltip } from '@/components/common'
+import Button from '@/components/ui/Button'
 
 // Import Ace Editor modes and themes
 import 'ace-builds/src-noconflict/mode-json'
@@ -26,12 +28,55 @@ export const JSONTabContent: React.FC<JSONTabContentProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const [copied, setCopied] = useState(false)
 
-    const data = jsonData || generateMockJsonData(callerData)
+    // Use actual callerData instead of mock data
+    const data = jsonData || callerData
     const jsonString = JSON.stringify(data, null, 2)
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(jsonString)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch (err) {
+            console.error('Failed to copy JSON:', err)
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea')
+            textArea.value = jsonString
+            textArea.style.position = 'fixed'
+            textArea.style.left = '-999999px'
+            document.body.appendChild(textArea)
+            textArea.select()
+            try {
+                document.execCommand('copy')
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+            } catch (fallbackErr) {
+                console.error('Fallback copy failed:', fallbackErr)
+            }
+            document.body.removeChild(textArea)
+        }
+    }
 
     return (
         <div className={clsx('space-y-6 pt-4', className)}>
+            {/* Header with Copy Button */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-[#F5F8FA]">
+                    Caller Data (JSON)
+                </h3>
+                <Tooltip tooltipText={copied ? 'Copied!' : 'Copy JSON'}>
+                    <Button
+                        variant="ghost"
+                        className="p-1 min-w-0 h-auto"
+                        onClick={handleCopy}
+                    >
+                        <CopyIcon />
+                    </Button>
+                </Tooltip>
+            </div>
+
             {/* JSON Viewer */}
             <div
                 className={clsx(

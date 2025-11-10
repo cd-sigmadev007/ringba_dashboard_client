@@ -69,7 +69,9 @@ export const useTableColumns = (
                 cell: ({ getValue }) => {
                     const duration = getValue() as string
                     // Duration is already formatted in the API conversion, but handle edge cases
-                    return <span className="text-sm">{duration || '00m 00s'}</span>
+                    return (
+                        <span className="text-sm">{duration || '00m 00s'}</span>
+                    )
                 },
             },
             {
@@ -101,12 +103,14 @@ export const useTableColumns = (
                     const totalCost = row.original.lifetimeRevenue || 0
                     const ringbaCost = row.original.ringbaCost || 0
                     const adCost = row.original.adCost || 0
-                    
+
                     // Calculate third party cost as remainder (if total > ringba + ad)
                     const calculatedTotal = ringbaCost + adCost
-                    const thirdPartyCost = totalCost > calculatedTotal 
-                        ? Math.round((totalCost - calculatedTotal) * 100) / 100 
-                        : 0
+                    const thirdPartyCost =
+                        totalCost > calculatedTotal
+                            ? Math.round((totalCost - calculatedTotal) * 100) /
+                              100
+                            : 0
 
                     return (
                         <LifetimeRevenueBreakdown

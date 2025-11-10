@@ -1,6 +1,6 @@
 import React from 'react'
-import { Tooltip } from '@/components/common'
 import { getCampaignLogos } from '../utils/campaignLogos'
+import { Tooltip } from '@/components/common'
 
 interface CampaignProps {
     campaign: string

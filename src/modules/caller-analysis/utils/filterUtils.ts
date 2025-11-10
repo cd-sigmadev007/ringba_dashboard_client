@@ -6,21 +6,21 @@ export const parseDuration = (duration: string | number): number => {
     if (typeof duration === 'number') {
         return duration
     }
-    
+
     if (!duration) return 0
-    
+
     // Try to parse as "Xm Ys" format first
     const match = duration.match(/(\d+)m\s+(\d+)s/)
     if (match) {
         return parseInt(match[1]) * 60 + parseInt(match[2])
     }
-    
+
     // If not in "Xm Ys" format, try parsing as seconds string
     const seconds = parseFloat(duration)
     if (!isNaN(seconds)) {
         return seconds
     }
-    
+
     return 0
 }
 

@@ -165,7 +165,8 @@ class CallerApiService {
         // Parse duration from seconds string to formatted "Xm Ys" format
         const formatDuration = (duration: string | number): string => {
             if (!duration && duration !== 0) return '00m 00s'
-            const seconds = typeof duration === 'string' ? parseFloat(duration) : duration
+            const seconds =
+                typeof duration === 'string' ? parseFloat(duration) : duration
             if (isNaN(seconds) || seconds < 0) return '00m 00s'
             const minutes = Math.floor(seconds / 60)
             const remainingSeconds = Math.floor(seconds % 60)
@@ -173,7 +174,9 @@ class CallerApiService {
         }
 
         // Parse numeric value from string or number
-        const parseNumeric = (value: string | number | null | undefined): number => {
+        const parseNumeric = (
+            value: string | number | null | undefined
+        ): number => {
             if (value === null || value === undefined) return 0
             if (typeof value === 'number') return isNaN(value) ? 0 : value
             if (typeof value === 'string') {
@@ -187,9 +190,12 @@ class CallerApiService {
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
         const calculatedLTR = ringbaCost + adCost
-        
+
         // Use calculated LTR if available, otherwise fall back to lifetimeRevenue from API
-        const lifetimeRevenue = calculatedLTR > 0 ? calculatedLTR : parseNumeric(apiData.lifetimeRevenue)
+        const lifetimeRevenue =
+            calculatedLTR > 0
+                ? calculatedLTR
+                : parseNumeric(apiData.lifetimeRevenue)
 
         return {
             id: apiData.id,
