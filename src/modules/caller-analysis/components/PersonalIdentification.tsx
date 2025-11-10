@@ -37,23 +37,8 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 : Number(callerData.adCost)
             : 0
 
-    // Calculate totalCost from ringbaCost + adCost, or use revenue if available, fallback to 0
-    const totalCostValue = (() => {
-        // If both costs are available, sum them
-        if (ringbaCostValue > 0 && adCostValue > 0) {
-            return ringbaCostValue + adCostValue
-        }
-        // Otherwise use revenue if available
-        if (callerData.revenue != null) {
-            const revenueValue =
-                typeof callerData.revenue === 'number'
-                    ? callerData.revenue
-                    : Number(callerData.revenue)
-            return Number.isFinite(revenueValue) ? revenueValue : 0
-        }
-        // Fallback to 0
-        return 0
-    })()
+    // Total cost = ringbaCost + adCost (always, regardless of other values)
+    const totalCostValue = ringbaCostValue + adCostValue
 
     // Build address from parts
     const buildAddress = (): string => {

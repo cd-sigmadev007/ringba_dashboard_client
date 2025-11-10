@@ -147,11 +147,11 @@ export const useTableColumns = (
                             ? Math.round((ltr - totalCost) * 100) / 100
                             : 0
 
-                    // Display LTR as the total (sum of all payouts for this call)
-                    // Breakdown shows: ringbaCost + adCost + thirdPartyCost = LTR
+                    // Display totalCost (ringbaCost + adCost) in breakdown
+                    // Breakdown shows: ringbaCost + adCost = totalCost
                     return (
                         <LifetimeRevenueBreakdown
-                            totalCost={ltr}
+                            totalCost={totalCost}
                             adCost={adCost}
                             ringbaCost={ringbaCost}
                             thirdPartyCost={thirdPartyCost}

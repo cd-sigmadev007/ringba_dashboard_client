@@ -166,15 +166,44 @@ class CallerApiService {
         const formatDuration = (duration: string | number | null | undefined): string => {
             // Handle null, undefined, or empty string
             if (duration === null || duration === undefined || duration === '') {
+                console.warn('Duration is null/undefined/empty:', duration)
                 return '00m 00s'
             }
             
-            // Convert to number
-            const seconds = typeof duration === 'string' ? parseFloat(duration) : duration
+            // If duration is already in "Xm Ys" format, return as is
+            if (typeof duration === 'string' && duration.match(/^\d+m\s+\d+s$/)) {
+                return duration
+            }
+            
+            // Convert to number (handle string numbers)
+            let seconds: number
+            if (typeof duration === 'string') {
+                // Try parsing as float first
+                seconds = parseFloat(duration)
+                // If that fails, try parsing as "Xm Ys" format
+                if (isNaN(seconds)) {
+                    const match = duration.match(/(\d+)m\s+(\d+)s/)
+                    if (match) {
+                        seconds = parseInt(match[1]) * 60 + parseInt(match[2])
+                    } else {
+                        console.warn('Unable to parse duration:', duration, 'type:', typeof duration)
+                        return '00m 00s'
+                    }
+                }
+            } else {
+                seconds = duration
+            }
             
             // Check if valid number and >= 0
             if (isNaN(seconds) || seconds < 0) {
+                console.warn('Invalid duration value:', duration, 'parsed as:', seconds)
                 return '00m 00s'
+            }
+            
+            // Debug log to see what we're getting
+            if (seconds < 10) {
+                console.log('Duration value:', duration, 'parsed as seconds:', seconds, 'formatted as:', 
+                    `${String(Math.floor(seconds / 60)).padStart(2, '0')}m ${String(Math.floor(seconds % 60)).padStart(2, '0')}s`)
             }
             
             // Format as "Xm Ys"
@@ -190,7 +219,9 @@ class CallerApiService {
             if (value === null || value === undefined) return 0
             if (typeof value === 'number') return isNaN(value) ? 0 : value
             if (typeof value === 'string') {
-                const parsed = parseFloat(value)
+                // Remove currency symbols, commas, and whitespace before parsing
+                const cleaned = value.replace(/[$,\s]/g, '').trim()
+                const parsed = parseFloat(cleaned)
                 return isNaN(parsed) ? 0 : parsed
             }
             return 0
@@ -200,16 +231,10 @@ class CallerApiService {
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
 
-        // LTR is the sum of all latest payouts for this particular call
-        // Only use latestPayout field (not revenue or billed)
-        const latestPayout = parseNumeric((apiData as any).latestPayout)
-        const lifetimeRevenueFromAPI = parseNumeric(apiData.lifetimeRevenue)
-        
-        // Calculate LTR as sum of all latest payouts for this call
-        // If lifetimeRevenue is provided, use it; otherwise use latestPayout
-        const lifetimeRevenue = lifetimeRevenueFromAPI > 0 
-            ? lifetimeRevenueFromAPI 
-            : latestPayout
+        // LTR will be calculated later by aggregating all latestPayout for same callerId
+        // For now, set it to 0 - it will be updated in useCallerAnalysis hook
+        // Set lifetimeRevenue to 0 initially - it will be aggregated by callerId later
+        const lifetimeRevenue = 0
 
         return {
             id: apiData.id,
@@ -226,6 +251,7 @@ class CallerApiService {
             ringbaCost,
             adCost,
             billed: (apiData as any).billed,
+            // Store the raw latestPayout string for display, but we'll parse it when aggregating
             latestPayout: (apiData as any).latestPayout,
         }
     }
