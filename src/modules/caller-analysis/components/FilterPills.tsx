@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import Button from '../../../components/ui/Button'
 import CrossIcon from '../../../assets/svg/CrossIcon'
-import { campaignOptions, statusOptions } from '../data/mockData'
+import { campaignOptions, statusOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { DurationRange } from '../../../components/ui/DurationRangeFilter'
 

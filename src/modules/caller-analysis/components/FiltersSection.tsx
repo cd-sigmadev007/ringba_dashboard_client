@@ -5,7 +5,7 @@ import {
     TimeFilter,
 } from '../../../components/ui'
 import { Search } from '../../../components/common'
-import { campaignOptions, statusOptions } from '../data/mockData'
+import { campaignOptions, statusOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 
 interface FiltersSectionProps {
