@@ -3,6 +3,7 @@ import type { PaginatedApiResponse } from './index'
 import type { CallData, FilterState } from '@/modules/caller-analysis/types'
 import type { FrontendCallerData } from '@/types/api'
 import { callerApiService } from '@/modules/caller-analysis/services/api'
+import { convertCampaignFiltersToIds } from '@/modules/caller-analysis/utils/campaignIds'
 
 // API Endpoints
 export const CALLER_ANALYSIS_ENDPOINTS = {
@@ -66,7 +67,11 @@ export class CallerAnalysisApiService {
             }
 
             if (filters.campaignFilter.length > 0) {
-                params.append('campaign', filters.campaignFilter.join(','))
+                // Convert campaign filter values to backend campaign IDs
+                const campaignIds = convertCampaignFiltersToIds(filters.campaignFilter)
+                if (campaignIds.length > 0) {
+                    params.append('campaign', campaignIds.join(','))
+                }
             }
 
             // Status filter disabled - using demo status data for now

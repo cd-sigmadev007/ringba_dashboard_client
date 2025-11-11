@@ -4,8 +4,8 @@
  */
 
 import applianceImg from '../../../assets/png/appliance.png'
-// import medicareImg from '../../../assets/png/medicare.png'
-// import pestImg from '../../../assets/png/pest.png'
+import medicareImg from '../../../assets/png/medicare.png'
+import pestImg from '../../../assets/png/pest.png'
 
 export interface CampaignLogo {
     image: string
@@ -17,16 +17,52 @@ export interface CampaignLogo {
  * Add new campaign IDs/names and their corresponding logos here
  */
 const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
-    // Campaign IDs
+    // Appliance Repair - Campaign IDs
     '22630528277': {
         image: applianceImg,
         name: 'Appliance Repair',
+    },
+    
+    // Medicare - Campaign IDs
+    '111': {
+        image: medicareImg,
+        name: 'Medicare',
+    },
+    'M': {
+        image: medicareImg,
+        name: 'Medicare',
+    },
+    
+    // Pest Control - Campaign IDs
+    '000': {
+        image: pestImg,
+        name: 'Pest Control',
+    },
+    'P': {
+        image: pestImg,
+        name: 'Pest Control',
     },
 
     // Campaign Names (case-insensitive matching)
     'appliance repair': {
         image: applianceImg,
         name: 'Appliance Repair',
+    },
+    'medicare': {
+        image: medicareImg,
+        name: 'Medicare',
+    },
+    'medicare only': {
+        image: medicareImg,
+        name: 'Medicare',
+    },
+    'pest control': {
+        image: pestImg,
+        name: 'Pest Control',
+    },
+    'pest control only': {
+        image: pestImg,
+        name: 'Pest Control',
     },
 }
 
