@@ -30,8 +30,10 @@ export interface GetCallerByPhoneRequest {
 }
 
 // Response Types - API returns FrontendCallerData, we convert to CallData
-export interface CallerApiResponse extends PaginatedApiResponse<FrontendCallerData> {}
-export interface ConvertedCallerApiResponse extends PaginatedApiResponse<CallData> {}
+export interface CallerApiResponse
+    extends PaginatedApiResponse<FrontendCallerData> {}
+export interface ConvertedCallerApiResponse
+    extends PaginatedApiResponse<CallData> {}
 
 export interface CallerSchemaResponse {
     columns: Array<{
@@ -68,7 +70,9 @@ export class CallerAnalysisApiService {
 
             if (filters.campaignFilter.length > 0) {
                 // Convert campaign filter values to backend campaign IDs
-                const campaignIds = convertCampaignFiltersToIds(filters.campaignFilter)
+                const campaignIds = convertCampaignFiltersToIds(
+                    filters.campaignFilter
+                )
                 if (campaignIds.length > 0) {
                     params.append('campaign', campaignIds.join(','))
                 }
@@ -105,10 +109,12 @@ export class CallerAnalysisApiService {
         const url = `${CALLER_ANALYSIS_ENDPOINTS.GET_ALL}?${params.toString()}`
 
         const response = await apiClient.get<CallerApiResponse>(url)
-        
+
         // Convert API response to CallData format
-        const convertedData = response.data.map(callerApiService.convertApiResponseToCallData)
-        
+        const convertedData = response.data.map(
+            callerApiService.convertApiResponseToCallData
+        )
+
         return {
             ...response,
             data: convertedData,

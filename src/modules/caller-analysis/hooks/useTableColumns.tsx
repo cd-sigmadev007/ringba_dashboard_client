@@ -135,7 +135,7 @@ export const useTableColumns = (
                 cell: ({ row }) => {
                     // LTR is the sum of all latestPayout for the same callerId (aggregated)
                     const ltr = row.original.lifetimeRevenue || 0
-                    
+
                     // Total cost = ringbaCost + adCost (for this call only, used in modal)
                     const ringbaCost = row.original.ringbaCost || 0
                     const adCost = row.original.adCost || 0

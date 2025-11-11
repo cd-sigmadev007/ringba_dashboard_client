@@ -1,10 +1,10 @@
+import { convertCampaignFiltersToIds } from '../utils/campaignIds'
 import type { CallData, FilterState } from '../types'
 import type {
     ApiResponse,
     FrontendCallerData,
     PaginatedResponse,
 } from '../../../types/api'
-import { convertCampaignFiltersToIds } from '../utils/campaignIds'
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 const API_BASE_URL = baseUrl.endsWith('/api')
@@ -136,7 +136,9 @@ class CallerApiService {
 
         if (filters.campaignFilter.length > 0) {
             // Convert campaign filter values to backend campaign IDs
-            params.campaign = convertCampaignFiltersToIds(filters.campaignFilter)
+            params.campaign = convertCampaignFiltersToIds(
+                filters.campaignFilter
+            )
         }
 
         if (filters.statusFilter.length > 0) {

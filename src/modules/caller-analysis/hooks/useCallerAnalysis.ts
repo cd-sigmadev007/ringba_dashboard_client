@@ -42,14 +42,17 @@ export const useCallerAnalysis = () => {
                     limit: 1000, // Fetch 1000 records for client-side pagination
                 })
                 console.log('✅ Data fetched:', response)
-                
+
                 // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
                 const callerIdLtrMap = new Map<string, number>()
-                
+
                 // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
-                const parseLatestPayout = (value: string | number | null | undefined): number => {
+                const parseLatestPayout = (
+                    value: string | number | null | undefined
+                ): number => {
                     if (value === null || value === undefined) return 0
-                    if (typeof value === 'number') return isNaN(value) ? 0 : value
+                    if (typeof value === 'number')
+                        return isNaN(value) ? 0 : value
                     if (typeof value === 'string') {
                         // Remove currency symbols, commas, and whitespace
                         const cleaned = value.replace(/[$,\s]/g, '')
@@ -58,28 +61,32 @@ export const useCallerAnalysis = () => {
                     }
                     return 0
                 }
-                
+
                 // First pass: sum all latestPayout values for each callerId
                 response.data.forEach((call: CallData) => {
                     const callerId = call.callerId
                     const latestPayout = parseLatestPayout(call.latestPayout)
-                    
+
                     // Debug log for each call to see what we're parsing
-                    if (call.latestPayout && typeof call.latestPayout === 'string' && call.latestPayout.includes('30')) {
+                    if (
+                        call.latestPayout &&
+                        typeof call.latestPayout === 'string' &&
+                        call.latestPayout.includes('30')
+                    ) {
                         console.log('Found $30 latestPayout:', {
                             callerId,
                             rawLatestPayout: call.latestPayout,
                             parsedLatestPayout: latestPayout,
                             currentLTR: call.lifetimeRevenue,
-                            ringbaCost: call.ringbaCost
+                            ringbaCost: call.ringbaCost,
                         })
                     }
-                    
+
                     if (latestPayout > 0) {
                         const currentSum = callerIdLtrMap.get(callerId) || 0
                         const newSum = currentSum + latestPayout
                         callerIdLtrMap.set(callerId, newSum)
-                        
+
                         // Debug log for suspicious values
                         if (latestPayout > 10 && newSum < 1) {
                             console.warn('LTR calculation issue:', {
@@ -87,21 +94,24 @@ export const useCallerAnalysis = () => {
                                 latestPayout,
                                 currentSum,
                                 newSum,
-                                rawValue: call.latestPayout
+                                rawValue: call.latestPayout,
                             })
                         }
                     }
                 })
-                
+
                 // Debug: log the LTR map for verification
-                console.log('LTR Map (first 10 entries):', Array.from(callerIdLtrMap.entries()).slice(0, 10))
-                
+                console.log(
+                    'LTR Map (first 10 entries):',
+                    Array.from(callerIdLtrMap.entries()).slice(0, 10)
+                )
+
                 // Second pass: update lifetimeRevenue for each call with the aggregated LTR
                 const processedData = response.data.map((call: CallData) => ({
                     ...call,
                     lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
                 }))
-                
+
                 setData(processedData)
                 setTotalRecords(response.pagination.total)
             } catch (error) {

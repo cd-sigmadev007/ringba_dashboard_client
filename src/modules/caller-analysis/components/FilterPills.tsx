@@ -113,11 +113,15 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                     <p>
                         Date:{' '}
                         {(() => {
-                            const fromDate = dayjs(filters.dateRange.from).tz('America/New_York')
+                            const fromDate = dayjs(filters.dateRange.from).tz(
+                                'America/New_York'
+                            )
                             const toDate = filters.dateRange.to
-                                ? dayjs(filters.dateRange.to).tz('America/New_York')
+                                ? dayjs(filters.dateRange.to).tz(
+                                      'America/New_York'
+                                  )
                                 : null
-                            
+
                             // Check if from and to are on the same day
                             if (toDate && fromDate.isSame(toDate, 'day')) {
                                 // Same day: show single date

@@ -22,23 +22,23 @@ const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
         image: applianceImg,
         name: 'Appliance Repair',
     },
-    
+
     // Medicare - Campaign IDs
     '111': {
         image: medicareImg,
         name: 'Medicare',
     },
-    'M': {
+    M: {
         image: medicareImg,
         name: 'Medicare',
     },
-    
+
     // Pest Control - Campaign IDs
     '000': {
         image: pestImg,
         name: 'Pest Control',
     },
-    'P': {
+    P: {
         image: pestImg,
         name: 'Pest Control',
     },
@@ -48,7 +48,7 @@ const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
         image: applianceImg,
         name: 'Appliance Repair',
     },
-    'medicare': {
+    medicare: {
         image: medicareImg,
         name: 'Medicare',
     },

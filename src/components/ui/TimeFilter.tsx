@@ -58,20 +58,20 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
     const getDisplayValue = () => {
         if (!range?.from) return ''
-        
+
         // Format dates in EST timezone to match backend
         // Convert Date objects to EST timezone for display
         const fromDate = dayjs(range.from).tz(EST_TIMEZONE)
         const toDate = range.to ? dayjs(range.to).tz(EST_TIMEZONE) : null
-        
+
         // If to is not set, show only from date
         if (!toDate) {
             return fromDate.format('MMM DD, YYYY')
         }
-        
+
         // Check if from and to are on the same day (in EST timezone)
         const isSameDay = fromDate.isSame(toDate, 'day')
-        
+
         if (isSameDay) {
             // Same day: show single date
             return fromDate.format('MMM DD, YYYY')
@@ -81,7 +81,11 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
         }
     }
 
-    const applyPreset = (preset: { label: string; days?: number; type?: string }) => {
+    const applyPreset = (preset: {
+        label: string
+        days?: number
+        type?: string
+    }) => {
         const { label, days, type } = preset
         let from: Date
         let to: Date
