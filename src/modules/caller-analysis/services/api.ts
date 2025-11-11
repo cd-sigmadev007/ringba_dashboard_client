@@ -166,15 +166,35 @@ class CallerApiService {
 
     // Convert API response to frontend CallData format
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
-        // Parse duration from seconds string to formatted "Xm Ys" format
-        const formatDuration = (duration: string | number): string => {
+        // Backend already sends duration as formatted string (e.g., "03m 39s")
+        // Just use it directly, but validate it's in the correct format
+        const getDuration = (duration: string | number | null | undefined): string => {
             if (!duration && duration !== 0) return '00m 00s'
-            const seconds =
-                typeof duration === 'string' ? parseFloat(duration) : duration
-            if (isNaN(seconds) || seconds < 0) return '00m 00s'
-            const minutes = Math.floor(seconds / 60)
-            const remainingSeconds = Math.floor(seconds % 60)
-            return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
+            
+            // If it's already a formatted string like "03m 39s", use it directly
+            if (typeof duration === 'string') {
+                // Check if it's already in "Xm Ys" format
+                if (/^\d+m\s+\d+s$/.test(duration.trim())) {
+                    return duration.trim()
+                }
+                // If it's a number string (seconds), parse and format it
+                const seconds = parseFloat(duration)
+                if (!isNaN(seconds) && seconds >= 0) {
+                    const minutes = Math.floor(seconds / 60)
+                    const remainingSeconds = Math.floor(seconds % 60)
+                    return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
+                }
+            }
+            
+            // If it's a number (seconds), format it
+            if (typeof duration === 'number') {
+                if (isNaN(duration) || duration < 0) return '00m 00s'
+                const minutes = Math.floor(duration / 60)
+                const remainingSeconds = Math.floor(duration % 60)
+                return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
+            }
+            
+            return '00m 00s'
         }
 
         // Parse numeric value from string or number
@@ -205,7 +225,7 @@ class CallerApiService {
             id: apiData.id,
             callerId: apiData.callerId,
             lastCall: apiData.lastCall,
-            duration: formatDuration(apiData.duration),
+            duration: getDuration(apiData.duration),
             lifetimeRevenue,
             campaign: apiData.campaign,
             action: apiData.action,
