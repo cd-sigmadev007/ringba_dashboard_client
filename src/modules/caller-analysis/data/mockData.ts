@@ -198,11 +198,11 @@ export const callData: Array<CallData> = [
     },
 ]
 
-// Filter options
+// Filter options - using campaign IDs directly
 export const campaignOptions: Array<SelectOption> = [
-    { title: 'Medicare Only', value: 'M' },
+    { title: 'Medicare Only', value: '111' },
     { title: 'Appliance Repair Only', value: '22630528277' },
-    { title: 'Pest Control Only', value: 'P' },
+    { title: 'Pest Control Only', value: '000' },
 ]
 
 // Mock caller data with priority information

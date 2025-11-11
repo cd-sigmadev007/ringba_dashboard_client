@@ -14,104 +14,48 @@ export interface CampaignLogo {
 
 /**
  * Campaign logo mapping configuration
- * Add new campaign IDs/names and their corresponding logos here
+ * Maps campaign IDs to their corresponding logo images
  */
 const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
-    // Appliance Repair - Campaign IDs
+    // Appliance Repair
     '22630528277': {
         image: applianceImg,
         name: 'Appliance Repair',
     },
 
-    // Medicare - Campaign IDs
+    // Medicare
     '111': {
         image: medicareImg,
         name: 'Medicare',
     },
-    M: {
-        image: medicareImg,
-        name: 'Medicare',
-    },
 
-    // Pest Control - Campaign IDs
+    // Pest Control
     '000': {
         image: pestImg,
         name: 'Pest Control',
     },
-    P: {
-        image: pestImg,
-        name: 'Pest Control',
-    },
-
-    // Campaign Names (case-insensitive matching)
-    'appliance repair': {
-        image: applianceImg,
-        name: 'Appliance Repair',
-    },
-    medicare: {
-        image: medicareImg,
-        name: 'Medicare',
-    },
-    'medicare only': {
-        image: medicareImg,
-        name: 'Medicare',
-    },
-    'pest control': {
-        image: pestImg,
-        name: 'Pest Control',
-    },
-    'pest control only': {
-        image: pestImg,
-        name: 'Pest Control',
-    },
 }
 
 /**
- * Gets the campaign logo for a given campaign identifier
- * @param campaign - Campaign ID or name
+ * Gets the campaign logo for a given campaign ID
+ * @param campaignId - Campaign ID (e.g., '111', '000', '22630528277')
  * @returns CampaignLogo object with image and name, or null if not found
  */
 export function getCampaignLogo(
-    campaign: string | null | undefined
+    campaignId: string | null | undefined
 ): CampaignLogo | null {
-    if (!campaign || typeof campaign !== 'string') {
+    if (!campaignId || typeof campaignId !== 'string') {
         return null
     }
 
-    // Try exact match first (case-sensitive)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (CAMPAIGN_LOGO_MAP[campaign]) {
-        return CAMPAIGN_LOGO_MAP[campaign]
-    }
-
-    // Try case-insensitive match
-    const upper = campaign.toUpperCase()
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (CAMPAIGN_LOGO_MAP[upper]) {
-        return CAMPAIGN_LOGO_MAP[upper]
-    }
-
-    // Try case-insensitive partial match for campaign names
-    const lower = campaign.toLowerCase()
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (CAMPAIGN_LOGO_MAP[lower]) {
-        return CAMPAIGN_LOGO_MAP[lower]
-    }
-
-    // Check if campaign contains any known keywords
-    for (const [key, logo] of Object.entries(CAMPAIGN_LOGO_MAP)) {
-        if (upper.includes(key) || lower.includes(key.toLowerCase())) {
-            return logo
-        }
-    }
-
-    return null
+    // Direct ID lookup
+    return CAMPAIGN_LOGO_MAP[campaignId]
 }
 
 /**
  * Gets all campaign logos that match a campaign string
- * Useful for campaigns that contain multiple identifiers (e.g., "M A P")
- * @param campaign - Campaign ID or name
+ * Useful for campaigns that contain multiple identifiers
+ * @param campaign - Campaign ID or string containing IDs
  * @returns Array of CampaignLogo objects
  */
 export function getCampaignLogos(
@@ -122,11 +66,13 @@ export function getCampaignLogos(
     }
 
     const logos: Array<CampaignLogo> = []
-    const upper = campaign.toUpperCase()
 
-    // Check for multiple campaign identifiers
-    for (const [key, logo] of Object.entries(CAMPAIGN_LOGO_MAP)) {
-        if (upper.includes(key) && !logos.find((l) => l.name === logo.name)) {
+    // Check for known campaign IDs in the string
+    for (const [campaignId, logo] of Object.entries(CAMPAIGN_LOGO_MAP)) {
+        if (
+            campaign.includes(campaignId) &&
+            !logos.find((l) => l.name === logo.name)
+        ) {
             logos.push(logo)
         }
     }
