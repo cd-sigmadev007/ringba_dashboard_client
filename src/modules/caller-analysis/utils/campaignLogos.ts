@@ -4,8 +4,8 @@
  */
 
 import applianceImg from '../../../assets/png/appliance.png'
-import medicareImg from '../../../assets/png/medicare.png'
-import pestImg from '../../../assets/png/pest.png'
+// import medicareImg from '../../../assets/png/medicare.png'
+// import pestImg from '../../../assets/png/pest.png'
 
 export interface CampaignLogo {
     image: string
@@ -27,34 +27,6 @@ const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
     'appliance repair': {
         image: applianceImg,
         name: 'Appliance Repair',
-    },
-
-    // Legacy single-letter mappings (for backward compatibility)
-    A: {
-        image: applianceImg,
-        name: 'Appliance Repair',
-    },
-    APPLIANCE: {
-        image: applianceImg,
-        name: 'Appliance Repair',
-    },
-
-    M: {
-        image: medicareImg,
-        name: 'Medicare',
-    },
-    MEDICARE: {
-        image: medicareImg,
-        name: 'Medicare',
-    },
-
-    P: {
-        image: pestImg,
-        name: 'Pest Control',
-    },
-    PEST: {
-        image: pestImg,
-        name: 'Pest Control',
     },
 }
 

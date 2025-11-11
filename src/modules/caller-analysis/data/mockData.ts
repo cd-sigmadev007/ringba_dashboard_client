@@ -201,7 +201,7 @@ export const callData: Array<CallData> = [
 // Filter options
 export const campaignOptions: Array<SelectOption> = [
     { title: 'Medicare Only', value: 'M' },
-    { title: 'Appliance Repair Only', value: 'A' },
+    { title: 'Appliance Repair Only', value: '22630528277' },
     { title: 'Pest Control Only', value: 'P' },
 ]
 

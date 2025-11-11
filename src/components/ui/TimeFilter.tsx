@@ -3,6 +3,8 @@ import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import { twMerge } from 'tailwind-merge'
 import { useClickOutside } from '../../lib/hooks/useClickOutside'
 import { useThemeStore } from '../../store/themeStore'
@@ -13,6 +15,13 @@ import { Modal } from './Modal'
 import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
 import { cn, useIsMobile } from '@/lib'
 
+// Extend dayjs with timezone support
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+// Use EST timezone for date operations to match backend
+const EST_TIMEZONE = 'America/New_York'
+
 export interface TimeFilterProps {
     /** Callback fired when the range changes */
     onChange?: (range: { from?: Date; to?: Date }) => void
@@ -20,12 +29,12 @@ export interface TimeFilterProps {
 }
 
 const presets = [
-    { label: 'Today', days: 0 },
-    { label: 'Yesterday', days: 1 },
+    { label: 'Today', type: 'today' },
+    { label: 'Yesterday', type: 'yesterday' },
     { label: 'Last 7 days', days: 7 },
     { label: 'Last 30 days', days: 30 },
     { label: 'Last 60 days', days: 60 },
-    { label: 'Custom', days: 0 },
+    { label: 'Custom', type: 'custom' },
 ]
 
 const IconRight = () => <ChevronRight />
@@ -49,21 +58,60 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 
     const getDisplayValue = () => {
         if (!range?.from) return ''
-        if (range.to) {
-            return `${dayjs(range.from).format('MMM DD, YYYY')} - ${dayjs(range.to).format('MMM DD, YYYY')}`
+        
+        // Format dates in EST timezone to match backend
+        // Convert Date objects to EST timezone for display
+        const fromDate = dayjs(range.from).tz(EST_TIMEZONE)
+        const toDate = range.to ? dayjs(range.to).tz(EST_TIMEZONE) : null
+        
+        // If to is not set, show only from date
+        if (!toDate) {
+            return fromDate.format('MMM DD, YYYY')
         }
-        return dayjs(range.from).format('MMM DD, YYYY')
+        
+        // Check if from and to are on the same day (in EST timezone)
+        const isSameDay = fromDate.isSame(toDate, 'day')
+        
+        if (isSameDay) {
+            // Same day: show single date
+            return fromDate.format('MMM DD, YYYY')
+        } else {
+            // Different days: show range
+            return `${fromDate.format('MMM DD, YYYY')} - ${toDate.format('MMM DD, YYYY')}`
+        }
     }
 
-    const applyPreset = (preset: { label: string; days: number }) => {
-        const { days, label } = preset
-        const to = dayjs().endOf('day').toDate()
-        const from =
-            days === 0
-                ? dayjs().startOf('day').toDate()
-                : dayjs().subtract(days, 'day').startOf('day').toDate()
+    const applyPreset = (preset: { label: string; days?: number; type?: string }) => {
+        const { label, days, type } = preset
+        let from: Date
+        let to: Date
+
+        // Get current date/time in EST timezone to match backend
+        const nowInEST = dayjs().tz(EST_TIMEZONE)
+
+        if (type === 'today') {
+            // Today: from start of today to end of today (in EST)
+            from = nowInEST.startOf('day').toDate()
+            to = nowInEST.endOf('day').toDate()
+        } else if (type === 'yesterday') {
+            // Yesterday: from start of yesterday to end of yesterday (in EST)
+            const yesterdayInEST = nowInEST.subtract(1, 'day')
+            from = yesterdayInEST.startOf('day').toDate()
+            to = yesterdayInEST.endOf('day').toDate()
+        } else if (days !== undefined && days > 0) {
+            // Last N days: from N days ago start (in EST) to today end (in EST)
+            from = nowInEST.subtract(days, 'day').startOf('day').toDate()
+            to = nowInEST.endOf('day').toDate()
+        } else {
+            // Custom or fallback - use today in EST
+            from = nowInEST.startOf('day').toDate()
+            to = nowInEST.endOf('day').toDate()
+        }
+
         setRange({ from, to })
         setActivePreset(label)
+        // Immediately apply the change for preset selections
+        onChange?.({ from, to })
     }
 
     const handleSelect: SelectRangeEventHandler = (rng) => {

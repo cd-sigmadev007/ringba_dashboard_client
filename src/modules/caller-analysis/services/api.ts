@@ -163,50 +163,11 @@ class CallerApiService {
     // Convert API response to frontend CallData format
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
         // Parse duration from seconds string to formatted "Xm Ys" format
-        const formatDuration = (duration: string | number | null | undefined): string => {
-            // Handle null, undefined, or empty string
-            if (duration === null || duration === undefined || duration === '') {
-                console.warn('Duration is null/undefined/empty:', duration)
-                return '00m 00s'
-            }
-            
-            // If duration is already in "Xm Ys" format, return as is
-            if (typeof duration === 'string' && duration.match(/^\d+m\s+\d+s$/)) {
-                return duration
-            }
-            
-            // Convert to number (handle string numbers)
-            let seconds: number
-            if (typeof duration === 'string') {
-                // Try parsing as float first
-                seconds = parseFloat(duration)
-                // If that fails, try parsing as "Xm Ys" format
-                if (isNaN(seconds)) {
-                    const match = duration.match(/(\d+)m\s+(\d+)s/)
-                    if (match) {
-                        seconds = parseInt(match[1]) * 60 + parseInt(match[2])
-                    } else {
-                        console.warn('Unable to parse duration:', duration, 'type:', typeof duration)
-                        return '00m 00s'
-                    }
-                }
-            } else {
-                seconds = duration
-            }
-            
-            // Check if valid number and >= 0
-            if (isNaN(seconds) || seconds < 0) {
-                console.warn('Invalid duration value:', duration, 'parsed as:', seconds)
-                return '00m 00s'
-            }
-            
-            // Debug log to see what we're getting
-            if (seconds < 10) {
-                console.log('Duration value:', duration, 'parsed as seconds:', seconds, 'formatted as:', 
-                    `${String(Math.floor(seconds / 60)).padStart(2, '0')}m ${String(Math.floor(seconds % 60)).padStart(2, '0')}s`)
-            }
-            
-            // Format as "Xm Ys"
+        const formatDuration = (duration: string | number): string => {
+            if (!duration && duration !== 0) return '00m 00s'
+            const seconds =
+                typeof duration === 'string' ? parseFloat(duration) : duration
+            if (isNaN(seconds) || seconds < 0) return '00m 00s'
             const minutes = Math.floor(seconds / 60)
             const remainingSeconds = Math.floor(seconds % 60)
             return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
@@ -219,22 +180,22 @@ class CallerApiService {
             if (value === null || value === undefined) return 0
             if (typeof value === 'number') return isNaN(value) ? 0 : value
             if (typeof value === 'string') {
-                // Remove currency symbols, commas, and whitespace before parsing
-                const cleaned = value.replace(/[$,\s]/g, '').trim()
-                const parsed = parseFloat(cleaned)
+                const parsed = parseFloat(value)
                 return isNaN(parsed) ? 0 : parsed
             }
             return 0
         }
 
-        // Parse costs
+        // Calculate lifetimeRevenue from ringbaCost + adCost
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
+        const calculatedLTR = ringbaCost + adCost
 
-        // LTR will be calculated later by aggregating all latestPayout for same callerId
-        // For now, set it to 0 - it will be updated in useCallerAnalysis hook
-        // Set lifetimeRevenue to 0 initially - it will be aggregated by callerId later
-        const lifetimeRevenue = 0
+        // Use calculated LTR if available, otherwise fall back to lifetimeRevenue from API
+        const lifetimeRevenue =
+            calculatedLTR > 0
+                ? calculatedLTR
+                : parseNumeric(apiData.lifetimeRevenue)
 
         return {
             id: apiData.id,
@@ -247,12 +208,8 @@ class CallerApiService {
             status: apiData.status,
             audioUrl: (apiData as any).audioUrl,
             transcript: (apiData as any).transcript,
-            revenue: parseNumeric(apiData.revenue) > 0 ? parseNumeric(apiData.revenue) : null,
             ringbaCost,
             adCost,
-            billed: (apiData as any).billed,
-            // Store the raw latestPayout string for display, but we'll parse it when aggregating
-            latestPayout: (apiData as any).latestPayout,
         }
     }
 }

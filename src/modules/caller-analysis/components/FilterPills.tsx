@@ -112,11 +112,24 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                 >
                     <p>
                         Date:{' '}
-                        {dayjs
-                            .tz(filters.dateRange.from, 'America/New_York')
-                            .format('MMM DD, YYYY')}
-                        {filters.dateRange.to &&
-                            ` - ${dayjs.tz(filters.dateRange.to, 'America/New_York').format('MMM DD, YYYY')}`}
+                        {(() => {
+                            const fromDate = dayjs(filters.dateRange.from).tz('America/New_York')
+                            const toDate = filters.dateRange.to
+                                ? dayjs(filters.dateRange.to).tz('America/New_York')
+                                : null
+                            
+                            // Check if from and to are on the same day
+                            if (toDate && fromDate.isSame(toDate, 'day')) {
+                                // Same day: show single date
+                                return fromDate.format('MMM DD, YYYY')
+                            } else if (toDate) {
+                                // Different days: show range
+                                return `${fromDate.format('MMM DD, YYYY')} - ${toDate.format('MMM DD, YYYY')}`
+                            } else {
+                                // Only from date
+                                return fromDate.format('MMM DD, YYYY')
+                            }
+                        })()}
                     </p>
                     <p onClick={onRemoveFilter.dateRange}>
                         <CrossIcon className="w-[20px] h-[20px]" />
