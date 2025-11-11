@@ -16,3 +16,6 @@ export * from './utils/filterUtils'
 
 // Data exports
 export * from './data/mockData'
+
+// Constants exports
+export * from './constants/filterOptions'

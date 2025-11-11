@@ -1,28 +1,14 @@
 /**
  * Campaign ID Mapping Utility
- * Maps campaign filter IDs to backend campaign IDs
+ * Converts campaign filter IDs to backend campaign IDs
+ * All filter values are already backend IDs - no mapping needed
  */
-
-/**
- * Campaign ID mapping configuration
- * Maps legacy campaign filter IDs to backend campaign IDs
- * Backend IDs: '111' (Medicare), '000' (Pest Control), '22630528277' (Appliance Repair)
- */
-const CAMPAIGN_ID_MAP: Record<string, string> = {
-    // Legacy mappings (for backward compatibility)
-    M: '111',
-    P: '000',
-}
-
-/**
- * Backend campaign IDs - these pass through directly
- */
-const BACKEND_CAMPAIGN_IDS = new Set(['111', '000', '22630528277'])
 
 /**
  * Converts campaign filter IDs to backend campaign IDs
- * @param campaignFilters - Array of campaign filter IDs (e.g., ['111', '000', '22630528277'])
- * @returns Array of backend campaign IDs (e.g., ['111', '000', '22630528277'])
+ * Since we're using IDs directly, this just validates and returns them
+ * @param campaignFilters - Array of campaign filter IDs (e.g., ['111', '000', 'CA56446512fe4e4926a05e76574a7d6963'])
+ * @returns Array of backend campaign IDs
  */
 export function convertCampaignFiltersToIds(
     campaignFilters: Array<string>
@@ -31,27 +17,16 @@ export function convertCampaignFiltersToIds(
         return []
     }
 
-    const ids = new Set<string>()
-
-    for (const filter of campaignFilters) {
-        // If already a backend ID, use it directly
-        if (BACKEND_CAMPAIGN_IDS.has(filter)) {
-            ids.add(filter)
-        } else {
-            // Otherwise, map legacy ID to backend ID
-            const backendId = CAMPAIGN_ID_MAP[filter] || filter
-            ids.add(backendId)
-        }
-    }
-
-    return Array.from(ids)
+    // Return IDs as-is (they're already backend IDs)
+    // Filter out empty or invalid IDs
+    return campaignFilters.filter((id) => id && id.trim().length > 0)
 }
 
 /**
  * Gets the campaign ID for a given campaign filter ID
- * @param campaignFilter - Campaign filter ID (e.g., 'M', 'P', '22630528277')
- * @returns Backend campaign ID or the original value if no mapping found
+ * @param campaignFilter - Campaign filter ID
+ * @returns The campaign ID as-is (no mapping needed)
  */
 export function getCampaignId(campaignFilter: string): string {
-    return CAMPAIGN_ID_MAP[campaignFilter] || campaignFilter
+    return campaignFilter
 }
