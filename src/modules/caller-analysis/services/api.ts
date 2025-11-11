@@ -168,9 +168,11 @@ class CallerApiService {
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
         // Backend already sends duration as formatted string (e.g., "03m 39s")
         // Just use it directly, but validate it's in the correct format
-        const getDuration = (duration: string | number | null | undefined): string => {
+        const getDuration = (
+            duration: string | number | null | undefined
+        ): string => {
             if (!duration && duration !== 0) return '00m 00s'
-            
+
             // If it's already a formatted string like "03m 39s", use it directly
             if (typeof duration === 'string') {
                 // Check if it's already in "Xm Ys" format
@@ -185,7 +187,7 @@ class CallerApiService {
                     return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
                 }
             }
-            
+
             // If it's a number (seconds), format it
             if (typeof duration === 'number') {
                 if (isNaN(duration) || duration < 0) return '00m 00s'
@@ -193,7 +195,7 @@ class CallerApiService {
                 const remainingSeconds = Math.floor(duration % 60)
                 return `${String(minutes).padStart(2, '0')}m ${String(remainingSeconds).padStart(2, '0')}s`
             }
-            
+
             return '00m 00s'
         }
 

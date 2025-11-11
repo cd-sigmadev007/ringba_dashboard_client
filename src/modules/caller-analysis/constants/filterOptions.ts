@@ -34,4 +34,3 @@ export const statusOptions: Array<SelectOption> = [
     { title: 'Technical Terms Used', value: 'Technical Terms Used' },
     { title: 'No Coverage (ZIP)', value: 'No Coverage (ZIP)' },
 ]
-

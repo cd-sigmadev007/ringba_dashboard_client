@@ -18,7 +18,7 @@ export interface CampaignLogo {
  */
 const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
     // Appliance Repair
-    'CA56446512fe4e4926a05e76574a7d6963': {
+    CA56446512fe4e4926a05e76574a7d6963: {
         image: applianceImg,
         name: 'Appliance Repair',
     },
@@ -74,8 +74,11 @@ export function getCampaignLogos(
     }
 
     // Split by common separators (comma, space, pipe) and check each part
-    const parts = trimmedCampaign.split(/[,\s|]+/).map(part => part.trim()).filter(part => part.length > 0)
-    
+    const parts = trimmedCampaign
+        .split(/[,\s|]+/)
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0)
+
     // Check each part for exact ID matches
     for (const part of parts) {
         if (part in CAMPAIGN_LOGO_MAP) {
@@ -94,7 +97,7 @@ export function getCampaignLogos(
             // Match ID at start/end of string, or surrounded by non-digit characters
             const idPattern = campaignId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
             const idRegex = new RegExp(`(^|[^0-9])${idPattern}([^0-9]|$)`, 'i')
-            
+
             if (
                 idRegex.test(trimmedCampaign) &&
                 !logos.find((l) => l.name === logo.name)
