@@ -2,9 +2,10 @@
  * Duration Range Filter component with Min/Max inputs
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
+import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'
 
 export interface DurationRange {
     min?: number // in seconds
@@ -40,6 +41,11 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
 
     const [isOpen, setIsOpen] = useState(false)
     const [tempRange, setTempRange] = useState<DurationRange>(value)
+
+    // Sync tempRange with value prop changes
+    useEffect(() => {
+        setTempRange(value)
+    }, [value])
 
     // Click outside to close dropdown
     const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
@@ -107,22 +113,21 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                 onClick={() => setIsOpen((prev) => !prev)}
             >
                 <span>{getDisplayText()}</span>
-                <svg
-                    className={cn(
-                        'w-3 h-3 transition-transform duration-200',
-                        isOpen ? 'rotate-180' : ''
-                    )}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
+                {isDark ? (
+                    <ChevronDownDark
+                        className={cn(
+                            'w-3 h-3 transition-transform duration-200',
+                            isOpen ? 'rotate-180' : ''
+                        )}
                     />
-                </svg>
+                ) : (
+                    <ChevronDownLight
+                        className={cn(
+                            'w-3 h-3 transition-transform duration-200',
+                            isOpen ? 'rotate-180' : ''
+                        )}
+                    />
+                )}
             </div>
 
             {/* Dropdown */}

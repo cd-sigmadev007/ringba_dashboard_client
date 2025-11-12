@@ -9,6 +9,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
 import { AudioPlayer, Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
+import { RefreshButton } from '@/components/ui/RefreshButton'
 import { FilterPills, FiltersSection } from '@/modules'
 
 export const CallerAnalysisContainer: React.FC = () => {
@@ -40,6 +41,7 @@ export const CallerAnalysisContainer: React.FC = () => {
         isLoading,
         totalRecords,
         refetch,
+        lastUpdated,
     } = useCallerAnalysis()
 
     const handleRowClick = (row: CallData) => {
@@ -129,11 +131,11 @@ export const CallerAnalysisContainer: React.FC = () => {
                                 Real-time caller data from your database
                             </p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Button onClick={() => refetch()}>
-                                Refresh Data
-                            </Button>
-                        </div>
+                        <RefreshButton
+                            onRefresh={refetch}
+                            lastUpdated={lastUpdated}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
 

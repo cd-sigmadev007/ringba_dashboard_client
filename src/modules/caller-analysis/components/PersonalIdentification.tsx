@@ -6,10 +6,12 @@ import { HistoryTabContent, JSONTabContent, TranscriptTabContent } from './tabs'
 import type { CallData } from '../types'
 import type { TabItem } from '@/components/ui/Tabs'
 import type { HistoryEntry, TranscriptEntry } from '@/data/caller-tabs-data'
-import type { FrontendCallerData } from '@/types/api'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 import { Tabs } from '@/components/ui'
+import { buildAddressFromCallData } from '../utils/addressUtils'
+import { parseTranscriptToEntries } from '../utils/transcriptUtils'
+import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -40,77 +42,13 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     // Total cost = ringbaCost + adCost (always, regardless of other values)
     const totalCostValue = ringbaCostValue + adCostValue
 
-    // Build address from parts
-    const buildAddress = (): string => {
-        const parts: Array<string> = []
-
-        // Add street number
-        if (
-            callerData.streetNumber &&
-            callerData.streetNumber !== 'NA' &&
-            callerData.streetNumber.trim()
-        ) {
-            parts.push(callerData.streetNumber.trim())
-        }
-
-        // Add street name
-        if (
-            callerData.streetName &&
-            callerData.streetName !== 'NA' &&
-            callerData.streetName.trim()
-        ) {
-            parts.push(callerData.streetName.trim())
-        }
-
-        // Add street type
-        if (
-            callerData.streetType &&
-            callerData.streetType !== 'NA' &&
-            callerData.streetType.trim()
-        ) {
-            parts.push(callerData.streetType.trim())
-        }
-
-        // Join street parts
-        const street = parts.length > 0 ? parts.join(' ') : null
-
-        // Build full address
-        const addressParts: Array<string> = []
-        if (street) addressParts.push(street)
-        if (
-            callerData.city &&
-            callerData.city !== 'NA' &&
-            callerData.city.trim()
-        ) {
-            addressParts.push(callerData.city.trim())
-        }
-        if (
-            callerData.state &&
-            callerData.state !== 'NA' &&
-            callerData.state.trim()
-        ) {
-            addressParts.push(callerData.state.trim())
-        }
-        if (
-            callerData.zip &&
-            callerData.zip !== 'NA' &&
-            callerData.zip.trim()
-        ) {
-            addressParts.push(callerData.zip.trim())
-        }
-
-        return addressParts.length > 0
-            ? addressParts.join(', ')
-            : callerData.address || '-'
-    }
-
     const additionalData = {
         firstName: callerData.firstName || '-',
         lastName: callerData.lastName || '-',
         email: callerData.email || '-',
         phoneNumber: callerData.callerId,
         type: callerData.type || 'Inbound',
-        address: buildAddress(),
+        address: buildAddressFromCallData(callerData),
         billed: callerData.billed || 'No',
         latestPayout: callerData.latestPayout || '-',
         totalCost: Number.isFinite(totalCostValue) ? totalCostValue : 0,
@@ -167,70 +105,13 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     )
 
     // Parse transcript string to entries with timestamps
-    const parseTranscript = (raw?: string): Array<TranscriptEntry> => {
-        if (!raw || typeof raw !== 'string') return []
-
-        // Format: "00:00 A - text,\n00:20 B - text,\n"
-        // Split by newlines first, then parse each line
-        const lines = raw
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((l) => l.trim())
-            .filter(Boolean)
-
-        const entries: Array<TranscriptEntry> = []
-
-        for (const line of lines) {
-            // Match format: "00:00 A - text," or "00:00 A: text," or "A - text,"
-            // Pattern: optional timestamp, speaker (A or B), separator (- or :), text
-            const m = /^(\d{2}:\d{2})?\s*(A|B)\s*[-:]\s*(.*)$/.exec(line)
-            if (m) {
-                const timestamp = m[1] || '00:00'
-                const speaker = m[2] as 'A' | 'B'
-                // Remove trailing comma if present
-                const text = m[3].trim().replace(/,$/, '').trim()
-                if (text) {
-                    entries.push({ timestamp, speaker, text })
-                }
-            } else {
-                // No explicit speaker marker; append to last speaker or default to A
-                if (entries.length > 0) {
-                    const lastEntry = entries[entries.length - 1]
-                    const additionalText = line.replace(/,$/, '').trim()
-                    if (additionalText) {
-                        lastEntry.text +=
-                            (lastEntry.text ? ' ' : '') + additionalText
-                    }
-                } else {
-                    const text = line.replace(/,$/, '').trim()
-                    if (text) {
-                        entries.push({ timestamp: '00:00', speaker: 'A', text })
-                    }
-                }
-            }
-        }
-
-        return entries
-    }
-
-    const transcriptEntries: Array<TranscriptEntry> = parseTranscript(
+    const transcriptEntries: Array<TranscriptEntry> = parseTranscriptToEntries(
         callerData.transcript
     )
 
     // Map history API rows to HistoryEntry[] used by tab
-    const historyData: Array<HistoryEntry> = (historyResp?.data || []).map(
-        (h: FrontendCallerData) => {
-            // lastCall is like 'Oct 30, 10:21:06 PM ET' -> keep as single date; split time if parsable
-            const dateStr = h.lastCall
-            const rev = Number((h as any).revenue)
-            return {
-                date: dateStr,
-                time: '',
-                duration: h.duration,
-                status: 'Completed',
-                revenue: Number.isFinite(rev) ? rev : 0,
-            }
-        }
+    const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
+        historyResp?.data || []
     )
 
     const tabs: Array<TabItem> = [

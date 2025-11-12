@@ -7,11 +7,13 @@ export interface TranscriptEntry {
 }
 
 export interface HistoryEntry {
-    date: string
-    time: string
-    duration: string
-    status: 'Completed' | 'Incomplete'
-    revenue: number
+    date: string // Date header (e.g., "Nov 07, 2025")
+    time: string // Time in format "08:08:30 PM ET"
+    duration: string // Duration in format "03m 15s"
+    converted: boolean // true for "Converted", false for "Not Converted"
+    revenue: number // Revenue amount
+    campaignId?: string // Campaign ID for badge
+    campaignName?: string // Campaign name for badge (fallback)
 }
 
 export interface CallerAnalysisData {
@@ -40,25 +42,31 @@ export const mockTranscriptData: Array<TranscriptEntry> = [
 
 export const mockHistoryData: Array<HistoryEntry> = [
     {
-        date: '2024-01-15',
-        time: '10:30 AM',
-        duration: '5:23',
-        status: 'Completed',
-        revenue: 125.0,
+        date: 'Nov 07, 2025',
+        time: '08:08:30 PM ET',
+        duration: '03m 15s',
+        converted: true,
+        revenue: 503.99,
+        campaignId: '000',
+        campaignName: 'Pest Control',
     },
     {
-        date: '2024-01-10',
-        time: '2:45 PM',
-        duration: '3:12',
-        status: 'Completed',
-        revenue: 85.5,
+        date: 'Nov 07, 2025',
+        time: '08:08:30 PM ET',
+        duration: '00m 02s',
+        converted: false,
+        revenue: 0,
+        campaignId: '000',
+        campaignName: 'Pest Control',
     },
     {
-        date: '2024-01-05',
-        time: '11:20 AM',
-        duration: '7:45',
-        status: 'Incomplete',
-        revenue: 0.0,
+        date: 'Nov 05, 2025',
+        time: '08:08:30 PM ET',
+        duration: '00m 02s',
+        converted: false,
+        revenue: 0,
+        campaignId: '000',
+        campaignName: 'Pest Control',
     },
 ]
 
