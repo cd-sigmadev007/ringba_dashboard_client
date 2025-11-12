@@ -29,4 +29,3 @@ export const ConvertedIcon: React.FC<
 )
 
 export default ConvertedIcon
-

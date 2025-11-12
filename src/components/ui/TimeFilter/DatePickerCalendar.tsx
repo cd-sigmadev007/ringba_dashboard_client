@@ -7,10 +7,10 @@ import React from 'react'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 import dayjs from 'dayjs'
-import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
 import { ChevronLeft, ChevronRight } from '../../../assets/svg'
-import { cn } from '@/lib'
 import { EST_TIMEZONE } from './constants'
+import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
+import { cn } from '@/lib'
 
 interface DatePickerCalendarProps {
     selected: DateRange | undefined
@@ -34,11 +34,7 @@ export const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
                 className="rdp no-focus"
                 components={{
                     Chevron: ({ orientation }) =>
-                        orientation === 'left' ? (
-                            <IconLeft />
-                        ) : (
-                            <IconRight />
-                        ),
+                        orientation === 'left' ? <IconLeft /> : <IconRight />,
                 }}
                 captionLayout="dropdown-years"
                 startMonth={dayjs().subtract(25, 'year').toDate()}
@@ -47,4 +43,3 @@ export const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
         </div>
     )
 }
-

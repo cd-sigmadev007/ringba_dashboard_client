@@ -27,4 +27,3 @@ export type Preset = {
  * Re-export DateRange from react-day-picker for convenience
  */
 export type { DateRange }
-

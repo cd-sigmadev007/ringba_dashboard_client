@@ -11,9 +11,10 @@ import dayjs from 'dayjs'
  * @param lastCall - Date string in various formats
  * @returns Object with date and time strings, or default values if parsing fails
  */
-export function parseLastCallDateAndTime(
-    lastCall: string | null | undefined
-): { date: string; time: string } {
+export function parseLastCallDateAndTime(lastCall: string | null | undefined): {
+    date: string
+    time: string
+} {
     let dateStr = 'Unknown Date'
     let timeStr = ''
     let parsedDate: dayjs.Dayjs | null = null
@@ -28,16 +29,20 @@ export function parseLastCallDateAndTime(
         const cleanLastCall = lastCall.replace(/\s+ET$/, '').trim()
 
         // Try parsing with dayjs (handles various formats)
-        parsedDate = dayjs(cleanLastCall, [
-            'MMM DD, YYYY, hh:mm:ss A',
-            'MMM DD, hh:mm:ss A',
-            'MMM DD, YYYY, h:mm:ss A',
-            'MMM DD, h:mm:ss A',
-            'MMM D, YYYY, hh:mm:ss A',
-            'MMM D, hh:mm:ss A',
-            'MMM D, YYYY, h:mm:ss A',
-            'MMM D, h:mm:ss A',
-        ], true)
+        parsedDate = dayjs(
+            cleanLastCall,
+            [
+                'MMM DD, YYYY, hh:mm:ss A',
+                'MMM DD, hh:mm:ss A',
+                'MMM DD, YYYY, h:mm:ss A',
+                'MMM DD, h:mm:ss A',
+                'MMM D, YYYY, hh:mm:ss A',
+                'MMM D, hh:mm:ss A',
+                'MMM D, YYYY, h:mm:ss A',
+                'MMM D, h:mm:ss A',
+            ],
+            true
+        )
 
         if (parsedDate.isValid()) {
             // Format date as "Nov 07, 2025"
@@ -77,4 +82,3 @@ export function parseLastCallDateAndTime(
 
     return { date: dateStr, time: timeStr }
 }
-

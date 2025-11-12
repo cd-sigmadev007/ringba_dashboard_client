@@ -11,9 +11,7 @@ import type { TranscriptEntry } from '@/data/caller-tabs-data'
  * @param raw - Raw transcript string
  * @returns Array of TranscriptEntry objects
  */
-export function parseTranscriptToEntries(
-    raw?: string
-): Array<TranscriptEntry> {
+export function parseTranscriptToEntries(raw?: string): Array<TranscriptEntry> {
     if (!raw || typeof raw !== 'string') return []
 
     // Format: "00:00 A - text,\n00:20 B - text,\n"
@@ -58,4 +56,3 @@ export function parseTranscriptToEntries(
 
     return entries
 }
-

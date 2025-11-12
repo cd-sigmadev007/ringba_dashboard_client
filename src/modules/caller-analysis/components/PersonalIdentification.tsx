@@ -1,6 +1,9 @@
 import React from 'react'
 import clsx from 'clsx'
 import { useCallerAnalysisApi } from '../hooks'
+import { buildAddressFromCallData } from '../utils/addressUtils'
+import { parseTranscriptToEntries } from '../utils/transcriptUtils'
+import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import { HistoryTabContent, JSONTabContent, TranscriptTabContent } from './tabs'
 import type { CallData } from '../types'
@@ -9,9 +12,6 @@ import type { HistoryEntry, TranscriptEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 import { Tabs } from '@/components/ui'
-import { buildAddressFromCallData } from '../utils/addressUtils'
-import { parseTranscriptToEntries } from '../utils/transcriptUtils'
-import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
 
 export interface PersonalIdentificationProps {
     callerData: CallData

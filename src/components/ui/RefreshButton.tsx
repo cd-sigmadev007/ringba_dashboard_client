@@ -3,10 +3,10 @@
  * Refresh button with rotating icon and "last updated" time display
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 import { RefreshIcon } from '@/assets/svg'
 import { cn } from '@/lib'
-import dayjs from 'dayjs'
 
 export interface RefreshButtonProps {
     onRefresh: () => void | Promise<void>
@@ -85,12 +85,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
             )}
         >
             {/* Last Updated Text */}
-            <p
-                className={cn(
-                    'text-sm whitespace-nowrap',
-                    'text-[#A1A5B7]'
-                )}
-            >
+            <p className={cn('text-sm whitespace-nowrap', 'text-[#A1A5B7]')}>
                 Updated {timeAgo}
             </p>
 
@@ -122,4 +117,3 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
 }
 
 export default RefreshButton
-

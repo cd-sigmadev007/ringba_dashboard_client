@@ -6,9 +6,8 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
-import type { DateRange } from './types'
 import { EST_TIMEZONE } from './constants'
-import type { Preset } from './types'
+import type { DateRange, Preset  } from './types'
 
 // Extend dayjs with timezone support
 dayjs.extend(utc)
@@ -49,7 +48,10 @@ export function formatDateRange(range: DateRange | undefined): string {
  * @param preset - Preset configuration
  * @returns Object with from and to dates in EST timezone
  */
-export function calculatePresetDateRange(preset: Preset): { from: Date; to: Date } {
+export function calculatePresetDateRange(preset: Preset): {
+    from: Date
+    to: Date
+} {
     // Get current date/time in EST timezone to match backend
     const nowInEST = dayjs().tz(EST_TIMEZONE)
     let from: Date
@@ -76,4 +78,3 @@ export function calculatePresetDateRange(preset: Preset): { from: Date; to: Date
 
     return { from, to }
 }
-

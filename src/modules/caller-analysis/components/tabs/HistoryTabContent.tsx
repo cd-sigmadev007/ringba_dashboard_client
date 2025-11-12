@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { getCampaignLogo } from '../../utils/campaignLogos'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { mockHistoryData } from '@/data/caller-tabs-data'
@@ -7,7 +8,6 @@ import {
     NotConvertedIcon,
     VerticalLineSeparator,
 } from '@/assets/svg'
-import { getCampaignLogo } from '../../utils/campaignLogos'
 import { cn } from '@/lib'
 
 export interface HistoryTabContentProps {

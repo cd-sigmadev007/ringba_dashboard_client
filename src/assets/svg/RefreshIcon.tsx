@@ -41,4 +41,3 @@ export const RefreshIcon: React.FC<
 )
 
 export default RefreshIcon
-

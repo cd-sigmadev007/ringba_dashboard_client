@@ -32,4 +32,3 @@ export const VerticalLineSeparator: React.FC<
 )
 
 export default VerticalLineSeparator
-

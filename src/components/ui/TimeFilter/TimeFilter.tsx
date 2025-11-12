@@ -11,13 +11,13 @@ import { useThemeStore } from '../../../store/themeStore'
 import { Calendar } from '../../../assets/svg'
 import { Input } from '../Input'
 import { Modal } from '../Modal'
-import { useIsMobile } from '@/lib'
-import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
-import type { TimeFilterProps, Preset } from './types'
-import { formatDateRange, calculatePresetDateRange } from './utils'
+import { calculatePresetDateRange, formatDateRange } from './utils'
 import { PresetButtons } from './PresetButtons'
 import { DatePickerCalendar } from './DatePickerCalendar'
 import { ActionButtons } from './ActionButtons'
+import type { Preset, TimeFilterProps } from './types'
+import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
+import { useIsMobile } from '@/lib'
 
 const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
     const { theme } = useThemeStore()
@@ -75,10 +75,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
                 <DatePickerCalendar selected={range} onSelect={handleSelect} />
             </div>
             <div className="horizontal-line my-4" />
-            <ActionButtons
-                onClear={handleClear}
-                onDone={handleDone}
-            />
+            <ActionButtons onClear={handleClear} onDone={handleDone} />
         </>
     )
 
@@ -138,4 +135,3 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
 }
 
 export default TimeFilter
-

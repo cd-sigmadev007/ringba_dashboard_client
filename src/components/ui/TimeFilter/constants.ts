@@ -17,4 +17,3 @@ export const presets = [
     { label: 'Last 60 days', days: 60 },
     { label: 'Custom', type: 'custom' },
 ] as const
-

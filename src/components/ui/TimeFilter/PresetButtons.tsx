@@ -5,9 +5,9 @@
 
 import React from 'react'
 import Button from '../Button'
-import { cn } from '@/lib'
 import { presets } from './constants'
 import type { Preset } from './types'
+import { cn } from '@/lib'
 
 interface PresetButtonsProps {
     activePreset: string | null
@@ -30,9 +30,7 @@ export const PresetButtons: React.FC<PresetButtonsProps> = ({
                         }}
                         className={cn(
                             '!py-[7px] !px-[10px] border-none w-full text-start hover:bg-[#132F4C]',
-                            activePreset === p.label
-                                ? 'bg-[#132F4C]'
-                                : ''
+                            activePreset === p.label ? 'bg-[#132F4C]' : ''
                         )}
                     >
                         {p.label}
@@ -42,4 +40,3 @@ export const PresetButtons: React.FC<PresetButtonsProps> = ({
         </ul>
     )
 }
-

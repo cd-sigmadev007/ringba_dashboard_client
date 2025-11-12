@@ -42,4 +42,3 @@ export const NotConvertedIcon: React.FC<
 )
 
 export default NotConvertedIcon
-

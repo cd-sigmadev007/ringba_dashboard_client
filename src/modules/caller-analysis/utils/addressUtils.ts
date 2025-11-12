@@ -48,11 +48,7 @@ export function buildAddressFromCallData(callerData: CallData): string {
     // Build full address
     const addressParts: Array<string> = []
     if (street) addressParts.push(street)
-    if (
-        callerData.city &&
-        callerData.city !== 'NA' &&
-        callerData.city.trim()
-    ) {
+    if (callerData.city && callerData.city !== 'NA' && callerData.city.trim()) {
         addressParts.push(callerData.city.trim())
     }
     if (
@@ -62,11 +58,7 @@ export function buildAddressFromCallData(callerData: CallData): string {
     ) {
         addressParts.push(callerData.state.trim())
     }
-    if (
-        callerData.zip &&
-        callerData.zip !== 'NA' &&
-        callerData.zip.trim()
-    ) {
+    if (callerData.zip && callerData.zip !== 'NA' && callerData.zip.trim()) {
         addressParts.push(callerData.zip.trim())
     }
 
@@ -74,4 +66,3 @@ export function buildAddressFromCallData(callerData: CallData): string {
         ? addressParts.join(', ')
         : callerData.address || '-'
 }
-

@@ -3,10 +3,10 @@
  * Utility functions for mapping API data to history entries
  */
 
+import { parseLastCallDateAndTime } from './dateUtils'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import type { FrontendCallerData } from '@/types/api'
 import { formatDuration } from '@/lib/utils/format'
-import { parseLastCallDateAndTime } from './dateUtils'
 
 /**
  * Maps API data to HistoryEntry array
@@ -30,9 +30,10 @@ export function mapApiDataToHistoryEntries(
         // Generate random converted status (true/false) based on revenue
         // If revenue > 0, more likely to be converted, but still random
         // This is temporary until backend provides converted status
-        const converted = revenue > 0
-            ? Math.random() > 0.2 // 80% chance if revenue > 0
-            : Math.random() > 0.8 // 20% chance if revenue = 0
+        const converted =
+            revenue > 0
+                ? Math.random() > 0.2 // 80% chance if revenue > 0
+                : Math.random() > 0.8 // 20% chance if revenue = 0
 
         // Extract campaign ID from campaign string
         // Campaign can be a single ID or comma-separated IDs
@@ -51,4 +52,3 @@ export function mapApiDataToHistoryEntries(
         }
     })
 }
-

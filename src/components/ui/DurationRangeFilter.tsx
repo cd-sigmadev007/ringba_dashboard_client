@@ -2,7 +2,7 @@
  * Duration Range Filter component with Min/Max inputs
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'

@@ -317,8 +317,7 @@ export const useCallerAnalysis = () => {
                 value: string | number | null | undefined
             ): number => {
                 if (value === null || value === undefined) return 0
-                if (typeof value === 'number')
-                    return isNaN(value) ? 0 : value
+                if (typeof value === 'number') return isNaN(value) ? 0 : value
                 if (typeof value === 'string') {
                     // Remove currency symbols, commas, and whitespace
                     const cleaned = value.replace(/[$,\s]/g, '')
