@@ -167,28 +167,39 @@ class CallerApiService {
 
     // Convert API response to frontend CallData format
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
-        // Calculate lifetimeRevenue from ringbaCost + adCost
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
-        const calculatedLTR = ringbaCost + adCost
-
-        // Use calculated LTR if available, otherwise fall back to lifetimeRevenue from API
-        const lifetimeRevenue =
-            calculatedLTR > 0
-                ? calculatedLTR
-                : parseNumeric(apiData.lifetimeRevenue)
+        
+        // Set lifetimeRevenue to 0 initially - it will be aggregated from latestPayout in the hook
+        // The hook will sum all latestPayout values for the same callerId to calculate LTR
+        const lifetimeRevenue = 0
 
         return {
             id: apiData.id,
             callerId: apiData.callerId,
             lastCall: apiData.lastCall,
             duration: formatDuration(apiData.duration),
-            lifetimeRevenue,
+            lifetimeRevenue, // Will be aggregated from latestPayout in useCallerAnalysis hook
             campaign: apiData.campaign,
             action: apiData.action,
             status: apiData.status,
             audioUrl: (apiData as any).audioUrl,
             transcript: (apiData as any).transcript,
+            // Include all additional fields from API
+            revenue: apiData.revenue || null,
+            firstName: apiData.firstName || null,
+            lastName: apiData.lastName || null,
+            email: apiData.email || null,
+            type: apiData.type || null,
+            address: apiData.address || null,
+            streetNumber: apiData.streetNumber || null,
+            streetName: apiData.streetName || null,
+            streetType: apiData.streetType || null,
+            city: apiData.city || null,
+            state: apiData.state || null,
+            zip: apiData.zip || null,
+            billed: apiData.billed || null,
+            latestPayout: apiData.latestPayout || null, // IMPORTANT: Include latestPayout for aggregation
             ringbaCost,
             adCost,
         }

@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrBefore'
 import isSameOrBefore from 'dayjs/plugin/isSameOrAfter'
 
+import { callerApiService } from '../services/api'
 import type { CallData, FilterState } from '../types'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import {
@@ -44,6 +45,14 @@ export const useCallerAnalysis = () => {
                 })
                 console.log('✅ Data fetched:', response)
 
+                // Convert API response to CallData format (this includes latestPayout)
+                const convertedData: Array<CallData> = response.data.map(
+                    (apiData) => callerApiService.convertApiResponseToCallData(apiData)
+                )
+
+                console.log('✅ Data converted, sample:', convertedData[0])
+                console.log('✅ Sample latestPayout:', convertedData[0]?.latestPayout)
+
                 // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
                 const callerIdLtrMap = new Map<string, number>()
 
@@ -64,7 +73,7 @@ export const useCallerAnalysis = () => {
                 }
 
                 // First pass: sum all latestPayout values for each callerId
-                response.data.forEach((call: CallData) => {
+                convertedData.forEach((call: CallData) => {
                     const callerId = call.callerId
                     const latestPayout = parseLatestPayout(call.latestPayout)
 
@@ -108,7 +117,7 @@ export const useCallerAnalysis = () => {
                 )
 
                 // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-                const processedData = response.data.map((call: CallData) => ({
+                const processedData = convertedData.map((call: CallData) => ({
                     ...call,
                     lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
                 }))
@@ -309,6 +318,11 @@ export const useCallerAnalysis = () => {
                 limit: 1000,
             })
 
+            // Data is already converted by callerAnalysisApi, but ensure latestPayout is preserved
+            // The response.data should already be CallData[] if callerAnalysisApi converts it
+            // But we'll work with it directly since it should have latestPayout from our fix
+            const convertedData: Array<CallData> = response.data
+
             // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
             const callerIdLtrMap = new Map<string, number>()
 
@@ -328,7 +342,7 @@ export const useCallerAnalysis = () => {
             }
 
             // First pass: sum all latestPayout values for each callerId
-            response.data.forEach((call: CallData) => {
+            convertedData.forEach((call: CallData) => {
                 const callerId = call.callerId
                 const latestPayout = parseLatestPayout(call.latestPayout)
                 if (callerId && latestPayout > 0) {
@@ -338,7 +352,7 @@ export const useCallerAnalysis = () => {
             })
 
             // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-            const processedData = response.data.map((call: CallData) => ({
+            const processedData = convertedData.map((call: CallData) => ({
                 ...call,
                 lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
             }))
