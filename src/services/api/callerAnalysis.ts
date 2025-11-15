@@ -179,7 +179,6 @@ export class CallerAnalysisApiService {
                 data: Array<{ tag_name: string; priority: string }>
             }>(CALLER_ANALYSIS_ENDPOINTS.GET_TAGS)
             // Response format is { success: true, data: [...], message: "..." }
-            // apiClient already returns response.data, so we access .data property
             return response.data
         } catch (error) {
             console.error('Failed to fetch tags:', error)

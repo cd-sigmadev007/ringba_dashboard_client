@@ -162,7 +162,10 @@ export const useTableColumns = (
             {
                 header: 'CAMPAIGN',
                 accessorKey: 'campaign',
-                meta: { width: 180 },
+                meta: {
+                    width: 180,
+                    align: 'center',
+                } as any,
                 cell: ({ getValue }) => (
                     <Campaign campaign={getValue() as string} />
                 ),

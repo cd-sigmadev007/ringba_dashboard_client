@@ -304,7 +304,15 @@ const Table = <T,>({
                                                 <th
                                                     key={header.id}
                                                     className={clsx(
-                                                        'px-5 py-[9px] uppercase text-[14px] font-semibold text-left',
+                                                        'px-5 py-[9px] uppercase text-[14px] font-semibold',
+                                                        // Use alignment from meta, default to left
+                                                        (
+                                                            header.column
+                                                                .columnDef
+                                                                .meta as any
+                                                        )?.align === 'center'
+                                                            ? 'text-center'
+                                                            : 'text-left',
                                                         (
                                                             header.column
                                                                 .columnDef
@@ -330,7 +338,18 @@ const Table = <T,>({
                                                 >
                                                     {header.column.getCanSort() ? (
                                                         <div
-                                                            className="flex items-center gap-x-2 cursor-pointer select-none hover:opacity-80"
+                                                            className={clsx(
+                                                                'flex items-center gap-x-2 cursor-pointer select-none hover:opacity-80',
+                                                                (
+                                                                    header
+                                                                        .column
+                                                                        .columnDef
+                                                                        .meta as any
+                                                                )?.align ===
+                                                                    'center'
+                                                                    ? 'justify-center'
+                                                                    : ''
+                                                            )}
                                                             onClick={header.column.getToggleSortingHandler()}
                                                         >
                                                             {flexRender(
@@ -419,6 +438,13 @@ const Table = <T,>({
                                             className={clsx(
                                                 'font-medium transition-colors',
                                                 sizeVariants[size],
+                                                // Use alignment from meta, default to left
+                                                (
+                                                    cell.column.columnDef
+                                                        .meta as any
+                                                )?.align === 'center'
+                                                    ? 'text-center'
+                                                    : '',
                                                 (
                                                     cell.column.columnDef
                                                         .meta as any
