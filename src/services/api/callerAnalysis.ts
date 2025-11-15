@@ -11,6 +11,7 @@ export const CALLER_ANALYSIS_ENDPOINTS = {
     GET_BY_ID: '/api/callers/:id',
     GET_BY_PHONE: '/api/callers/phone/:phone',
     GET_SCHEMA: '/api/callers/schema',
+    GET_TAGS: '/api/callers/tags',
     HEALTH_CHECK: '/health',
 } as const
 
@@ -78,10 +79,9 @@ export class CallerAnalysisApiService {
                 }
             }
 
-            // Status filter disabled - using demo status data for now
-            // if (filters.statusFilter.length > 0) {
-            //   params.append('status', filters.statusFilter.join(','))
-            // }
+            if (filters.statusFilter.length > 0) {
+                params.append('status', filters.statusFilter.join(','))
+            }
 
             if (filters.dateRange.from) {
                 params.append('dateFrom', filters.dateRange.from.toISOString())
@@ -164,6 +164,27 @@ export class CallerAnalysisApiService {
      */
     static async healthCheck(): Promise<{ status: string; timestamp: string }> {
         return apiClient.healthCheck()
+    }
+
+    /**
+     * Get all available tags from the database
+     */
+    static async getTags(): Promise<
+        Array<{ tag_name: string; priority: string }>
+    > {
+        try {
+            // apiClient.get returns response.data directly
+            const response = await apiClient.get<{
+                success: boolean
+                data: Array<{ tag_name: string; priority: string }>
+            }>(CALLER_ANALYSIS_ENDPOINTS.GET_TAGS)
+            // Response format is { success: true, data: [...], message: "..." }
+            // apiClient already returns response.data, so we access .data property
+            return response.data
+        } catch (error) {
+            console.error('Failed to fetch tags:', error)
+            throw error
+        }
     }
 }
 

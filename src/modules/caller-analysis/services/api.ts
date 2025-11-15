@@ -206,6 +206,8 @@ class CallerApiService {
             adjustment_amount: apiData.adjustment_amount ?? null,
             call_timestamp: apiData.call_timestamp ?? null,
             targetName: apiData.targetName ?? null,
+            ai_processed: apiData.ai_processed ?? undefined,
+            summary: apiData.summary ?? null,
         }
     }
 

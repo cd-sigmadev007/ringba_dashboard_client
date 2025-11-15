@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
-import { CallTranscriptModal } from '../components/CallTranscriptModal'
+import { CallDetailsModal } from '../components/CallDetailsModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
@@ -228,9 +228,9 @@ export const CallerAnalysisContainer: React.FC = () => {
                     />
                 )}
 
-                {/* Call Transcript Modal */}
+                {/* Call Details Modal */}
                 {selectedCaller && (
-                    <CallTranscriptModal
+                    <CallDetailsModal
                         callerData={selectedCaller}
                         isOpen={openTranscriptModal}
                         onClose={handleCloseTranscriptModal}

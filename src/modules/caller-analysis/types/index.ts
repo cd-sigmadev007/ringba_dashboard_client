@@ -35,6 +35,8 @@ export interface CallData {
     adjustment_amount?: number | null
     call_timestamp?: string | Date | null
     targetName?: string | null
+    ai_processed?: boolean
+    summary?: string | null
 }
 
 export interface FilterState {

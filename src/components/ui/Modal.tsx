@@ -92,13 +92,15 @@ export interface ModalProps
     open: boolean
     onClose: () => void
     children: ReactNode
-    title?: string
+    title?: string | ReactNode
     showCloseButton?: boolean
     showSeparator?: boolean
     className?: string
     overlayClassName?: string
     container?: Element
     border?: boolean
+    titleClassName?: string
+    contentClassName?: string
 }
 
 export const Modal: FC<ModalProps> = ({
@@ -116,6 +118,8 @@ export const Modal: FC<ModalProps> = ({
     overlayClassName,
     container,
     border = false,
+    titleClassName,
+    contentClassName,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -157,7 +161,7 @@ export const Modal: FC<ModalProps> = ({
                     modalContentVariants({ size, position, animation }),
                     isDark ? 'bg-[#071B2F]' : 'bg-white',
                     className,
-                    'pb-6',
+                    'pb-6 flex flex-col',
                     isMobile && position === 'bottom' && 'pb-8'
                 )}
                 onClick={(e) => {
@@ -168,24 +172,31 @@ export const Modal: FC<ModalProps> = ({
                 {(title || showCloseButton) && (
                     <div
                         className={cn(
-                            'flex items-center justify-between px-6 pt-6 pb-4 rounded-t-[10px] sticky top-0 z-10',
-                            isDark ? 'bg-[#071B2F]' : 'bg-white'
+                            'flex items-center rounded-t-[10px] sticky top-0 z-10',
+                            title && showCloseButton
+                                ? 'justify-between'
+                                : 'justify-end',
+                            isDark ? 'bg-[#071B2F]' : 'bg-white',
+                            titleClassName || 'px-6 pt-6 pb-4'
                         )}
                     >
-                        {title && (
-                            <h2
-                                id="modal-title"
-                                className={cn(
-                                    'text-[24px] font-semibold',
-                                    isDark
-                                        ? 'text-[#F5F8FA]'
-                                        : 'text-[#3F4254]',
-                                    isMobile && 'text-[20px]'
-                                )}
-                            >
-                                {title}
-                            </h2>
-                        )}
+                        {title &&
+                            (typeof title === 'string' ? (
+                                <h2
+                                    id="modal-title"
+                                    className={cn(
+                                        'text-[24px] font-semibold',
+                                        isDark
+                                            ? 'text-[#F5F8FA]'
+                                            : 'text-[#3F4254]',
+                                        isMobile && 'text-[20px]'
+                                    )}
+                                >
+                                    {title}
+                                </h2>
+                            ) : (
+                                <div className="flex-1">{title}</div>
+                            ))}
                         {showCloseButton && (
                             <button
                                 onClick={(e) => {
@@ -217,15 +228,14 @@ export const Modal: FC<ModalProps> = ({
 
                 <div
                     className={cn(
-                        'mx-6 overflow-y-auto custom-scroll rounded-[7px]',
-                        size === 'full'
-                            ? 'h-[90%]'
-                            : 'max-h-[calc(100vh-200px)]',
+                        'overflow-y-auto custom-scroll rounded-[7px] flex-1 min-h-0',
+                        size === 'full' ? 'h-[90%]' : '',
                         border &&
                             cn(
                                 'border',
                                 isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
-                            )
+                            ),
+                        contentClassName || 'mx-6'
                     )}
                     onClick={(e) => {
                         // Stop propagation to prevent the content area from closing when clicked

@@ -51,7 +51,7 @@ export const Tabs: React.FC<TabsProps> = ({
                             key={tab.id}
                             onClick={() => handleTabChange(tab.id)}
                             className={clsx(
-                                'px-2.5 py-3 text-sm font-medium transition-colors duration-200 flex items-center justify-center relative',
+                                'px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center justify-center relative',
                                 isActive && [
                                     // Active tab styles - blue bottom border
                                     isDark

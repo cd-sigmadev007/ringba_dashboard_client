@@ -1,5 +1,6 @@
 import React from 'react'
 import clsx from 'clsx'
+import { Priority, STATUS_PRIORITY_MAP } from '../types/priority.types'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
@@ -21,37 +22,43 @@ export const StatusModal: React.FC<StatusModalProps> = ({
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
 
-    // Categorize statuses by priority
-    const highestPriorityStatuses = callerData.status.filter(
-        (status) =>
-            status === 'High-Quality Un-billed (Critical)' ||
-            status === 'Chargeback Risk (Critical)'
-    )
+    // Categorize statuses by priority dynamically using STATUS_PRIORITY_MAP
+    // This ensures all tags from the database are shown, not just hardcoded ones
+    const categorizeByPriority = (statuses: Array<string>) => {
+        const highest: Array<string> = []
+        const high: Array<string> = []
+        const medium: Array<string> = []
+        const low: Array<string> = []
 
-    const highPriorityStatuses = callerData.status.filter(
-        (status) =>
-            status === 'Wrong Appliance Category' ||
-            status === 'Wrong Pest Control Category' ||
-            status === 'Short Call (<90s)' ||
-            status === 'Buyer Hung Up' ||
-            status === 'Immediate Hangup (<10s)' ||
-            status === 'No Coverage (ZIP)'
-    )
+        statuses.forEach((status) => {
+            const priority = STATUS_PRIORITY_MAP[status] ?? Priority.LOW
+            switch (priority) {
+                case Priority.HIGHEST:
+                    highest.push(status)
+                    break
+                case Priority.HIGH:
+                    high.push(status)
+                    break
+                case Priority.MEDIUM:
+                    medium.push(status)
+                    break
+                case Priority.LOW:
+                    low.push(status)
+                    break
+                default:
+                    low.push(status) // Default to low if not found
+            }
+        })
 
-    const mediumPriorityStatuses = callerData.status.filter(
-        (status) =>
-            status === 'Competitor Mentioned' ||
-            status === 'Booking Intent' ||
-            status === 'Warranty/Status Inquiry'
-    )
+        return { highest, high, medium, low }
+    }
 
-    const lowPriorityStatuses = callerData.status.filter(
-        (status) =>
-            status === 'Positive Sentiment' ||
-            status === 'Negative Sentiment' ||
-            status === 'Repeat Customer' ||
-            status === 'Technical Terms Used'
-    )
+    const {
+        highest: highestPriorityStatuses,
+        high: highPriorityStatuses,
+        medium: mediumPriorityStatuses,
+        low: lowPriorityStatuses,
+    } = categorizeByPriority(callerData.status)
 
     return (
         <Modal
