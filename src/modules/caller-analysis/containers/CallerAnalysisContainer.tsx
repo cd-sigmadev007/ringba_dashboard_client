@@ -39,7 +39,6 @@ export const CallerAnalysisContainer: React.FC = () => {
         clearAllFilters,
         hasActiveFilters,
         isLoading,
-        totalRecords,
         refetch,
         lastUpdated,
     } = useCallerAnalysis()
@@ -140,7 +139,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                 </div>
 
                 {/* Data Summary */}
-                <div className="mb-6 grid grid-cols-1 gap-4">
+                {/* <div className="mb-6 grid grid-cols-1 gap-4">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
                         <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
                             Total Records
@@ -149,7 +148,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                             {totalRecords.toLocaleString()}
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Filters */}
                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">

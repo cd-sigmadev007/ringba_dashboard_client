@@ -47,11 +47,15 @@ export const useCallerAnalysis = () => {
 
                 // Convert API response to CallData format (this includes latestPayout)
                 const convertedData: Array<CallData> = response.data.map(
-                    (apiData) => callerApiService.convertApiResponseToCallData(apiData)
+                    (apiData) =>
+                        callerApiService.convertApiResponseToCallData(apiData)
                 )
 
                 console.log('✅ Data converted, sample:', convertedData[0])
-                console.log('✅ Sample latestPayout:', convertedData[0]?.latestPayout)
+                console.log(
+                    '✅ Sample latestPayout:',
+                    convertedData[0]?.latestPayout
+                )
 
                 // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
                 const callerIdLtrMap = new Map<string, number>()
@@ -181,8 +185,10 @@ export const useCallerAnalysis = () => {
         }
 
         // Apply client-side filtering
+        // Note: Search filtering is primarily done on the backend for performance
+        // This client-side filter is a fallback for already-fetched data
         const filtered = data.filter((d: CallData) => {
-            // Search filter (caller ID)
+            // Search filter (caller ID only - partial matching done on backend)
             if (!matchesSearchQuery(d.callerId, filters.searchQuery)) {
                 return false
             }

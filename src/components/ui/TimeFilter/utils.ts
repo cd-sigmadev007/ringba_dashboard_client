@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { EST_TIMEZONE } from './constants'
-import type { DateRange, Preset  } from './types'
+import type { DateRange, Preset } from './types'
 
 // Extend dayjs with timezone support
 dayjs.extend(utc)

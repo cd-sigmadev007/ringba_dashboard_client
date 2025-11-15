@@ -6,11 +6,11 @@
 import { parseLastCallDateAndTime } from './dateUtils'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import type { FrontendCallerData } from '@/types/api'
-import { formatDuration } from '@/lib/utils/format'
+import { formatDuration, parseNumeric } from '@/lib/utils/format'
 
 /**
  * Maps API data to HistoryEntry array
- * Parses lastCall date/time, extracts revenue, generates converted status, and extracts campaign ID
+ * Parses lastCall date/time, extracts revenue, determines converted status from payout, and extracts campaign ID
  * @param apiData - Array of FrontendCallerData from API
  * @returns Array of HistoryEntry objects
  */
@@ -27,13 +27,10 @@ export function mapApiDataToHistoryEntries(
         const rev = Number((h as any).revenue)
         const revenue = Number.isFinite(rev) ? rev : 0
 
-        // Generate random converted status (true/false) based on revenue
-        // If revenue > 0, more likely to be converted, but still random
-        // This is temporary until backend provides converted status
-        const converted =
-            revenue > 0
-                ? Math.random() > 0.2 // 80% chance if revenue > 0
-                : Math.random() > 0.8 // 20% chance if revenue = 0
+        // Parse latestPayout and determine converted status
+        // User is shown as converted when payout > 0
+        const payout = parseNumeric(h.latestPayout)
+        const converted = payout > 0
 
         // Extract campaign ID from campaign string
         // Campaign can be a single ID or comma-separated IDs

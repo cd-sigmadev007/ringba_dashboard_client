@@ -169,7 +169,7 @@ class CallerApiService {
     convertApiResponseToCallData(apiData: FrontendCallerData): CallData {
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
-        
+
         // Set lifetimeRevenue to 0 initially - it will be aggregated from latestPayout in the hook
         // The hook will sum all latestPayout values for the same callerId to calculate LTR
         const lifetimeRevenue = 0
