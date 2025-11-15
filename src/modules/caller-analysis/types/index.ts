@@ -31,6 +31,10 @@ export interface CallData {
     latestPayout?: string | null
     ringbaCost?: number | null
     adCost?: number | null
+    is_adjusted?: boolean
+    adjustment_amount?: number | null
+    call_timestamp?: string | Date | null
+    targetName?: string | null
 }
 
 export interface FilterState {
