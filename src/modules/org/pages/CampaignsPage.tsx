@@ -5,6 +5,7 @@ import { useCampaignStore } from '../store/campaignStore'
 import { Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface CampaignRow {
     id: string
@@ -17,6 +18,7 @@ interface CampaignRow {
 const CampaignsPage: React.FC = () => {
     const { campaigns, loading, fetchCampaigns, deleteCampaign } =
         useCampaignStore()
+    const { isAuthenticated, isLoading: authLoading } = usePermissions()
     const [openCreate, setOpenCreate] = React.useState(false)
     const [editRow, setEditRow] = React.useState<CampaignRow | null>(null)
     const [deleteRow, setDeleteRow] = React.useState<CampaignRow | null>(null)
@@ -135,8 +137,11 @@ const CampaignsPage: React.FC = () => {
     )
 
     useEffect(() => {
-        fetchCampaigns()
-    }, [fetchCampaigns])
+        // Only fetch campaigns when authentication is ready and user is authenticated
+        if (!authLoading && isAuthenticated) {
+            fetchCampaigns()
+        }
+    }, [fetchCampaigns, isAuthenticated, authLoading])
 
     const data: Array<CampaignRow> = campaigns.map((c) => ({
         id: c.id,
