@@ -181,7 +181,7 @@ interface FilterState {
 - `matchesCampaignFilter(campaign, filters)` - Campaign filter logic
 - `matchesStatusFilter(status, filters)` - Status filter logic
 - `matchesDurationRange(duration, range)` - Duration range filtering
-- `matchesSearchQuery(callerId, query)` - Regex-based caller ID search
+- `matchesSearchQuery(callerId, query)` - Client-side caller ID partial search (primary search is done on backend for performance)
 
 ## 🎯 Features
 

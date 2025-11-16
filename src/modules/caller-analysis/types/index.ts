@@ -13,6 +13,30 @@ export interface CallData {
     campaign: string
     action: string
     status: Array<string>
+    audioUrl?: string
+    transcript?: string
+    revenue?: number | null
+    firstName?: string | null
+    lastName?: string | null
+    email?: string | null
+    type?: string | null
+    address?: string | null
+    streetNumber?: string | null
+    streetName?: string | null
+    streetType?: string | null
+    city?: string | null
+    state?: string | null
+    zip?: string | null
+    billed?: string | null
+    latestPayout?: string | null
+    ringbaCost?: number | null
+    adCost?: number | null
+    is_adjusted?: boolean
+    adjustment_amount?: number | null
+    call_timestamp?: string | Date | null
+    targetName?: string | null
+    ai_processed?: boolean
+    summary?: string | null
 }
 
 export interface FilterState {

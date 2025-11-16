@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { Tooltip } from '../../../components/common'
 import type { StatusItem } from '@/modules'
 
 import {
@@ -8,14 +9,13 @@ import {
     STATUS_PRIORITY_MAP,
 } from '@/modules'
 import { cn } from '@/lib'
-import Tooltip from '../../../components/common/Tooltip'
 
 export interface StatusProps {
     status:
-    | Array<Map<string, string>>
-    | string
-    | Array<string>
-    | Array<StatusItem>
+        | Array<Map<string, string>>
+        | string
+        | Array<string>
+        | Array<StatusItem>
     truncate?: boolean
     enablePillOverflow?: boolean
     sortByPriority?: boolean

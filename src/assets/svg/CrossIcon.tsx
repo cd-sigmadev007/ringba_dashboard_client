@@ -9,7 +9,7 @@ interface CrossIconProps {
 const CrossIcon: React.FC<CrossIconProps> = ({ className }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
+
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

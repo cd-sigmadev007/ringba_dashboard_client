@@ -41,19 +41,35 @@ export interface StatusItem {
     description?: string
 }
 
-// Status to priority mapping
+// Status to priority mapping - matches tag_definitions table
 export const STATUS_PRIORITY_MAP: Record<string, Priority> = {
-    'High-Quality Un-billed (Critical)': Priority.HIGHEST,
-    'Chargeback Risk (Critical)': Priority.HIGHEST,
+    // Highest Priority
+    'High-Quality Unbilled': Priority.HIGHEST,
+    'High-Quality Un-billed (Critical)': Priority.HIGHEST, // Legacy name
+    'Chargeback Risk': Priority.HIGHEST,
+    'Chargeback Risk (Critical)': Priority.HIGHEST, // Legacy name
+    'Duplicate Call': Priority.HIGHEST,
+    'Compliance Issue': Priority.HIGHEST,
+
+    // High Priority
     'Wrong Appliance Category': Priority.HIGH,
     'Wrong Pest Control Category': Priority.HIGH,
     'Short Call (<90s)': Priority.HIGH,
     'Buyer Hung Up': Priority.HIGH,
     'Immediate Hangup (<10s)': Priority.HIGH,
     'No Coverage (ZIP)': Priority.HIGH,
-    'Competitor Mentioned': Priority.MEDIUM,
+    'Caller Hung Up (IVR)': Priority.HIGH,
+    'Low Confidence Transcription': Priority.HIGH,
+    'Repeated Caller': Priority.HIGH,
+
+    // Medium Priority
     'Booking Intent': Priority.MEDIUM,
+    'General Customer Service': Priority.MEDIUM,
+    'Inquiry / Pricing Call': Priority.MEDIUM,
     'Warranty/Status Inquiry': Priority.MEDIUM,
+    'Competitor Mentioned': Priority.MEDIUM,
+
+    // Low/Lower Priority
     'Positive Sentiment': Priority.LOW,
     'Negative Sentiment': Priority.LOW,
     'Repeat Customer': Priority.LOW,

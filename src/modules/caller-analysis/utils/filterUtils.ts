@@ -1,10 +1,27 @@
 import type { DurationRange } from '@/components'
 
 // Helper function to parse duration string to seconds
-export const parseDuration = (duration: string): number => {
+// Handles both "Xm Ys" format and seconds string/number
+export const parseDuration = (duration: string | number): number => {
+    if (typeof duration === 'number') {
+        return duration
+    }
+
+    if (!duration) return 0
+
+    // Try to parse as "Xm Ys" format first
     const match = duration.match(/(\d+)m\s+(\d+)s/)
-    if (!match) return 0
-    return parseInt(match[1]) * 60 + parseInt(match[2])
+    if (match) {
+        return parseInt(match[1]) * 60 + parseInt(match[2])
+    }
+
+    // If not in "Xm Ys" format, try parsing as seconds string
+    const seconds = parseFloat(duration)
+    if (!isNaN(seconds)) {
+        return seconds
+    }
+
+    return 0
 }
 
 // Campaign filter matching logic
@@ -80,30 +97,20 @@ export const matchesDurationRange = (
     return true
 }
 
-// Search query matching logic with regex
+// Search query matching logic - caller ID only (partial matching handled by backend)
+// This function is kept for client-side filtering fallback, but search should primarily be done via API
 export const matchesSearchQuery = (
     callerId: string,
     searchQuery: string
 ): boolean => {
     if (!searchQuery.trim()) return true
 
-    try {
-        // Create regex pattern - allow for flexible matching
-        // Remove any existing + or special chars and create a flexible pattern
-        const cleanQuery = searchQuery.replace(/[^\d\s]/g, '')
-        const numbers = cleanQuery.split(/\s+/).filter((n) => n.length > 0)
+    // Remove non-digit characters for phone number matching
+    const cleanQuery = searchQuery.replace(/\D/g, '')
+    if (cleanQuery.length === 0) return true
 
-        if (numbers.length === 0) return true
+    const cleanCallerId = callerId.replace(/\D/g, '')
 
-        // Create regex that matches numbers in sequence with optional separators
-        const regexPattern = numbers.join('[\\s\\-\\(\\)\\.]*')
-        const regex = new RegExp(regexPattern, 'i')
-
-        // Test against caller ID (remove + prefix for matching)
-        const cleanCallerId = callerId.replace(/^\+/, '')
-        return regex.test(cleanCallerId) || regex.test(callerId)
-    } catch (error) {
-        // If regex fails, fall back to simple includes
-        return callerId.toLowerCase().includes(searchQuery.toLowerCase())
-    }
+    // Partial match: check if caller ID contains the search query
+    return cleanCallerId.includes(cleanQuery)
 }

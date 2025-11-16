@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Tooltip } from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 import clsx from 'clsx'
 import type { ReactNode } from 'react'
 
@@ -14,7 +14,7 @@ interface TooltipProps {
     width?: string | number
 }
 
-const Index: React.FC<TooltipProps> = ({
+export const Tooltip: React.FC<TooltipProps> = ({
     tooltipText,
     children,
     id,
@@ -29,13 +29,14 @@ const Index: React.FC<TooltipProps> = ({
         if (id) return String(id)
         // Use crypto.randomUUID() for unique ID generation with fallback
         try {
-            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (crypto.randomUUID) {
                 return `tooltip-${crypto.randomUUID()}`
             } else {
                 // Fallback for environments without crypto.randomUUID
                 return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
             }
-        } catch (error) {
+        } catch {
             // Fallback for any crypto errors
             return `tooltip-${Math.random().toString(36).substr(2, 9)}-${Date.now()}`
         }
@@ -51,7 +52,7 @@ const Index: React.FC<TooltipProps> = ({
                 <div id={uniqueId}>{children}</div>
             )}
             {!disable && (
-                <Tooltip
+                <ReactTooltip
                     positionStrategy="fixed"
                     anchorId={uniqueId}
                     style={{
@@ -75,10 +76,8 @@ const Index: React.FC<TooltipProps> = ({
                     >
                         {tooltipText}
                     </div>
-                </Tooltip>
+                </ReactTooltip>
             )}
         </>
     )
 }
-
-export default Index

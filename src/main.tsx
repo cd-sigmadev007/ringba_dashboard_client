@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
     RouterProvider,
@@ -10,7 +10,9 @@ import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
 import DashboardRoute from './routes/dashboard.tsx'
-
+import { useCampaignStore } from './modules/org/store/campaignStore'
+import OrganizationRoute from './routes/organization.tsx'
+import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -20,7 +22,7 @@ import RootLayout from './layout/Index.tsx'
 import CallbackRoute from './routes/callback.tsx'
 
 // Initialize theme on app startup
-const savedTheme = localStorage.getItem('theme') || 'light'
+const savedTheme = localStorage.getItem('theme') || 'dark'
 document.documentElement.classList.add(
     savedTheme === 'dark' ? 'theme-dark' : 'theme-light'
 )
@@ -35,6 +37,8 @@ const routeTree = rootRoute.addChildren([
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
     CallbackRoute(rootRoute),
+    OrganizationRoute(rootRoute),
+    OrganizationCampaignsRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
@@ -49,6 +53,14 @@ const router = createRouter({
     defaultPreloadStaleTime: 0,
 })
 
+function PreloadProviders({ children }: { children: React.ReactNode }) {
+    const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns)
+    React.useEffect(() => {
+        fetchCampaigns()
+    }, [fetchCampaigns])
+    return <>{children}</>
+}
+
 declare module '@tanstack/react-router' {
     interface Register {
         router: typeof router
@@ -58,15 +70,17 @@ declare module '@tanstack/react-router' {
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement)
-    
+
     const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
     const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
     const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE
-    
+
     if (!auth0Domain || !auth0ClientId || !auth0Audience) {
-        console.error('Missing Auth0 environment variables. Please check your .env file.')
+        console.error(
+            'Missing Auth0 environment variables. Please check your .env file.'
+        )
     }
-    
+
     root.render(
         <StrictMode>
             <Auth0Provider
@@ -79,8 +93,12 @@ if (rootElement && !rootElement.innerHTML) {
                 }}
                 cacheLocation="localstorage"
             >
-                <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-                    <RouterProvider router={router} />
+                <TanStackQueryProvider.Provider
+                    {...TanStackQueryProviderContext}
+                >
+                    <PreloadProviders>
+                        <RouterProvider router={router} />
+                    </PreloadProviders>
                 </TanStackQueryProvider.Provider>
             </Auth0Provider>
         </StrictMode>

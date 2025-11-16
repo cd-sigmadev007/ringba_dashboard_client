@@ -131,7 +131,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             inputVariants({ variant: inputVariant, inputSize }),
                             isDark
-                                ? 'bg-[#001E3C] focus:bg-[#001E3C] text-white'
+                                ? 'bg-[#002B57] focus:bg-[#001E3C] text-white'
                                 : '',
                             leftIcon && 'pl-10',
                             rightIcon && 'pr-10',

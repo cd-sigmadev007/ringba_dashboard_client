@@ -1,0 +1,69 @@
+import { apiClient } from '@/services/api'
+
+export interface CampaignDto {
+    id: string
+    name: string
+    org_id: string
+    created_at: string
+    created_by: string | null
+    campaign_id?: string | null
+    logo_url?: string | null
+}
+
+// Dev helper: read orgId from env or localStorage for no-auth access
+const DEV_ORG_ID =
+    (import.meta.env.VITE_DEV_ORG_ID as string | undefined) ||
+    (typeof window !== 'undefined'
+        ? localStorage.getItem('dev_org_id') || undefined
+        : undefined)
+
+export const campaignApi = {
+    async fetchCampaigns(): Promise<Array<CampaignDto>> {
+        const qs = DEV_ORG_ID ? `?orgId=${encodeURIComponent(DEV_ORG_ID)}` : ''
+        const res = await apiClient.get<{
+            success: boolean
+            data: Array<CampaignDto>
+        }>(`/api/org-admin/campaigns${qs}`)
+        return res.data
+    },
+
+    async createCampaign(
+        input: { name: string; campaign_id?: string },
+        logoFile?: File
+    ): Promise<CampaignDto> {
+        const form = new FormData()
+        form.append('name', input.name)
+        if (input.campaign_id) form.append('campaign_id', input.campaign_id)
+        if (logoFile) form.append('logo', logoFile)
+        const qs = DEV_ORG_ID ? `?orgId=${encodeURIComponent(DEV_ORG_ID)}` : ''
+        const res = await apiClient.post<{
+            success: boolean
+            data: CampaignDto
+        }>(`/api/org-admin/campaigns${qs}`, form, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        return res.data
+    },
+    async updateCampaign(
+        id: string,
+        input: { name?: string; campaign_id?: string | null },
+        logoFile?: File
+    ): Promise<CampaignDto> {
+        const form = new FormData()
+        if (input.name !== undefined) form.append('name', input.name)
+        if (input.campaign_id !== undefined)
+            form.append('campaign_id', input.campaign_id || '')
+        if (logoFile) form.append('logo', logoFile)
+        const res = await apiClient.put<CampaignDto>(
+            `/api/org-admin/campaigns/${id}`,
+            form,
+            {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            }
+        )
+        return res
+    },
+    async deleteCampaign(id: string): Promise<void> {
+        await apiClient.delete(`/api/org-admin/campaigns/${id}`)
+    },
+}

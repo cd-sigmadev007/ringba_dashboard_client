@@ -1,10 +1,15 @@
 import React from 'react'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import Button from '../../../components/ui/Button'
 import CrossIcon from '../../../assets/svg/CrossIcon'
-import { campaignOptions, statusOptions } from '../data/mockData'
+import { statusOptions, useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { DurationRange } from '../../../components/ui/DurationRangeFilter'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 interface FilterPillsProps {
     filters: FilterState
@@ -21,6 +26,7 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
     filters,
     onRemoveFilter,
 }) => {
+    const campaignOptions = useCampaignOptions()
     const formatDurationRange = (range: DurationRange) => {
         if (range.min !== undefined && range.max !== undefined) {
             return `${range.min}s - ${range.max}s`
@@ -107,9 +113,28 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
                 >
                     <p>
                         Date:{' '}
-                        {dayjs(filters.dateRange.from).format('MMM DD, YYYY')}
-                        {filters.dateRange.to &&
-                            ` - ${dayjs(filters.dateRange.to).format('MMM DD, YYYY')}`}
+                        {(() => {
+                            const fromDate = dayjs(filters.dateRange.from).tz(
+                                'America/New_York'
+                            )
+                            const toDate = filters.dateRange.to
+                                ? dayjs(filters.dateRange.to).tz(
+                                      'America/New_York'
+                                  )
+                                : null
+
+                            // Check if from and to are on the same day
+                            if (toDate && fromDate.isSame(toDate, 'day')) {
+                                // Same day: show single date
+                                return fromDate.format('MMM DD, YYYY')
+                            } else if (toDate) {
+                                // Different days: show range
+                                return `${fromDate.format('MMM DD, YYYY')} - ${toDate.format('MMM DD, YYYY')}`
+                            } else {
+                                // Only from date
+                                return fromDate.format('MMM DD, YYYY')
+                            }
+                        })()}
                     </p>
                     <p onClick={onRemoveFilter.dateRange}>
                         <CrossIcon className="w-[20px] h-[20px]" />

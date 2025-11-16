@@ -1,12 +1,17 @@
 import React from 'react'
 import clsx from 'clsx'
+import { useCallerAnalysisApi } from '../hooks'
+import { buildAddressFromCallData } from '../utils/addressUtils'
+import { parseTranscriptToEntries } from '../utils/transcriptUtils'
+import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
+import { PriorityStatusSection } from './PriorityStatusSection'
+import { HistoryTabContent, JSONTabContent, TranscriptTabContent } from './tabs'
 import type { CallData } from '../types'
+import type { TabItem } from '@/components/ui/Tabs'
+import type { HistoryEntry, TranscriptEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
-import { PriorityStatusSection } from './PriorityStatusSection'
 import { Tabs } from '@/components/ui'
-import type { TabItem } from '@/components/ui/Tabs'
-import { TranscriptTabContent, HistoryTabContent, JSONTabContent } from './tabs'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
@@ -19,19 +24,36 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
 
-    // Mock data based on CSV structure
+    // Use real data from API, fallback to 0 if not available
+    // Ensure numeric values are properly converted
+    const ringbaCostValue =
+        callerData.ringbaCost != null
+            ? typeof callerData.ringbaCost === 'number'
+                ? callerData.ringbaCost
+                : Number(callerData.ringbaCost)
+            : 0
+    const adCostValue =
+        callerData.adCost != null
+            ? typeof callerData.adCost === 'number'
+                ? callerData.adCost
+                : Number(callerData.adCost)
+            : 0
+
+    // Total cost = ringbaCost + adCost (always, regardless of other values)
+    const totalCostValue = ringbaCostValue + adCostValue
+
     const additionalData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'johndoe@gmail.com',
+        firstName: callerData.firstName || '-',
+        lastName: callerData.lastName || '-',
+        email: callerData.email || '-',
         phoneNumber: callerData.callerId,
-        type: 'Inbound',
-        address: '-',
-        billed: 'No',
-        latestPayout: '-',
-        totalCost: callerData.lifetimeRevenue,
-        ringbaCost: Math.round(callerData.lifetimeRevenue * 0.76 * 100) / 100,
-        adCost: Math.round(callerData.lifetimeRevenue * 0.24 * 100) / 100,
+        type: callerData.type || 'Inbound',
+        address: buildAddressFromCallData(callerData),
+        billed: callerData.billed || 'No',
+        latestPayout: callerData.latestPayout || '-',
+        totalCost: Number.isFinite(totalCostValue) ? totalCostValue : 0,
+        ringbaCost: Number.isFinite(ringbaCostValue) ? ringbaCostValue : 0,
+        adCost: Number.isFinite(adCostValue) ? adCostValue : 0,
     }
 
     // Config array for personal info
@@ -67,33 +89,49 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         'text-sm',
         isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     )
-    
+
     // Theme-aware border and background classes
     const borderClass = clsx(
         'border',
         isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
     )
-    
-    const containerBgClass = clsx(
-        isDark ? 'bg-transparent' : 'bg-[#FFFFFF]'
+
+    const containerBgClass = clsx(isDark ? 'bg-transparent' : 'bg-[#FFFFFF]')
+
+    // Fetch history by phone number
+    const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
+    const { data: historyResp } = useGetCallerHistoryByPhone(
+        callerData.callerId
     )
 
-    const tabs: TabItem[] = [
+    // Parse transcript string to entries with timestamps
+    const transcriptEntries: Array<TranscriptEntry> = parseTranscriptToEntries(
+        callerData.transcript
+    )
+
+    // Map history API rows to HistoryEntry[] used by tab
+    const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
+        historyResp?.data || []
+    )
+
+    const tabs: Array<TabItem> = [
         {
             id: 'transcription',
             label: 'Call Transcription',
-            content: <TranscriptTabContent />
+            content: (
+                <TranscriptTabContent transcriptData={transcriptEntries} />
+            ),
         },
         {
             id: 'history',
             label: 'History',
-            content: <HistoryTabContent />
+            content: <HistoryTabContent historyData={historyData} />,
         },
         {
             id: 'json',
             label: 'JSON',
-            content: <JSONTabContent callerData={callerData} />
-        }
+            content: <JSONTabContent callerData={callerData} />,
+        },
     ]
 
     return (
@@ -108,7 +146,13 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
             </h2>
 
             {/* Personal Info + Revenue */}
-            <div className={clsx('flex flex-col rounded-sm', containerBgClass, borderClass)}>
+            <div
+                className={clsx(
+                    'flex flex-col rounded-sm',
+                    containerBgClass,
+                    borderClass
+                )}
+            >
                 {personalInfo.map((item, idx) => (
                     <div
                         key={idx}
@@ -123,38 +167,50 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 ))}
 
                 {/* Lifetime Revenue Section inside */}
-                <div className={clsx(
-                    'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
-                    isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
-                    isMobile ? 'flex-col gap-y-4' : 'flex-row'
-                )}>
+                <div
+                    className={clsx(
+                        'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
+                        isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
+                        isMobile ? 'flex-col gap-y-4' : 'flex-row'
+                    )}
+                >
                     <p className={labelClass}>Lifetime Revenue</p>
-                    <div className={clsx(
-                        'flex',
-                        isMobile ? 'flex-col gap-y-2 self-end' : 'flex-row gap-x-6'
-                    )}>
+                    <div
+                        className={clsx(
+                            'flex',
+                            isMobile
+                                ? 'flex-col gap-y-2 self-end'
+                                : 'flex-row gap-x-6'
+                        )}
+                    >
                         {revenueInfo.map((count, i) => (
                             <div
                                 key={i}
                                 className={clsx(
                                     'flex flex-col',
-                                    isMobile ? 'justify-between items-start w-full' : 'items-start gap-x-[24px]'
+                                    isMobile
+                                        ? 'justify-between items-start w-full'
+                                        : 'items-start gap-x-[24px]'
                                 )}
                             >
                                 <p
                                     className={clsx(
                                         'text-sm',
-                                        isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+                                        isDark
+                                            ? 'text-[#A1A5B7]'
+                                            : 'text-[#5E6278]',
                                         isMobile ? 'text-xs' : ''
                                     )}
                                 >
                                     {count.label}
                                 </p>
-                                <p className={clsx(
-                                    'font-bold', 
-                                    valueClass,
-                                    isMobile ? 'text-sm' : ''
-                                )}>
+                                <p
+                                    className={clsx(
+                                        'font-bold',
+                                        valueClass,
+                                        isMobile ? 'text-sm' : ''
+                                    )}
+                                >
                                     {count.value}
                                 </p>
                             </div>
@@ -209,10 +265,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
             {/* Tabs Section */}
             <div className="mt-6">
-                <Tabs
-                    tabs={tabs}
-                    defaultActiveTab="transcription"
-                />
+                <Tabs tabs={tabs} defaultActiveTab="transcription" />
             </div>
         </div>
     )

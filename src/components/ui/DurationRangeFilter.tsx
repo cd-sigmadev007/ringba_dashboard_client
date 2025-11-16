@@ -2,9 +2,11 @@
  * Duration Range Filter component with Min/Max inputs
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Input } from './Input'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
+import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'
 
 export interface DurationRange {
     min?: number // in seconds
@@ -41,11 +43,16 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
     const [isOpen, setIsOpen] = useState(false)
     const [tempRange, setTempRange] = useState<DurationRange>(value)
 
+    // Sync tempRange with value prop changes
+    useEffect(() => {
+        setTempRange(value)
+    }, [value])
+
     // Click outside to close dropdown
     const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
     // Color definitions matching FilterSelect
-    const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
+    const triggerBg = isDark ? 'bg-[#002B57]' : 'bg-white'
     const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
     const triggerBorderClosed = 'border-transparent'
@@ -107,22 +114,21 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                 onClick={() => setIsOpen((prev) => !prev)}
             >
                 <span>{getDisplayText()}</span>
-                <svg
-                    className={cn(
-                        'w-3 h-3 transition-transform duration-200',
-                        isOpen ? 'rotate-180' : ''
-                    )}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
+                {isDark ? (
+                    <ChevronDownDark
+                        className={cn(
+                            'w-3 h-3 transition-transform duration-200',
+                            isOpen ? 'rotate-180' : ''
+                        )}
                     />
-                </svg>
+                ) : (
+                    <ChevronDownLight
+                        className={cn(
+                            'w-3 h-3 transition-transform duration-200',
+                            isOpen ? 'rotate-180' : ''
+                        )}
+                    />
+                )}
             </div>
 
             {/* Dropdown */}
@@ -151,8 +157,8 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                                     inputBg
                                 )}
                             >
-                                <input
-                                    type="number"
+                                <Input
+                                    inputSize="sm"
                                     placeholder="0s"
                                     value={tempRange.min ?? ''}
                                     onChange={handleMinChange}
@@ -178,7 +184,7 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                                     inputBg
                                 )}
                             >
-                                <input
+                                <Input
                                     type="number"
                                     placeholder="3600s"
                                     value={tempRange.max ?? ''}

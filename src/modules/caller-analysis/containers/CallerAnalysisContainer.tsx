@@ -3,14 +3,14 @@ import clsx from 'clsx'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
-import { CallTranscriptModal } from '../components/CallTranscriptModal'
+import { CallDetailsModal } from '../components/CallDetailsModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
-import { Modal, Table, AudioPlayer } from '@/components/ui'
+import { AudioPlayer, Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
+import { RefreshButton } from '@/components/ui/RefreshButton'
 import { FilterPills, FiltersSection } from '@/modules'
-
 
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
@@ -22,12 +22,14 @@ export const CallerAnalysisContainer: React.FC = () => {
     const [selectedCaller, setSelectedCaller] = React.useState<CallData | null>(
         null
     )
-    
+
     // Audio player state
     const [audioPlayerVisible, setAudioPlayerVisible] = React.useState(false)
     const [currentAudioUrl, setCurrentAudioUrl] = React.useState<string>('')
     const [isPlaying, setIsPlaying] = React.useState(false)
-    const [currentPlayingRow, setCurrentPlayingRow] = React.useState<string | null>(null)
+    const [currentPlayingRow, setCurrentPlayingRow] = React.useState<
+        string | null
+    >(null)
 
     const {
         filters,
@@ -37,8 +39,8 @@ export const CallerAnalysisContainer: React.FC = () => {
         clearAllFilters,
         hasActiveFilters,
         isLoading,
-        totalRecords,
         refetch,
+        lastUpdated,
     } = useCallerAnalysis()
 
     const handleRowClick = (row: CallData) => {
@@ -96,9 +98,13 @@ export const CallerAnalysisContainer: React.FC = () => {
         setIsPlaying(playing)
     }
 
-
-
-    const columns = useTableColumns(handleStatusClick, handleTranscriptClick, handlePlayAudio, currentPlayingRow, isPlaying)
+    const columns = useTableColumns(
+        handleStatusClick,
+        handleTranscriptClick,
+        handlePlayAudio,
+        currentPlayingRow,
+        isPlaying
+    )
 
     return (
         <div className="min-h-screen content">
@@ -124,21 +130,25 @@ export const CallerAnalysisContainer: React.FC = () => {
                                 Real-time caller data from your database
                             </p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Button onClick={() => refetch()}>
-                                Refresh Data
-                            </Button>
-                        </div>
+                        <RefreshButton
+                            onRefresh={refetch}
+                            lastUpdated={lastUpdated}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
 
                 {/* Data Summary */}
-                <div className="mb-6 grid grid-cols-1 gap-4">
+                {/* <div className="mb-6 grid grid-cols-1 gap-4">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Records</div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{totalRecords.toLocaleString()}</div>
+                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Total Records
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                            {totalRecords.toLocaleString()}
+                        </div>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Filters */}
                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -195,7 +205,9 @@ export const CallerAnalysisContainer: React.FC = () => {
                     position={isMobile ? 'bottom' : 'right'}
                     title="Caller Details"
                     size={isMobile ? 'full' : 'full'}
-                    className={isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'}
+                    className={
+                        isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'
+                    }
                     animation={isMobile ? 'slide' : 'fade'}
                 >
                     <div className="h-full overflow-y-auto custom-scroll">
@@ -216,9 +228,9 @@ export const CallerAnalysisContainer: React.FC = () => {
                     />
                 )}
 
-                {/* Call Transcript Modal */}
+                {/* Call Details Modal */}
                 {selectedCaller && (
-                    <CallTranscriptModal
+                    <CallDetailsModal
                         callerData={selectedCaller}
                         isOpen={openTranscriptModal}
                         onClose={handleCloseTranscriptModal}

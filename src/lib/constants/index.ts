@@ -6,7 +6,7 @@ import type { Theme } from '../types'
 
 // Theme constants
 export const THEME_KEY = 'ringba-theme'
-export const DEFAULT_THEME: Theme = 'light'
+export const DEFAULT_THEME: Theme = 'dark'
 
 // API constants
 export const API_BASE_URL =

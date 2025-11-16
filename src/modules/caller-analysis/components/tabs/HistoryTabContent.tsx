@@ -1,95 +1,214 @@
-import React from 'react'
-import clsx from 'clsx'
+import React, { useMemo } from 'react'
+import { getCampaignLogo } from '../../utils/campaignLogos'
+import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { mockHistoryData } from '@/data/caller-tabs-data'
-import type { HistoryEntry } from '@/data/caller-tabs-data'
+import {
+    ConvertedIcon,
+    NotConvertedIcon,
+    VerticalLineSeparator,
+} from '@/assets/svg'
+import { cn } from '@/lib'
 
 export interface HistoryTabContentProps {
-    historyData?: HistoryEntry[]
+    historyData?: Array<HistoryEntry>
     className?: string
+}
+
+interface GroupedHistoryEntry {
+    date: string
+    entries: Array<HistoryEntry>
 }
 
 export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
     historyData = mockHistoryData,
-    className
+    className,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
+    // Group entries by date
+    const groupedEntries = useMemo(() => {
+        const groups = new Map<string, Array<HistoryEntry>>()
+
+        historyData.forEach((entry) => {
+            const date = entry.date
+            if (!groups.has(date)) {
+                groups.set(date, [])
+            }
+            groups.get(date)!.push(entry)
+        })
+
+        // Convert to array and sort by date (most recent first)
+        const grouped: Array<GroupedHistoryEntry> = Array.from(
+            groups.entries()
+        ).map(([date, entries]) => ({
+            date,
+            entries,
+        }))
+
+        // Sort by date (most recent first) - simple string comparison for "Nov 07, 2025" format
+        grouped.sort((a, b) => {
+            // Parse dates and compare (fallback to string comparison if parsing fails)
+            try {
+                const dateA = new Date(a.date)
+                const dateB = new Date(b.date)
+                return dateB.getTime() - dateA.getTime()
+            } catch {
+                return b.date.localeCompare(a.date)
+            }
+        })
+
+        return grouped
+    }, [historyData])
+
     return (
-        <div className={clsx('space-y-4 p-4', className)}>
-            <div className="space-y-3">
-                {historyData.map((call, index) => (
-                    <div key={index} className={clsx(
-                        'p-4 rounded-[7px] border transition-all duration-200 hover:shadow-sm',
-                        isDark ? 'border-[#1B456F] bg-[#1B456F]/10 hover:bg-[#1B456F]/15' : 'border-[#E1E5E9] bg-[#F8F9FA] hover:bg-[#F1F3F4]'
-                    )}>
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className={clsx(
-                                        'font-semibold text-base',
-                                        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-                                    )}>
-                                        {call.date}
-                                    </div>
-                                    <div className={clsx(
-                                        'text-sm px-2 py-1 rounded-full',
-                                        isDark ? 'bg-[#2D596B] text-[#A1A5B7]' : 'bg-[#E1E5E9] text-[#5E6278]'
-                                    )}>
-                                        {call.time}
-                                    </div>
-                                </div>
-                                
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className={clsx(
-                                            'text-xs font-medium',
-                                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                                        )}>
-                                            Duration:
-                                        </span>
-                                        <span className={clsx(
-                                            'text-sm font-medium',
-                                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
-                                        )}>
-                                            {call.duration}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="flex flex-col items-end gap-2">
-                                <div className={clsx(
-                                    'px-3 py-1 rounded-full text-xs font-semibold',
-                                    call.status === 'Completed'
-                                        ? (isDark ? 'bg-green-900/30 text-green-400 border border-green-500/20' : 'bg-green-50 text-green-700 border border-green-200')
-                                        : (isDark ? 'bg-red-900/30 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-700 border border-red-200')
-                                )}>
-                                    {call.status}
-                                </div>
-                                
-                                <div className="flex flex-col items-end">
-                                    <span className={clsx(
-                                        'text-xs font-medium',
-                                        isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                                    )}>
-                                        Revenue
-                                    </span>
-                                    <span className={clsx(
-                                        'text-lg font-bold',
-                                        call.revenue > 0 
-                                            ? (isDark ? 'text-green-400' : 'text-green-600')
-                                            : (isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')
-                                    )}>
-                                        ${call.revenue.toFixed(2)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+        <div className={cn('flex flex-col gap-4 pt-[16px]', className)}>
+            {groupedEntries.map((group) => (
+                <div
+                    key={group.date}
+                    className={cn(
+                        'border rounded-[7px] overflow-hidden',
+                        isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                    )}
+                >
+                    {/* Date Header */}
+                    <div
+                        className={cn(
+                            'flex items-start gap-8 p-[14px] border-b',
+                            isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                        )}
+                    >
+                        <p
+                            className={cn(
+                                'font-medium text-[14px] whitespace-nowrap',
+                                isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                            )}
+                        >
+                            {group.date}
+                        </p>
                     </div>
-                ))}
-            </div>
+
+                    {/* Entries */}
+                    {group.entries.map((entry, entryIndex) => {
+                        const isLastEntry =
+                            entryIndex === group.entries.length - 1
+                        const campaignLogo = getCampaignLogo(
+                            entry.campaignId || entry.campaignName || ''
+                        )
+
+                        return (
+                            <div
+                                key={entryIndex}
+                                className={cn(
+                                    'flex gap-[14px] items-start p-[14px]',
+                                    !isLastEntry && 'border-b',
+                                    isDark
+                                        ? 'border-[#1B456F]'
+                                        : 'border-[#E1E5E9]'
+                                )}
+                            >
+                                {/* Status Icon */}
+                                <div className="shrink-0 size-[24px] flex items-center justify-center">
+                                    {entry.converted ? (
+                                        <ConvertedIcon className="size-[24px]" />
+                                    ) : (
+                                        <NotConvertedIcon className="size-[24px]" />
+                                    )}
+                                </div>
+
+                                {/* Main Content */}
+                                <div className="flex-1 flex items-start justify-between min-w-0 gap-4">
+                                    {/* Left Side: Status, Time, Duration */}
+                                    <div className="flex flex-col gap-[5px] min-w-0">
+                                        {/* Status Text */}
+                                        <p
+                                            className={cn(
+                                                'font-medium text-[16px] whitespace-nowrap',
+                                                isDark
+                                                    ? 'text-[#F5F8FA]'
+                                                    : 'text-[#3F4254]'
+                                            )}
+                                        >
+                                            {entry.converted
+                                                ? 'Converted'
+                                                : 'Not Converted'}
+                                        </p>
+
+                                        {/* Time, Separator, Duration */}
+                                        <div className="flex items-center gap-2">
+                                            <p
+                                                className={cn(
+                                                    'font-medium text-[14px] whitespace-nowrap',
+                                                    isDark
+                                                        ? 'text-[#A1A5B7]'
+                                                        : 'text-[#5E6278]'
+                                                )}
+                                            >
+                                                {entry.time}
+                                            </p>
+                                            <VerticalLineSeparator className="shrink-0 size-[20px]" />
+                                            <p
+                                                className={cn(
+                                                    'font-medium text-[14px] whitespace-nowrap',
+                                                    isDark
+                                                        ? 'text-[#A1A5B7]'
+                                                        : 'text-[#5E6278]'
+                                                )}
+                                            >
+                                                {entry.duration}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Right Side: Revenue, Campaign Badge */}
+                                    <div className="flex flex-col gap-[5px] items-end shrink-0">
+                                        {/* Revenue */}
+                                        <p
+                                            className={cn(
+                                                'font-medium text-[16px] whitespace-nowrap',
+                                                isDark
+                                                    ? 'text-[#F5F8FA]'
+                                                    : 'text-[#3F4254]'
+                                            )}
+                                        >
+                                            ${entry.revenue.toFixed(2)}
+                                        </p>
+
+                                        {/* Campaign Badge */}
+                                        {campaignLogo && (
+                                            <div
+                                                className={cn(
+                                                    'flex gap-[5px] items-center px-[7px] py-[3px] rounded-[50px]',
+                                                    isDark
+                                                        ? 'bg-[#1B456F]'
+                                                        : 'bg-[#E1E5E9]'
+                                                )}
+                                            >
+                                                <img
+                                                    src={campaignLogo.image}
+                                                    alt={campaignLogo.name}
+                                                    className="size-4 rounded-full object-cover"
+                                                />
+                                                <p
+                                                    className={cn(
+                                                        'font-medium text-[14px] whitespace-nowrap',
+                                                        isDark
+                                                            ? 'text-[#F5F8FA]'
+                                                            : 'text-[#3F4254]'
+                                                    )}
+                                                >
+                                                    {campaignLogo.name}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            ))}
         </div>
     )
 }

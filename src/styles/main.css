@@ -562,6 +562,43 @@ input[type='search']::-webkit-search-results-decoration {
     background-color: #f0f5ff;
 }
 
+/* Submenu items */
+.theme-dark .sidebar-item-list li ul li .sidebar-item {
+    font-size: 14px;
+    padding: 0;
+    margin-left: 2rem;
+}
+
+.theme-light .sidebar-item-list li ul li .sidebar-item {
+    font-size: 14px;
+    margin-left: 2rem;
+    padding: 0;
+}
+
+/* No hover background for submenu items */
+.theme-dark .sidebar-item-list li ul li .sidebar-item:hover {
+    background-color: transparent;
+    color: #f5f8fa;
+}
+
+.theme-light .sidebar-item-list li ul li .sidebar-item:hover {
+    background-color: transparent;
+    color: #007fff;
+}
+
+/* Active submenu items - transparent background and blue text */
+.theme-dark .sidebar-subitem-active {
+    background-color: transparent !important;
+    color: #f5f8fa !important;
+    fill: #f5f8fa !important;
+}
+
+.theme-light .sidebar-subitem-active {
+    background-color: transparent !important;
+    color: #007fff !important;
+    fill: #007fff !important;
+}
+
 /* Button theme colors */
 .theme-dark .btn-primary {
     background-color: #007fff;

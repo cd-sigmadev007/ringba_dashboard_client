@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import isSameOrAfter from 'dayjs/plugin/isSameOrBefore'
 import isSameOrBefore from 'dayjs/plugin/isSameOrAfter'
 
+import { callerApiService } from '../services/api'
 import type { CallData, FilterState } from '../types'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import {
@@ -26,9 +27,10 @@ export const useCallerAnalysis = () => {
         searchQuery: '',
     })
 
-    const [data, setData] = useState<CallData[]>([])
+    const [data, setData] = useState<Array<CallData>>([])
     const [isLoading, setIsLoading] = useState(true)
     const [totalRecords, setTotalRecords] = useState(0)
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
     // Fetch all data for client-side pagination
     useEffect(() => {
@@ -42,8 +44,91 @@ export const useCallerAnalysis = () => {
                     limit: 1000, // Fetch 1000 records for client-side pagination
                 })
                 console.log('✅ Data fetched:', response)
-                setData(response.data)
+
+                // Convert API response to CallData format (this includes latestPayout)
+                const convertedData: Array<CallData> = response.data.map(
+                    (apiData) =>
+                        callerApiService.convertApiResponseToCallData(apiData)
+                )
+
+                console.log('✅ Data converted, sample:', convertedData[0])
+                console.log(
+                    '✅ Sample latestPayout:',
+                    convertedData[0]?.latestPayout
+                )
+
+                // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
+                const callerIdLtrMap = new Map<string, number>()
+
+                // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
+                const parseLatestPayout = (
+                    value: string | number | null | undefined
+                ): number => {
+                    if (value === null || value === undefined) return 0
+                    if (typeof value === 'number')
+                        return isNaN(value) ? 0 : value
+                    if (typeof value === 'string') {
+                        // Remove currency symbols, commas, and whitespace
+                        const cleaned = value.replace(/[$,\s]/g, '')
+                        const parsed = parseFloat(cleaned)
+                        return isNaN(parsed) ? 0 : parsed
+                    }
+                    return 0
+                }
+
+                // First pass: sum all latestPayout values for each callerId
+                convertedData.forEach((call: CallData) => {
+                    const callerId = call.callerId
+                    const latestPayout = parseLatestPayout(call.latestPayout)
+
+                    // Debug log for each call to see what we're parsing
+                    if (
+                        call.latestPayout &&
+                        typeof call.latestPayout === 'string' &&
+                        call.latestPayout.includes('30')
+                    ) {
+                        console.log('Found $30 latestPayout:', {
+                            callerId,
+                            rawLatestPayout: call.latestPayout,
+                            parsedLatestPayout: latestPayout,
+                            currentLTR: call.lifetimeRevenue,
+                            ringbaCost: call.ringbaCost,
+                        })
+                    }
+
+                    if (latestPayout > 0) {
+                        const currentSum = callerIdLtrMap.get(callerId) || 0
+                        const newSum = currentSum + latestPayout
+                        callerIdLtrMap.set(callerId, newSum)
+
+                        // Debug log for suspicious values
+                        if (latestPayout > 10 && newSum < 1) {
+                            console.warn('LTR calculation issue:', {
+                                callerId,
+                                latestPayout,
+                                currentSum,
+                                newSum,
+                                rawValue: call.latestPayout,
+                            })
+                        }
+                    }
+                })
+
+                // Debug: log the LTR map for verification
+                console.log(
+                    'LTR Map (first 10 entries):',
+                    Array.from(callerIdLtrMap.entries()).slice(0, 10)
+                )
+
+                // Second pass: update lifetimeRevenue for each call with the aggregated LTR
+                const processedData = convertedData.map((call: CallData) => ({
+                    ...call,
+                    lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
+                }))
+
+                setData(processedData)
                 setTotalRecords(response.pagination.total)
+                setLastUpdated(new Date())
             } catch (error) {
                 console.error('❌ Failed to fetch data:', error)
             } finally {
@@ -58,18 +143,29 @@ export const useCallerAnalysis = () => {
     const parseLastCallDate = (lastCall: string): Date | null => {
         try {
             // Parse the date string format: "Aug 05, 06:00:00 AM ET"
-            const dateMatch = lastCall.match(/(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/)
+            const dateMatch = lastCall.match(
+                /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
+            )
             if (!dateMatch) return null
-            
+
             const [, month, day, hour, minute, second, ampm] = dateMatch
-            const monthIndex = new Date(Date.parse(month + " 1, 2000")).getMonth()
+            const monthIndex = new Date(
+                Date.parse(month + ' 1, 2000')
+            ).getMonth()
             const year = new Date().getFullYear() // Use current year as fallback
-            
+
             let hour24 = parseInt(hour)
             if (ampm === 'PM' && hour24 !== 12) hour24 += 12
             if (ampm === 'AM' && hour24 === 12) hour24 = 0
-            
-            return new Date(year, monthIndex, parseInt(day), hour24, parseInt(minute), parseInt(second))
+
+            return new Date(
+                year,
+                monthIndex,
+                parseInt(day),
+                hour24,
+                parseInt(minute),
+                parseInt(second)
+            )
         } catch (error) {
             console.error('Error parsing date:', lastCall, error)
             return null
@@ -78,19 +174,21 @@ export const useCallerAnalysis = () => {
 
     // Filter data based on current filters
     const filteredData = useMemo(() => {
-        console.log('🔍 Filtering data:', { 
+        console.log('🔍 Filtering data:', {
             dataLength: data.length,
-            filters: filters
+            filters: filters,
         })
-        
+
         if (!data.length) {
             console.log('📄 No data available')
             return []
         }
-        
+
         // Apply client-side filtering
+        // Note: Search filtering is primarily done on the backend for performance
+        // This client-side filter is a fallback for already-fetched data
         const filtered = data.filter((d: CallData) => {
-            // Search filter (caller ID)
+            // Search filter (caller ID only - partial matching done on backend)
             if (!matchesSearchQuery(d.callerId, filters.searchQuery)) {
                 return false
             }
@@ -109,10 +207,16 @@ export const useCallerAnalysis = () => {
             if (filters.dateRange.from || filters.dateRange.to) {
                 const callDate = parseLastCallDate(d.lastCall)
                 if (callDate) {
-                    if (filters.dateRange.from && callDate < filters.dateRange.from) {
+                    if (
+                        filters.dateRange.from &&
+                        callDate < filters.dateRange.from
+                    ) {
                         return false
                     }
-                    if (filters.dateRange.to && callDate > filters.dateRange.to) {
+                    if (
+                        filters.dateRange.to &&
+                        callDate > filters.dateRange.to
+                    ) {
                         return false
                     }
                 }
@@ -130,12 +234,12 @@ export const useCallerAnalysis = () => {
 
             return true
         })
-        
-        console.log('🔍 Filtered data:', { 
-            original: data.length, 
-            filtered: filtered.length 
+
+        console.log('🔍 Filtered data:', {
+            original: data.length,
+            filtered: filtered.length,
         })
-        
+
         return filtered
     }, [data, filters])
 
@@ -211,24 +315,62 @@ export const useCallerAnalysis = () => {
         filters.durationRange.max !== undefined
 
     // Refresh function
-    const refetch = () => {
-        const fetchData = async () => {
-            setIsLoading(true)
-            try {
-                const response = await callerAnalysisApi.getAllCallers({
-                    filters,
-                    page: 1,
-                    limit: 1000,
-                })
-                setData(response.data)
-                setTotalRecords(response.pagination.total)
-            } catch (error) {
-                console.error('❌ Failed to refetch data:', error)
-            } finally {
-                setIsLoading(false)
+    const refetch = async () => {
+        setIsLoading(true)
+        try {
+            const response = await callerAnalysisApi.getAllCallers({
+                filters,
+                page: 1,
+                limit: 1000,
+            })
+
+            // Data is already converted by callerAnalysisApi, but ensure latestPayout is preserved
+            // The response.data should already be CallData[] if callerAnalysisApi converts it
+            // But we'll work with it directly since it should have latestPayout from our fix
+            const convertedData: Array<CallData> = response.data
+
+            // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
+            const callerIdLtrMap = new Map<string, number>()
+
+            // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
+            const parseLatestPayout = (
+                value: string | number | null | undefined
+            ): number => {
+                if (value === null || value === undefined) return 0
+                if (typeof value === 'number') return isNaN(value) ? 0 : value
+                if (typeof value === 'string') {
+                    // Remove currency symbols, commas, and whitespace
+                    const cleaned = value.replace(/[$,\s]/g, '')
+                    const parsed = parseFloat(cleaned)
+                    return isNaN(parsed) ? 0 : parsed
+                }
+                return 0
             }
+
+            // First pass: sum all latestPayout values for each callerId
+            convertedData.forEach((call: CallData) => {
+                const callerId = call.callerId
+                const latestPayout = parseLatestPayout(call.latestPayout)
+                if (callerId && latestPayout > 0) {
+                    const currentLTR = callerIdLtrMap.get(callerId) || 0
+                    callerIdLtrMap.set(callerId, currentLTR + latestPayout)
+                }
+            })
+
+            // Second pass: update lifetimeRevenue for each call with the aggregated LTR
+            const processedData = convertedData.map((call: CallData) => ({
+                ...call,
+                lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
+            }))
+
+            setData(processedData)
+            setTotalRecords(response.pagination.total)
+            setLastUpdated(new Date())
+        } catch (error) {
+            console.error('❌ Failed to refetch data:', error)
+        } finally {
+            setIsLoading(false)
         }
-        fetchData()
     }
 
     return {
@@ -242,5 +384,6 @@ export const useCallerAnalysis = () => {
         totalRecords,
         isLoading,
         refetch,
+        lastUpdated,
     }
 }

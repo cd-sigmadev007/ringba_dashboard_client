@@ -1,202 +1,305 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import Button from '../../../components/ui/Button'
-import Tooltip from '../../../components/common/Tooltip'
+import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
+import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { Campaign } from '@/modules'
-import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
 import {
-  CopyIcon,
-  DocumentIcon,
-  PlayIcon,
-  WarningIcon,
-  PauseIcon,
+    CopyIcon,
+    DocumentIcon,
+    PauseIcon,
+    PlayIcon,
+    WarningIcon,
 } from '@/assets/svg'
 import { cn } from '@/lib'
 
+// Caller ID cell component with copy functionality
+const CallerIdCell: React.FC<{ callerId: string }> = ({ callerId }) => {
+    const [copied, setCopied] = React.useState(false)
+
+    const handleCopy = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        try {
+            await navigator.clipboard.writeText(callerId)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch (err) {
+            console.error('Failed to copy caller ID:', err)
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea')
+            textArea.value = callerId
+            textArea.style.position = 'fixed'
+            textArea.style.left = '-999999px'
+            document.body.appendChild(textArea)
+            textArea.select()
+            try {
+                document.execCommand('copy')
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+            } catch (fallbackErr) {
+                console.error('Fallback copy failed:', fallbackErr)
+            }
+            document.body.removeChild(textArea)
+        }
+    }
+
+    return (
+        <div className="flex items-center gap-[10px]">
+            <span className="text-sm truncate">{callerId}</span>
+            <Tooltip tooltipText={copied ? 'Copied!' : 'Copy Caller ID'}>
+                <Button
+                    variant="ghost"
+                    className="p-1 min-w-0 h-auto"
+                    onClick={handleCopy}
+                >
+                    <CopyIcon />
+                </Button>
+            </Tooltip>
+        </div>
+    )
+}
+
 export const useTableColumns = (
-  onStatusClick: (callerData: CallData) => void,
-  onTranscriptClick: (callerData: CallData) => void,
-  onPlayAudio: (audioUrl: string, rowId: string) => void,
-  currentPlayingRow: string | null,
-  isPlaying: boolean
+    onStatusClick: (callerData: CallData) => void,
+    onTranscriptClick: (callerData: CallData) => void,
+    onPlayAudio: (audioUrl: string, rowId: string) => void,
+    currentPlayingRow: string | null,
+    isPlaying: boolean
 ) => {
-  const { theme } = useThemeStore()
-  const isDark = theme === 'dark'
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
 
-  return useMemo<Array<ColumnDef<CallData>>>(
-    () => [
-      {
-        header: 'CALLER ID',
-        accessorKey: 'callerId',
-        meta: { 
-          sticky: 'left',
-          width: 150
-        } as any,
-        cell: ({ getValue }) => (
-          <div className="flex items-center gap-[10px]">
-            <span className="text-sm truncate">{getValue() as string}</span>
-            <Tooltip tooltipText="Copy Caller ID">
-              <Button 
-                variant="ghost" 
-                className="p-1 min-w-0 h-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <CopyIcon />
-              </Button>
-            </Tooltip>
-          </div>
-        ),
-      },
-      {
-        header: 'LAST CALL',
-        accessorKey: 'lastCall',
-        meta: { width: 120 },
-        cell: ({ getValue }) => (
-          <span className="text-sm whitespace-nowrap">
-            {getValue() as string}
-          </span>
-        ),
-      },
-      {
-        header: 'DURATION',
-        accessorKey: 'duration',
-        meta: { width: 100 },
-        cell: ({ getValue }) => (
-          <span className="text-sm">{getValue() as string}</span>
-        ),
-      },
-      {
-        header: (
-          <div className="flex items-center gap-2">
-            <span>LTR</span>
-            <Tooltip tooltipText="Life Time Revenue" id="ltr-header-tooltip">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="17"
-                viewBox="0 0 16 17"
-                fill="none"
-              >
-                <path
-                  d="M8.75 11.75C8.75 11.8983 8.70602 12.0433 8.6236 12.1667C8.54119 12.29 8.42406 12.3861 8.28701 12.4429C8.14997 12.4997 7.99917 12.5145 7.85368 12.4856C7.7082 12.4566 7.57456 12.3852 7.46967 12.2803C7.36478 12.1754 7.29335 12.0418 7.26441 11.8963C7.23548 11.7508 7.25033 11.6 7.30709 11.463C7.36386 11.3259 7.45999 11.2088 7.58333 11.1264C7.70666 11.044 7.85167 11 8 11C8.19892 11 8.38968 11.079 8.53033 11.2197C8.67098 11.3603 8.75 11.5511 8.75 11.75ZM8 5C6.62125 5 5.5 6.00938 5.5 7.25V7.5C5.5 7.63261 5.55268 7.75979 5.64645 7.85355C5.74022 7.94732 5.86739 8 6 8C6.13261 8 6.25979 7.94732 6.35356 7.85355C6.44732 7.75979 6.5 7.63261 6.5 7.5V7.25C6.5 6.5625 7.17313 6 8 6C8.82688 6 9.5 6.5625 9.5 7.25C9.5 7.9375 8.82688 8.5 8 8.5C7.86739 8.5 7.74022 8.55268 7.64645 8.64645C7.55268 8.74021 7.5 8.86739 7.5 9V9.5C7.5 9.63261 7.55268 9.75979 7.64645 9.85355C7.74022 9.94732 7.86739 10 8 10C8.13261 10 8.25979 9.94732 8.35356 9.85355C8.44732 9.75979 8.5 9.63261 8.5 9.5V9.5V9.455C9.64 9.24563 10.5 8.33625 10.5 7.25C10.5 6.00938 9.37875 5 8 5ZM14.5 8.5C14.5 9.78558 14.1188 11.0423 13.4046 12.1112C12.6903 13.1801 11.6752 14.0132 10.4874 14.5052C9.29973 14.9972 7.99279 15.1259 6.73192 14.8751C5.47104 14.6243 4.31285 14.0052 3.40381 13.0962C2.49477 12.1872 1.8757 11.029 1.6249 9.76809C1.37409 8.50721 1.50282 7.20028 1.99479 6.01256C2.48676 4.82484 3.31988 3.80968 4.3888 3.09545C5.45772 2.38122 6.71442 2 8 2C9.72335 2.00182 11.3756 2.68722 12.5942 3.90582C13.8128 5.12441 14.4982 6.77665 14.5 8.5ZM13.5 8.5C13.5 7.4122 13.1774 6.34883 12.5731 5.44436C11.9687 4.53989 11.1098 3.83494 10.1048 3.41866C9.09977 3.00238 7.9939 2.89346 6.92701 3.10568C5.86011 3.3179 4.8801 3.84172 4.11092 4.61091C3.34173 5.3801 2.8179 6.36011 2.60568 7.427C2.39347 8.4939 2.50238 9.59977 2.91867 10.6048C3.33495 11.6098 4.0399 12.4687 4.94437 13.0731C5.84884 13.6774 6.91221 14 8 14C9.45819 13.9983 10.8562 13.4184 11.8873 12.3873C12.9184 11.3562 13.4983 9.95818 13.5 8.5Z"
-                  fill="#A1A5B7"
-                />
-              </svg>
-            </Tooltip>
-          </div>
-        ) as any,
-        accessorKey: 'lifetimeRevenue',
-        meta: { width: 140 },
-        cell: ({ getValue }) => {
-          const totalCost = getValue() as number
-          
-          // Demo data for cost breakdown - replace with real API data later
-          const adCost = Math.round(totalCost * 0.35 * 100) / 100 // 35% of total
-          const ringbaCost = Math.round(totalCost * 0.45 * 100) / 100 // 45% of total  
-          const thirdPartyCost = Math.round(totalCost * 0.20 * 100) / 100 // 20% of total
-          
-          return (
-            <LifetimeRevenueBreakdown
-              totalCost={totalCost}
-              adCost={adCost}
-              ringbaCost={ringbaCost}
-              thirdPartyCost={thirdPartyCost}
-            />
-          )
-        },
-      },
-      {
-        header: 'CAMPAIGN',
-        accessorKey: 'campaign',
-        meta: { width: 180 },
-        cell: ({ getValue }) => <Campaign campaign={getValue() as string} />,
-      },
-      {
-        header: 'ACTION',
-        accessorKey: 'action',
-        meta: { width: 120 },
-        cell: ({ row }) => {
-          return (
-            <div className="flex items-center gap-[5px]">
-              {/* Play Button */}
-              <Tooltip tooltipText={currentPlayingRow === row.original.id && isPlaying ? 'Pause Call Recording' : 'Play Call Recording'}>
-                <Button
-                  variant="ghost"
-                  className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    // For now, use a mock audio URL - we can replace this with actual audio URLs from your data
-                    onPlayAudio('https://cdn.pixabay.com/audio/2025/06/28/audio_4a05c5cd3b.mp3', row.original.id)
-                  }}
-                >
-                  {currentPlayingRow === row.original.id && isPlaying ? <PauseIcon /> : <PlayIcon />}
-                </Button>
-              </Tooltip>
+    return useMemo<Array<ColumnDef<CallData>>>(
+        () => [
+            {
+                header: 'CALLER ID',
+                accessorKey: 'callerId',
+                meta: {
+                    sticky: 'left',
+                    width: 150,
+                } as any,
+                cell: ({ getValue }) => (
+                    <CallerIdCell callerId={getValue() as string} />
+                ),
+            },
+            {
+                header: 'LAST CALL',
+                accessorKey: 'lastCall',
+                meta: { width: 120 },
+                cell: ({ getValue }) => (
+                    <span className="text-sm whitespace-nowrap">
+                        {getValue() as string}
+                    </span>
+                ),
+            },
+            {
+                header: 'DURATION',
+                accessorKey: 'duration',
+                meta: { width: 100 },
+                cell: ({ getValue }) => {
+                    const duration = getValue() as string
+                    // Duration is already formatted in the API conversion, but handle edge cases
+                    return (
+                        <span className="text-sm">{duration || '00m 00s'}</span>
+                    )
+                },
+            },
+            {
+                header: (
+                    <div className="flex items-center gap-2">
+                        <span>LTR</span>
+                        <Tooltip
+                            tooltipText="Life Time Revenue"
+                            id="ltr-header-tooltip"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="17"
+                                viewBox="0 0 16 17"
+                                fill="none"
+                            >
+                                <path
+                                    d="M8.75 11.75C8.75 11.8983 8.70602 12.0433 8.6236 12.1667C8.54119 12.29 8.42406 12.3861 8.28701 12.4429C8.14997 12.4997 7.99917 12.5145 7.85368 12.4856C7.7082 12.4566 7.57456 12.3852 7.46967 12.2803C7.36478 12.1754 7.29335 12.0418 7.26441 11.8963C7.23548 11.7508 7.25033 11.6 7.30709 11.463C7.36386 11.3259 7.45999 11.2088 7.58333 11.1264C7.70666 11.044 7.85167 11 8 11C8.19892 11 8.38968 11.079 8.53033 11.2197C8.67098 11.3603 8.75 11.5511 8.75 11.75ZM8 5C6.62125 5 5.5 6.00938 5.5 7.25V7.5C5.5 7.63261 5.55268 7.75979 5.64645 7.85355C5.74022 7.94732 5.86739 8 6 8C6.13261 8 6.25979 7.94732 6.35356 7.85355C6.44732 7.75979 6.5 7.63261 6.5 7.5V7.25C6.5 6.5625 7.17313 6 8 6C8.82688 6 9.5 6.5625 9.5 7.25C9.5 7.9375 8.82688 8.5 8 8.5C7.86739 8.5 7.74022 8.55268 7.64645 8.64645C7.55268 8.74021 7.5 8.86739 7.5 9V9.5C7.5 9.63261 7.55268 9.75979 7.64645 9.85355C7.74022 9.94732 7.86739 10 8 10C8.13261 10 8.25979 9.94732 8.35356 9.85355C8.44732 9.75979 8.5 9.63261 8.5 9.5V9.5V9.455C9.64 9.24563 10.5 8.33625 10.5 7.25C10.5 6.00938 9.37875 5 8 5ZM14.5 8.5C14.5 9.78558 14.1188 11.0423 13.4046 12.1112C12.6903 13.1801 11.6752 14.0132 10.4874 14.5052C9.29973 14.9972 7.99279 15.1259 6.73192 14.8751C5.47104 14.6243 4.31285 14.0052 3.40381 13.0962C2.49477 12.1872 1.8757 11.029 1.6249 9.76809C1.37409 8.50721 1.50282 7.20028 1.99479 6.01256C2.48676 4.82484 3.31988 3.80968 4.3888 3.09545C5.45772 2.38122 6.71442 2 8 2C9.72335 2.00182 11.3756 2.68722 12.5942 3.90582C13.8128 5.12441 14.4982 6.77665 14.5 8.5ZM13.5 8.5C13.5 7.4122 13.1774 6.34883 12.5731 5.44436C11.9687 4.53989 11.1098 3.83494 10.1048 3.41866C9.09977 3.00238 7.9939 2.89346 6.92701 3.10568C5.86011 3.3179 4.8801 3.84172 4.11092 4.61091C3.34173 5.3801 2.8179 6.36011 2.60568 7.427C2.39347 8.4939 2.50238 9.59977 2.91867 10.6048C3.33495 11.6098 4.0399 12.4687 4.94437 13.0731C5.84884 13.6774 6.91221 14 8 14C9.45819 13.9983 10.8562 13.4184 11.8873 12.3873C12.9184 11.3562 13.4983 9.95818 13.5 8.5Z"
+                                    fill="#A1A5B7"
+                                />
+                            </svg>
+                        </Tooltip>
+                    </div>
+                ) as any,
+                accessorKey: 'lifetimeRevenue',
+                meta: { width: 140 },
+                cell: ({ row }) => {
+                    // LTR is the sum of all latestPayout for the same callerId (aggregated)
+                    const ltr = row.original.lifetimeRevenue || 0
 
-              {/* Document/Transcript Button */}
-              <Tooltip tooltipText="View Call Transcript">
-                <Button
-                  variant="ghost"
-                  className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onTranscriptClick(row.original)
-                  }}
-                >
-                  <DocumentIcon />
-                </Button>
-              </Tooltip>
+                    // Total cost = ringbaCost + adCost (for this call only, used in modal)
+                    const ringbaCost = row.original.ringbaCost || 0
+                    const adCost = row.original.adCost || 0
+                    const totalCost = ringbaCost + adCost
 
-              {/* Warning Button */}
-              <Tooltip tooltipText="View Warning Details">
-                <Button
-                  variant="ghost"
-                  className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <WarningIcon />
-                </Button>
-              </Tooltip>
-            </div>
-          )
-        },
-      },
-      {
-        header: 'STATUS',
-        accessorKey: 'status',
-        meta: { 
-          width: 200,
-          className: 'status-column'
-        } as any,
-        cell: ({ getValue, row }) => {
-          const status = getValue() as Array<string>
-          return (
-            <div 
-              className="flex items-center justify-end gap-2 w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Status truncate={true} status={status[0]} />
-              <Tooltip tooltipText={`View all ${status.length} statuses`}>
-                <span
-                  className={cn(      
-                    'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onStatusClick(row.original)
-                  }}
-                >
-                  +{status.length > 0 ? status.length - 1 : ''}
-                </span>
-              </Tooltip>
-            </div>
-          )
-        },
-      },
-    ],
-    [isDark, onStatusClick, onTranscriptClick, onPlayAudio, currentPlayingRow, isPlaying],
-  )
+                    // Calculate third party cost as remainder (if LTR > total cost)
+                    const thirdPartyCost =
+                        ltr > totalCost
+                            ? Math.round((ltr - totalCost) * 100) / 100
+                            : 0
+
+                    // Display LTR (sum of all latestPayout for same callerId) in breakdown
+                    // Breakdown shows: ringbaCost + adCost + thirdPartyCost = LTR
+                    return (
+                        <LifetimeRevenueBreakdown
+                            totalCost={ltr}
+                            adCost={adCost}
+                            ringbaCost={ringbaCost}
+                            thirdPartyCost={thirdPartyCost}
+                        />
+                    )
+                },
+            },
+            {
+                header: 'CAMPAIGN',
+                accessorKey: 'campaign',
+                meta: {
+                    width: 180,
+                    align: 'center',
+                } as any,
+                cell: ({ getValue }) => (
+                    <Campaign campaign={getValue() as string} />
+                ),
+            },
+            {
+                header: 'ACTION',
+                accessorKey: 'action',
+                meta: { width: 120 },
+                cell: ({ row }) => {
+                    return (
+                        <div className="flex items-center gap-[5px]">
+                            {/* Play Button */}
+                            <Tooltip
+                                tooltipText={
+                                    currentPlayingRow === row.original.id &&
+                                    isPlaying
+                                        ? 'Pause Call Recording'
+                                        : 'Play Call Recording'
+                                }
+                            >
+                                <Button
+                                    variant="ghost"
+                                    className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        const audioUrl =
+                                            (row.original as any).audioUrl || ''
+                                        onPlayAudio(audioUrl, row.original.id)
+                                    }}
+                                >
+                                    {currentPlayingRow === row.original.id &&
+                                    isPlaying ? (
+                                        <PauseIcon />
+                                    ) : (
+                                        <PlayIcon />
+                                    )}
+                                </Button>
+                            </Tooltip>
+
+                            {/* Document/Transcript Button */}
+                            <Tooltip tooltipText="View Call Transcript">
+                                <Button
+                                    variant="ghost"
+                                    className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onTranscriptClick(row.original)
+                                    }}
+                                >
+                                    <DocumentIcon />
+                                </Button>
+                            </Tooltip>
+
+                            {/* Warning Button */}
+                            <Tooltip tooltipText="View Warning Details">
+                                <Button
+                                    variant="ghost"
+                                    className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <WarningIcon />
+                                </Button>
+                            </Tooltip>
+                        </div>
+                    )
+                },
+            },
+            {
+                header: 'STATUS',
+                accessorKey: 'status',
+                meta: {
+                    width: 200,
+                    className: 'status-column',
+                } as any,
+                cell: ({ getValue, row }) => {
+                    const status = getValue() as Array<string>
+                    const aiProcessed = row.original.ai_processed
+
+                    // Ensure status is an array and filter out empty/null values
+                    const statusArray = Array.isArray(status)
+                        ? status.filter((s) => s && s.trim() !== '')
+                        : []
+                    // Remove duplicates to ensure accurate count
+                    const uniqueStatus = Array.from(new Set(statusArray))
+                    const hasTags = uniqueStatus.length > 0
+                    const remainingCount = hasTags ? uniqueStatus.length - 1 : 0
+
+                    // If ai_processed is explicitly false, hide status
+                    // Otherwise, show tags if they exist
+                    if (aiProcessed === false) {
+                        return null
+                    }
+
+                    // If no tags, show nothing
+                    if (!hasTags) {
+                        return null
+                    }
+
+                    // Show tags (ai_processed is not false and tags exist)
+                    return (
+                        <div
+                            className="flex items-center justify-end gap-2 w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Status truncate={true} status={uniqueStatus[0]} />
+                            {remainingCount > 0 && (
+                                <Tooltip
+                                    tooltipText={`View all ${uniqueStatus.length} statuses`}
+                                >
+                                    <span
+                                        className={cn(
+                                            'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
+                                        )}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            onStatusClick(row.original)
+                                        }}
+                                    >
+                                        +{remainingCount}
+                                    </span>
+                                </Tooltip>
+                            )}
+                        </div>
+                    )
+                },
+            },
+        ],
+        [
+            isDark,
+            onStatusClick,
+            onTranscriptClick,
+            onPlayAudio,
+            currentPlayingRow,
+            isPlaying,
+        ]
+    )
 }

@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import Button from './Button'
 import { cn } from '@/lib'
 import { useThemeStore } from '@/store/themeStore'
-import { PlayIcon, PauseIcon } from '@/assets/svg'
-import Button from './Button'
+import { PauseIcon, PlayIcon } from '@/assets/svg'
 
 interface AudioPlayerProps {
     audioUrl: string
@@ -19,21 +19,21 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     onClose,
     onPlayPause,
     isPlaying: externalIsPlaying = false,
-    className
+    className,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
+
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    
+
     const audioRef = useRef<HTMLAudioElement>(null)
     const progressRef = useRef<HTMLDivElement>(null)
 
     // Use external isPlaying state if provided
-    const isPlaying = externalIsPlaying !== undefined ? externalIsPlaying : false
+    const isPlaying = externalIsPlaying
 
     // Format time to MM:SS
     const formatTime = (time: number): string => {
@@ -128,39 +128,47 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
     if (error) {
         return (
-            <div className={cn(
-                'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
-                'flex items-center justify-center px-[20px] py-[16px] rounded-lg',
-                isDark ? 'bg-red-900/20 text-red-400' : 'bg-red-50 text-red-600',
-                className
-            )}>
+            <div
+                className={cn(
+                    'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
+                    'flex items-center justify-center px-[20px] py-[16px] rounded-lg',
+                    isDark
+                        ? 'bg-red-900/20 text-red-400'
+                        : 'bg-red-50 text-red-600',
+                    className
+                )}
+            >
                 <span className="text-sm">{error}</span>
             </div>
         )
     }
 
     return (
-        <div className={cn(
-            'audio-player fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
-            'flex items-center gap-2.5 p-4 shadow-lg',
-            'w-[533px] h-[55px]',
-            'rounded-[50px] shadow-[0_24px_30px_0_rgba(0,0,0,0.10)]',
-            isDark ? 'bg-[#132F4C] border border-[#007FFF]' : 'bg-[#F5F8FA] border border-[#1B456F]',
-            className
-        )}>
+        <div
+            className={cn(
+                'audio-player fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
+                'flex items-center gap-2.5 p-4 shadow-lg',
+                'w-[533px] h-[55px]',
+                'rounded-[50px] shadow-[0_24px_30px_0_rgba(0,0,0,0.10)]',
+                isDark
+                    ? 'bg-[#132F4C] border border-[#007FFF]'
+                    : 'bg-[#F5F8FA] border border-[#1B456F]',
+                className
+            )}
+        >
             {/* Hidden Audio Element */}
             <audio ref={audioRef} src={audioUrl} preload="metadata" />
-            
+
             {/* Play/Pause Button */}
             <div className="flex items-center gap-2.5">
                 <Button
                     onClick={togglePlayPause}
                     disabled={isLoading}
-                    variant='ghost'
+                    variant="ghost"
                     className={cn(
                         'p-0 h-6 w-6 flex items-center justify-center rounded-lg',
-                        isDark 
-                            ? 'border-[#0254a5] hover:border-transparent' 
+                        isDark
+                            ? 'border-[#0254a5] hover:border-transparent'
                             : 'border-[#e0e0e0] hover:border-transparent',
                         isLoading && 'opacity-50 cursor-not-allowed'
                     )}
@@ -173,18 +181,20 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                         <PlayIcon />
                     )}
                 </Button>
-                
+
                 {/* Current Time */}
-                <span className={cn(
-                    'text-sm font-medium',
-                    isDark ? 'text-[#F5F8FA]' : 'text-gray-900'
-                )}>
+                <span
+                    className={cn(
+                        'text-sm font-medium',
+                        isDark ? 'text-[#F5F8FA]' : 'text-gray-900'
+                    )}
+                >
                     {formatTime(currentTime)}
                 </span>
             </div>
 
             {/* Progress Bar */}
-            <div 
+            <div
                 ref={progressRef}
                 onClick={handleProgressClick}
                 className={cn(
@@ -192,23 +202,25 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                     'bg-[#363636]'
                 )}
             >
-                <div 
+                <div
                     className={cn(
                         'h-full rounded-lg transition-all duration-75 ease-out',
                         'bg-[#007FFF]'
                     )}
-                    style={{ 
+                    style={{
                         width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
-                        transition: 'width 0.1s ease-out'
+                        transition: 'width 0.1s ease-out',
                     }}
                 />
             </div>
 
             {/* Total Duration */}
-            <span className={cn(
-                'text-sm font-medium',
-                isDark ? 'text-[#F5F8FA]' : 'text-gray-900'
-            )}>
+            <span
+                className={cn(
+                    'text-sm font-medium',
+                    isDark ? 'text-[#F5F8FA]' : 'text-gray-900'
+                )}
+            >
                 {formatTime(duration)}
             </span>
 
@@ -217,13 +229,13 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 <button
                     onClick={onClose}
                     className={cn(
-                        'w-6 h-6 rounded-full flex items-center justify-center transition-colors',
+                        'w-6 h-6 rounded-full flex items-center justify-center transition-colors'
                     )}
                 >
-                    <svg 
-                        width="10" 
-                        height="10" 
-                        viewBox="0 0 10 10" 
+                    <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
                         fill="none"
                         className={cn(
                             'stroke-2',
