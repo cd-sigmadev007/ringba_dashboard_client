@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button'
 import { Tabs } from '@/components/ui/Tabs'
 import { UserRole } from '@/types/auth'
 import { usePermissions } from '@/hooks/usePermissions'
+import { AuthDebugPanel } from '@/components/debug/AuthDebugPanel'
 
 export default function DashboardPage() {
     const { role, isAuthenticated, isLoading } = usePermissions()
@@ -55,6 +56,12 @@ export default function DashboardPage() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
+            {/* Debug Panel - Remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="mb-4">
+                    <AuthDebugPanel />
+                </div>
+            )}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                     Dashboard

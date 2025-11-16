@@ -121,12 +121,39 @@ const errorInterceptor = async (error: any) => {
     ) {
         originalRequest._retry = true
 
+        console.error('🔒 Authentication failed:', {
+            url: originalRequest.url,
+            status: error.response?.status,
+            message: error.response?.data?.message || 'Unauthorized',
+        })
+
         // Auth0 will handle redirect via useAuth0 hook
         // Just reject the error
         return Promise.reject(error)
     }
 
-    // Handle other errors - simplified for now
+    // Handle 403 Forbidden
+    if (error.response?.status === HTTP_STATUS.FORBIDDEN) {
+        console.error('🚫 Access forbidden:', {
+            url: originalRequest.url,
+            message: error.response?.data?.message || 'Forbidden',
+        })
+    }
+
+    // Handle other errors
+    if (error.response) {
+        console.error('❌ API Error:', {
+            url: originalRequest.url,
+            status: error.response.status,
+            message: error.response.data?.message || 'Request failed',
+        })
+    } else if (error.request) {
+        console.error('🌐 Network Error:', {
+            url: originalRequest.url,
+            message: 'No response received from server',
+        })
+    }
+
     return Promise.reject(error)
 }
 
@@ -151,9 +178,38 @@ const createApiInstance = (): AxiosInstance => {
 // API Client Class
 export class ApiClient {
     private instance: AxiosInstance
+    private authInitialized = false
 
     constructor() {
         this.instance = createApiInstance()
+    }
+
+    /**
+     * Initialize authentication interceptor
+     * Must be called after Auth0Provider is mounted
+     * @param getAccessToken Function to get Auth0 access token
+     */
+    initializeAuth(getAccessToken: () => Promise<string | undefined>): void {
+        if (this.authInitialized) {
+            console.warn('ApiClient auth already initialized')
+            return
+        }
+
+        // Remove default request interceptor
+        this.instance.interceptors.request.clear()
+
+        // Add auth interceptor
+        const authInterceptor = createAuthInterceptor(getAccessToken)
+        this.instance.interceptors.request.use(authInterceptor)
+
+        // Add response interceptor
+        this.instance.interceptors.response.use(
+            responseInterceptor,
+            errorInterceptor
+        )
+
+        this.authInitialized = true
+        console.log('✅ ApiClient authentication initialized')
     }
 
     // Generic GET request

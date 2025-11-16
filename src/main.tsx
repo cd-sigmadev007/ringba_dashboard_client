@@ -20,6 +20,7 @@ import reportWebVitals from './reportWebVitals.ts'
 
 import RootLayout from './layout/Index.tsx'
 import CallbackRoute from './routes/callback.tsx'
+import { ApiClientSetup } from './services/api/setupApiClient'
 
 // Initialize theme on app startup
 const savedTheme = localStorage.getItem('theme') || 'dark'
@@ -96,9 +97,11 @@ if (rootElement && !rootElement.innerHTML) {
                 <TanStackQueryProvider.Provider
                     {...TanStackQueryProviderContext}
                 >
-                    <PreloadProviders>
-                        <RouterProvider router={router} />
-                    </PreloadProviders>
+                    <ApiClientSetup>
+                        <PreloadProviders>
+                            <RouterProvider router={router} />
+                        </PreloadProviders>
+                    </ApiClientSetup>
                 </TanStackQueryProvider.Provider>
             </Auth0Provider>
         </StrictMode>
