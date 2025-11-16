@@ -13,6 +13,8 @@ import DashboardRoute from './routes/dashboard.tsx'
 import { useCampaignStore } from './modules/org/store/campaignStore'
 import OrganizationRoute from './routes/organization.tsx'
 import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
+import CreateCampaignRoute from './routes/createCampaign.tsx'
+import EditCampaignRoute from './routes/editCampaign.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -40,6 +42,8 @@ const routeTree = rootRoute.addChildren([
     CallbackRoute(rootRoute),
     OrganizationRoute(rootRoute),
     OrganizationCampaignsRoute(rootRoute),
+    CreateCampaignRoute(rootRoute),
+    EditCampaignRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()

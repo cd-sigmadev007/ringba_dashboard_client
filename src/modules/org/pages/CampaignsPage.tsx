@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import clsx from 'clsx'
-import CreateCampaignModal from '../components/CreateCampaignModal'
+import { useNavigate } from '@tanstack/react-router'
 import { useCampaignStore } from '../store/campaignStore'
 import { Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
@@ -16,19 +16,22 @@ interface CampaignRow {
 }
 
 const CampaignsPage: React.FC = () => {
+    const navigate = useNavigate()
     const { campaigns, loading, fetchCampaigns, deleteCampaign } =
         useCampaignStore()
     const { isAuthenticated, isLoading: authLoading } = usePermissions()
-    const [openCreate, setOpenCreate] = React.useState(false)
-    const [editRow, setEditRow] = React.useState<CampaignRow | null>(null)
     const [deleteRow, setDeleteRow] = React.useState<CampaignRow | null>(null)
     const [deleting, setDeleting] = React.useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
     const handleEdit = useCallback((row: CampaignRow) => {
-        setEditRow(row)
-    }, [])
+        navigate({ to: `/organization/campaigns/${row.id}` })
+    }, [navigate])
+
+    const handleCreate = useCallback(() => {
+        navigate({ to: '/organization/campaigns/new' })
+    }, [navigate])
 
     const handleDelete = useCallback((row: CampaignRow) => {
         setDeleteRow(row)
@@ -158,7 +161,7 @@ const CampaignsPage: React.FC = () => {
                 <Button
                     id="open-create-campaign"
                     variant="secondary"
-                    onClick={() => setOpenCreate(true)}
+                    onClick={handleCreate}
                 >
                     Create Campaign
                 </Button>
@@ -172,15 +175,6 @@ const CampaignsPage: React.FC = () => {
                     className={clsx(theme === 'dark' ? 'dark' : '')}
                 />
             </div>
-            <CreateCampaignModal
-                open={openCreate}
-                onClose={() => setOpenCreate(false)}
-            />
-            <CreateCampaignModal
-                open={!!editRow}
-                onClose={() => setEditRow(null)}
-                campaign={editRow as any}
-            />
             <Modal
                 open={!!deleteRow}
                 onClose={() => !deleting && setDeleteRow(null)}
