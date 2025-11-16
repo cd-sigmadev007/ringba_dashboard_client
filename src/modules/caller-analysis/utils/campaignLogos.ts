@@ -14,7 +14,8 @@ export interface CampaignLogo {
 const getApiBaseUrl = (): string => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
     // Remove trailing /api if present since logo URLs already include /uploads
-    return baseUrl.replace(/\/api$/, '')
+    // Also remove trailing slashes to prevent double slashes
+    return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
 }
 
 // Helper to convert relative logo URL to absolute URL

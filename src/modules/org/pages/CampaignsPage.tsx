@@ -36,7 +36,8 @@ const CampaignsPage: React.FC = () => {
         const baseUrl =
             (import.meta as any).env?.VITE_API_BASE_URL ||
             'http://localhost:3001'
-        return baseUrl.replace(/\/api$/, '')
+        // Remove trailing /api if present and remove trailing slashes
+        return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
     }
     const toAbsoluteLogoUrl = (logoUrl?: string | null) => {
         if (!logoUrl) return ''
