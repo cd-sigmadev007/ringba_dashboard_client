@@ -21,6 +21,7 @@ interface FilterSelectProps {
     setFilter?: (value: string | Array<string>) => void
     multiple?: boolean
     selectedValues?: Array<string>
+    error?: boolean
 }
 
 /**
@@ -34,6 +35,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     setFilter = () => undefined,
     multiple = false,
     selectedValues = [],
+    error = false,
 }) => {
     const [openSelect, setOpenSelect] = useState(false)
     const [selected, setSelected] = useState<SelectOption>(defaultValue)
@@ -115,7 +117,10 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
     const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
-    const triggerBorderClosed = 'border-transparent'
+    const triggerBorderClosed = error
+        ? 'border-[#F64E60]'
+        : 'border-transparent'
+    const triggerBorderError = error ? 'border-[#F64E60]' : ''
     const triggerHover = isDark
         ? 'hover:border-[#007FFF]'
         : 'hover:border-[#007FFF]'
@@ -160,17 +165,14 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                     }}
                 >
                     {/* Checkbox indicator for all items */}
-                    <div className="flex items-center justify-center w-5 h-5">
-                        <CheckboxIcon
-                            checked={
-                                multiple
-                                    ? multiSelected.includes(item.value)
-                                    : isEqual(item.value, selected.value)
-                            }
-                            isDark={isDark}
-                        />
-                    </div>
-
+                    {multiple && (
+                        <div className="flex items-center justify-center w-5 h-5">
+                            <CheckboxIcon
+                                checked={multiSelected.includes(item.value)}
+                                isDark={isDark}
+                            />
+                        </div>
+                    )}
                     {item.icon && (
                         <img
                             src={item.icon}
@@ -198,8 +200,12 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                         'h-10 cursor-pointer w-full flex gap-x-2.5 justify-between items-center py-[9px] text-xs px-[16px] rounded-[7px] border transition-all duration-200',
                         triggerBg,
                         triggerText,
-                        openSelect ? triggerBorderOpen : triggerBorderClosed,
-                        triggerHover,
+                        openSelect
+                            ? error
+                                ? triggerBorderError
+                                : triggerBorderOpen
+                            : triggerBorderClosed,
+                        !error && triggerHover,
                         className
                     )
                 )}

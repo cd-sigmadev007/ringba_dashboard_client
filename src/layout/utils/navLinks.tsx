@@ -8,4 +8,11 @@ export const navLinks = [
         disable: false,
         icon: <CallerAnalysisIcon />,
     },
+    {
+        id: 99887766,
+        title: 'Organization',
+        path: '/organization/profile',
+        disable: false,
+        icon: <CallerAnalysisIcon />, // TODO: replace with Org icon asset when available
+    },
 ]
