@@ -2,8 +2,18 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 // API Configuration
+// Normalize base URL: remove trailing slash and ensure it doesn't include /api
+const normalizeBaseUrl = (url: string): string => {
+    if (!url) return 'http://localhost:3001'
+    // Remove trailing slash
+    let normalized = url.replace(/\/+$/, '')
+    // Remove /api suffix if present (routes already include /api)
+    normalized = normalized.replace(/\/api$/, '')
+    return normalized
+}
+
 const API_CONFIG = {
-    BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001',
+    BASE_URL: normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'),
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000,
