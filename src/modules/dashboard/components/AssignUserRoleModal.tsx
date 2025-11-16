@@ -38,9 +38,7 @@ export default function AssignUserRoleModal({
     }, [user, isOpen])
 
     useEffect(() => {
-        if (selectedRole === 'super_admin') {
-            setSelectedOrgId(null)
-        } else if (!selectedOrgId && user?.org_id) {
+        if (!selectedOrgId && user?.org_id) {
             setSelectedOrgId(user.org_id)
         }
     }, [selectedRole, user])
@@ -50,11 +48,6 @@ export default function AssignUserRoleModal({
         setError(null)
 
         if (!user) return
-
-        if (selectedRole === 'super_admin' && selectedOrgId !== null) {
-            setError('Super admin must not have an organization')
-            return
-        }
 
         if (
             (selectedRole === 'org_admin' || selectedRole === 'user') &&

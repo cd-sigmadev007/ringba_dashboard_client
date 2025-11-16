@@ -7,12 +7,8 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { useEffect, useState } from 'react'
 
 export function AuthDebugPanel() {
-    const {
-        isAuthenticated,
-        user,
-        getIdTokenClaims,
-        getAccessTokenSilently,
-    } = useAuth0()
+    const { isAuthenticated, user, getIdTokenClaims, getAccessTokenSilently } =
+        useAuth0()
     const [idTokenClaims, setIdTokenClaims] = useState<any>(null)
     const [accessTokenClaims, setAccessTokenClaims] = useState<any>(null)
     const [error, setError] = useState<string | null>(null)

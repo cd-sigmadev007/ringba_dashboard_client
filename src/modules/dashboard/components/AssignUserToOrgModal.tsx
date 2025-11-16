@@ -39,11 +39,6 @@ export default function AssignUserToOrgModal({
 
         if (!user) return
 
-        if (user.role === 'super_admin') {
-            setError('Super admin cannot be assigned to an organization')
-            return
-        }
-
         if (selectedOrgId === null) {
             setError(
                 'Cannot remove organization from org_admin or user. Change role first.'
@@ -97,12 +92,6 @@ export default function AssignUserToOrgModal({
                             Current Role:{' '}
                             <span className="font-normal">{user.role}</span>
                         </label>
-                        {user.role === 'super_admin' && (
-                            <p className="text-sm text-yellow-600 dark:text-yellow-400 mb-4">
-                                Note: Super admins cannot be assigned to
-                                organizations
-                            </p>
-                        )}
                     </div>
 
                     <div>
@@ -125,11 +114,10 @@ export default function AssignUserToOrgModal({
                                 }
                                 disabled={
                                     assignMutation.isPending ||
-                                    user.role === 'super_admin' ||
                                     organizations.length === 0
                                 }
                                 className="w-full px-[15px] py-[10px] rounded-[7px] border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-0 focus:border-[#007FFF] disabled:opacity-50 disabled:cursor-not-allowed"
-                                required={user.role !== 'super_admin'}
+                                required
                             >
                                 <option value="">
                                     {organizations.length === 0
@@ -164,9 +152,7 @@ export default function AssignUserToOrgModal({
                         <button
                             type="submit"
                             disabled={
-                                assignMutation.isPending ||
-                                user.role === 'super_admin' ||
-                                !selectedOrgId
+                                assignMutation.isPending || !selectedOrgId
                             }
                             className="text-[#F5F8FA] bg-[#007FFF] hover:bg-[#0254A5] active:bg-[#0254A5] py-[9px] px-[15px] rounded-[7px] transition-all duration-300 ease-in-out text-[14px] leading-5 cursor-pointer disabled:cursor-default disabled:opacity-50 disabled:!bg-[#E0E0E0] disabled:text-[#7E8299]"
                         >
