@@ -84,7 +84,7 @@ export async function assignUserToOrg(
 ): Promise<ApiResponse<User>> {
     return apiClient.patch<ApiResponse<User>>(
         `/api/admin/users/${userId}/assign-org`,
-        { org_id: orgId }
+        { org_id: orgId || null }
     )
 }
 
