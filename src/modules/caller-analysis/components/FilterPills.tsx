@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import Button from '../../../components/ui/Button'
 import CrossIcon from '../../../assets/svg/CrossIcon'
-import { campaignOptions, statusOptions } from '../constants/filterOptions'
+import { statusOptions, useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { DurationRange } from '../../../components/ui/DurationRangeFilter'
 
@@ -26,6 +26,7 @@ export const FilterPills: React.FC<FilterPillsProps> = ({
     filters,
     onRemoveFilter,
 }) => {
+    const campaignOptions = useCampaignOptions()
     const formatDurationRange = (range: DurationRange) => {
         if (range.min !== undefined && range.max !== undefined) {
             return `${range.min}s - ${range.max}s`

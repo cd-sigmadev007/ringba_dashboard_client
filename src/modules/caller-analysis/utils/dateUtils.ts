@@ -28,9 +28,25 @@ export function parseLastCallDateAndTime(lastCall: string | null | undefined): {
         // Remove " ET" suffix and parse
         const cleanLastCall = lastCall.replace(/\s+ET$/, '').trim()
 
+        // Check if the string contains a 4-digit year (YYYY)
+        const hasYear = /\b(19|20)\d{2}\b/.test(cleanLastCall)
+        const currentYear = new Date().getFullYear()
+
+        // If no year is present, add current year before parsing
+        let dateToParse = cleanLastCall
+        if (!hasYear) {
+            // Insert year after the date part (e.g., "Nov 15, 10:21:06 PM" -> "Nov 15, 2025, 10:21:06 PM")
+            const parts = cleanLastCall.split(',')
+            if (parts.length >= 2) {
+                const datePart = parts[0].trim() // "Nov 15"
+                const rest = parts.slice(1).join(',').trim() // "10:21:06 PM"
+                dateToParse = `${datePart}, ${currentYear}, ${rest}`
+            }
+        }
+
         // Try parsing with dayjs (handles various formats)
         parsedDate = dayjs(
-            cleanLastCall,
+            dateToParse,
             [
                 'MMM DD, YYYY, hh:mm:ss A',
                 'MMM DD, hh:mm:ss A',
@@ -56,8 +72,7 @@ export function parseLastCallDateAndTime(lastCall: string | null | undefined): {
                 const datePart = parts[0].trim() // "Oct 30" or "Nov 07"
                 const timePart = parts[parts.length - 1].trim() // "10:21:06 PM"
 
-                // Try to parse date part with current year
-                const currentYear = new Date().getFullYear()
+                // Try to parse date part with current year (reuse variable from upper scope)
                 const dateWithYear = `${datePart}, ${currentYear}`
                 parsedDate = dayjs(dateWithYear, 'MMM DD, YYYY', true)
 

@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useState } from 'react'
+import { Input } from './Input'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'
@@ -51,7 +52,7 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
     const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
     // Color definitions matching FilterSelect
-    const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
+    const triggerBg = isDark ? 'bg-[#002B57]' : 'bg-white'
     const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
     const triggerBorderClosed = 'border-transparent'
@@ -156,8 +157,8 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                                     inputBg
                                 )}
                             >
-                                <input
-                                    type="number"
+                                <Input
+                                    inputSize="sm"
                                     placeholder="0s"
                                     value={tempRange.min ?? ''}
                                     onChange={handleMinChange}
@@ -183,7 +184,7 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
                                     inputBg
                                 )}
                             >
-                                <input
+                                <Input
                                     type="number"
                                     placeholder="3600s"
                                     value={tempRange.max ?? ''}

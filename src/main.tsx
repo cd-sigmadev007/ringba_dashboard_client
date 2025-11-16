@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
     RouterProvider,
@@ -10,7 +10,9 @@ import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
 import DashboardRoute from './routes/dashboard.tsx'
+import { useCampaignStore } from './modules/org/store/campaignStore'
 import OrganizationRoute from './routes/organization.tsx'
+import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -36,6 +38,7 @@ const routeTree = rootRoute.addChildren([
     ApiDemo(rootRoute),
     CallbackRoute(rootRoute),
     OrganizationRoute(rootRoute),
+    OrganizationCampaignsRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
@@ -49,6 +52,14 @@ const router = createRouter({
     defaultStructuralSharing: true,
     defaultPreloadStaleTime: 0,
 })
+
+function PreloadProviders({ children }: { children: React.ReactNode }) {
+    const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns)
+    React.useEffect(() => {
+        fetchCampaigns()
+    }, [fetchCampaigns])
+    return <>{children}</>
+}
 
 declare module '@tanstack/react-router' {
     interface Register {
@@ -85,7 +96,9 @@ if (rootElement && !rootElement.innerHTML) {
                 <TanStackQueryProvider.Provider
                     {...TanStackQueryProviderContext}
                 >
-                    <RouterProvider router={router} />
+                    <PreloadProviders>
+                        <RouterProvider router={router} />
+                    </PreloadProviders>
                 </TanStackQueryProvider.Provider>
             </Auth0Provider>
         </StrictMode>

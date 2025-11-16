@@ -1,11 +1,14 @@
 import type { SelectOption } from '@/components/ui/FilterSelect.tsx'
+import { useCampaignStore } from '@/modules/org/store/campaignStore'
 
-// Campaign filter options - using campaign IDs directly
-export const campaignOptions: Array<SelectOption> = [
-    { title: 'Medicare', value: '111' },
-    { title: 'Appliance Repair', value: 'CA56446512fe4e4926a05e76574a7d6963' },
-    { title: 'Pest Control', value: '000' },
-]
+// Dynamic campaign options from store
+export function useCampaignOptions(): Array<SelectOption> {
+    const campaigns = useCampaignStore((s) => s.campaigns)
+    return campaigns.map((c) => ({
+        title: c.name,
+        value: c.campaign_id || c.id,
+    }))
+}
 
 // Status filter options
 export const statusOptions: Array<SelectOption> = [

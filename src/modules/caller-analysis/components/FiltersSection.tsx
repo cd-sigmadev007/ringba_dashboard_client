@@ -5,7 +5,7 @@ import {
     TimeFilter,
 } from '../../../components/ui'
 import { Search } from '../../../components/common'
-import { campaignOptions } from '../constants/filterOptions'
+import { useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { SelectOption } from '@/components/ui/FilterSelect'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
@@ -27,6 +27,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
 }) => {
     const [statusOptions, setStatusOptions] = useState<Array<SelectOption>>([])
     const [isLoadingTags, setIsLoadingTags] = useState(true)
+    const campaignOptions = useCampaignOptions()
 
     // Fetch tags from database on component mount
     useEffect(() => {

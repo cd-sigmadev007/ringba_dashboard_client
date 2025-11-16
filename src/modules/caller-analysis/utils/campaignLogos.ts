@@ -3,37 +3,45 @@
  * Maps campaign IDs and names to their corresponding logo images
  */
 
-import applianceImg from '../../../assets/png/appliance.png'
-import medicareImg from '../../../assets/png/medicare.png'
-import pestImg from '../../../assets/png/pest.png'
+import { useCampaignStore } from '@/modules/org/store/campaignStore'
 
 export interface CampaignLogo {
     image: string
     name: string
 }
 
-/**
- * Campaign logo mapping configuration
- * Maps campaign IDs to their corresponding logo images
- */
-const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
-    // Appliance Repair
-    CA56446512fe4e4926a05e76574a7d6963: {
-        image: applianceImg,
-        name: 'Appliance Repair',
-    },
+// Get API base URL for constructing full logo URLs
+const getApiBaseUrl = (): string => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+    // Remove trailing /api if present since logo URLs already include /uploads
+    return baseUrl.replace(/\/api$/, '')
+}
 
-    // Medicare
-    '111': {
-        image: medicareImg,
-        name: 'Medicare',
-    },
+// Helper to convert relative logo URL to absolute URL
+const getAbsoluteLogoUrl = (logoUrl: string | null | undefined): string => {
+    if (!logoUrl) return ''
+    // If already absolute URL, return as-is
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+        return logoUrl
+    }
+    // Prepend API base URL to relative path
+    const apiBase = getApiBaseUrl()
+    // Ensure logoUrl starts with /
+    const path = logoUrl.startsWith('/') ? logoUrl : `/${logoUrl}`
+    return `${apiBase}${path}`
+}
 
-    // Pest Control
-    '000': {
-        image: pestImg,
-        name: 'Pest Control',
-    },
+// Dynamic lookup from campaign store instead of hardcoded map
+function findCampaignById(id: string | null | undefined) {
+    if (!id) return null
+    const campaigns = useCampaignStore.getState().campaigns
+    // match by campaign_id first, fallback to primary id
+    return (
+        campaigns.find(
+            (c) =>
+                (c.campaign_id && c.campaign_id === id) || (c.id && c.id === id)
+        ) || null
+    )
 }
 
 /**
@@ -44,12 +52,13 @@ const CAMPAIGN_LOGO_MAP: Record<string, CampaignLogo> = {
 export function getCampaignLogo(
     campaignId: string | null | undefined
 ): CampaignLogo | null {
-    if (!campaignId || typeof campaignId !== 'string') {
-        return null
+    if (!campaignId || typeof campaignId !== 'string') return null
+    const c = findCampaignById(campaignId)
+    if (!c || !c.logo_url) return null
+    return {
+        image: getAbsoluteLogoUrl(c.logo_url),
+        name: c.name,
     }
-
-    // Direct ID lookup
-    return CAMPAIGN_LOGO_MAP[campaignId]
 }
 
 /**
@@ -67,43 +76,18 @@ export function getCampaignLogos(
 
     const logos: Array<CampaignLogo> = []
     const trimmedCampaign = campaign.trim()
-
-    // First, try exact match for single campaign ID
-    if (trimmedCampaign in CAMPAIGN_LOGO_MAP) {
-        return [CAMPAIGN_LOGO_MAP[trimmedCampaign]]
-    }
-
-    // Split by common separators (comma, space, pipe) and check each part
     const parts = trimmedCampaign
         .split(/[,\s|]+/)
         .map((part) => part.trim())
         .filter((part) => part.length > 0)
 
-    // Check each part for exact ID matches
     for (const part of parts) {
-        if (part in CAMPAIGN_LOGO_MAP) {
-            const logo = CAMPAIGN_LOGO_MAP[part]
-            if (!logos.find((l) => l.name === logo.name)) {
-                logos.push(logo)
-            }
-        }
-    }
-
-    // If no exact matches found in parts, check if campaign string contains any IDs
-    // This handles cases where IDs might be embedded in text
-    if (logos.length === 0) {
-        for (const [campaignId, logo] of Object.entries(CAMPAIGN_LOGO_MAP)) {
-            // Use regex to match ID as whole value (not part of larger number)
-            // Match ID at start/end of string, or surrounded by non-digit characters
-            const idPattern = campaignId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-            const idRegex = new RegExp(`(^|[^0-9])${idPattern}([^0-9]|$)`, 'i')
-
-            if (
-                idRegex.test(trimmedCampaign) &&
-                !logos.find((l) => l.name === logo.name)
-            ) {
-                logos.push(logo)
-            }
+        const c = findCampaignById(part)
+        if (c && c.logo_url && !logos.find((l) => l.name === c.name)) {
+            logos.push({
+                image: getAbsoluteLogoUrl(c.logo_url),
+                name: c.name,
+            })
         }
     }
 

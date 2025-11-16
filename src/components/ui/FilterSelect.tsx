@@ -108,13 +108,16 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         return selected.title
     }
 
+    // isDark
+    // ? 'bg-[#002B57] text-[#A1A5B7] border-transparent hover:!border-transparent focus:!border-transparent'
+    // : 'bg-white text-[#3F4254] border-[#ECECEC] hover:!border-[#ECECEC] focus:!border-[#ECECEC]'
     /**
      * Helpers – colour classes based on current theme.
      */
     const isDark = theme === 'dark'
 
     // Main trigger styles
-    const triggerBg = isDark ? 'bg-[#001E3C]' : 'bg-white'
+    const triggerBg = isDark ? 'bg-[#002B57]' : 'bg-white'
     const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const triggerBorderOpen = isDark ? 'border-[#007FFF]' : 'border-[#007FFF]'
     const triggerBorderClosed = error

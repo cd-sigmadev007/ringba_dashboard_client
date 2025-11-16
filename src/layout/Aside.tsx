@@ -1,47 +1,146 @@
-import React, { useEffect } from 'react'
-import { Link } from '@tanstack/react-router'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from '@tanstack/react-router'
 import { get, map } from 'lodash'
 import clsx from 'clsx'
 import { Tooltip } from '../components/common'
+import type { NavLinkItem } from '@/layout/utils/navLinks'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import ThemeSwitcher from '@/layout/utils/theme-switcher'
 import { navLinks } from '@/layout/utils/navLinks'
-
-interface NavLinkItem {
-    id?: string
-    title?: string
-    path?: string
-    icon?: React.ReactNode
-    disable?: boolean
-}
+import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'
 
 interface NavItemProps {
     navItem: NavLinkItem
     setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>
+    expandedItems: Set<string | number>
+    toggleExpanded: (id: string | number) => void
 }
 
-const NavItem: React.FC<NavItemProps> = ({ navItem, setOpenMenu }) => {
-    return get(navItem, 'disable') ? (
-        <Tooltip id={get(navItem, 'id', '')} tooltipText="Coming soon">
-            <button
-                className={clsx('sidebar-item group cursor-pointer w-full')}
-                disabled
+const NavItem: React.FC<NavItemProps> = ({
+    navItem,
+    setOpenMenu,
+    expandedItems,
+    toggleExpanded,
+}) => {
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
+    const location = useLocation()
+    const hasSubmenu = navItem.submenu && navItem.submenu.length > 0
+    const isExpanded = expandedItems.has(navItem.id)
+    const isActive =
+        navItem.submenu?.some((item) => location.pathname === item.path) ||
+        false
+
+    if (get(navItem, 'disable')) {
+        return (
+            <Tooltip
+                id={String(get(navItem, 'id', ''))}
+                tooltipText="Coming soon"
+            >
+                <button
+                    className={clsx('sidebar-item group cursor-pointer w-full')}
+                    disabled
+                >
+                    <span>{get(navItem, 'icon')}</span>
+                    <span>{get(navItem, 'title', '')}</span>
+                </button>
+            </Tooltip>
+        )
+    }
+
+    if (hasSubmenu) {
+        return (
+            <li className="w-full">
+                <Button
+                    variant="secondary"
+                    onClick={() => toggleExpanded(navItem.id)}
+                    className={clsx(
+                        'sidebar-item bg-transparent group w-full justify-between',
+                        isActive && 'sidebar-item-active'
+                    )}
+                >
+                    <div className="flex items-center gap-2.5">
+                        <span>{get(navItem, 'icon')}</span>
+                        <span>{get(navItem, 'title', '')}</span>
+                    </div>
+                    {isDark ? (
+                        <ChevronDownDark
+                            className={clsx(
+                                'transition-transform duration-200',
+                                isExpanded && 'rotate-180'
+                            )}
+                        />
+                    ) : (
+                        <ChevronDownLight
+                            className={clsx(
+                                'transition-transform duration-200',
+                                isExpanded && 'rotate-180'
+                            )}
+                        />
+                    )}
+                </Button>
+                {isExpanded && (
+                    <ul className="ml-4 mt-[14px] flex flex-col gap-y-[14px]">
+                        {navItem.submenu?.map((subItem) => {
+                            const isSubActive =
+                                location.pathname === subItem.path
+                            return get(subItem, 'disable') ? (
+                                <Tooltip
+                                    key={subItem.id}
+                                    id={String(subItem.id)}
+                                    tooltipText="Coming soon"
+                                >
+                                    <Button
+                                        className={clsx(
+                                            'sidebar-item group cursor-pointer w-full text-sm pl-8 bg-transparent',
+                                            'opacity-50 cursor-not-allowed'
+                                        )}
+                                        disabled
+                                    >
+                                        <span>{subItem.title}</span>
+                                    </Button>
+                                </Tooltip>
+                            ) : (
+                                <li key={subItem.id} className="w-full">
+                                    <Link
+                                        to={subItem.path}
+                                        className={clsx(
+                                            'sidebar-item group text-sm pl-8',
+                                            isSubActive &&
+                                                'sidebar-item-active sidebar-subitem-active'
+                                        )}
+                                        activeProps={{
+                                            className:
+                                                'sidebar-item-active sidebar-subitem-active group is-active',
+                                        }}
+                                        onClick={() => setOpenMenu(false)}
+                                    >
+                                        <span>{subItem.title}</span>
+                                    </Link>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                )}
+            </li>
+        )
+    }
+
+    return (
+        <li>
+            <Link
+                to={get(navItem, 'path', '/')}
+                className="sidebar-item group"
+                activeProps={{
+                    className: 'sidebar-item-active group is-active',
+                }}
+                onClick={() => setOpenMenu(false)}
             >
                 <span>{get(navItem, 'icon')}</span>
                 <span>{get(navItem, 'title', '')}</span>
-            </button>
-        </Tooltip>
-    ) : (
-        <Link
-            to={get(navItem, 'path', '/')}
-            className="sidebar-item group"
-            activeProps={{ className: 'sidebar-item-active group is-active' }}
-            onClick={() => setOpenMenu(false)}
-        >
-            <span>{get(navItem, 'icon')}</span>
-            <span>{get(navItem, 'title', '')}</span>
-        </Link>
+            </Link>
+        </li>
     )
 }
 
@@ -53,10 +152,33 @@ interface IndexProps {
 const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const location = useLocation()
+    const [expandedItems, setExpandedItems] = useState<Set<string | number>>(
+        new Set()
+    )
 
     useEffect(() => {
         document.body.style.overflowY = openMenu ? 'hidden' : 'auto'
     }, [openMenu])
+
+    // Auto-expand Organization menu if on any org route
+    useEffect(() => {
+        if (location.pathname.startsWith('/organization')) {
+            setExpandedItems((prev) => new Set(prev).add(99887766))
+        }
+    }, [location.pathname])
+
+    const toggleExpanded = (id: string | number) => {
+        setExpandedItems((prev) => {
+            const newSet = new Set(prev)
+            if (newSet.has(id)) {
+                newSet.delete(id)
+            } else {
+                newSet.add(id)
+            }
+            return newSet
+        })
+    }
 
     // ✅ Define navigatesignup
     const navigatesignup = () => {
@@ -75,11 +197,13 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
             )}
         >
             <ul className="flex flex-col gap-y-2.5 sidebar-item-list">
-                {map(navLinks, (navItem: NavLinkItem, index: number) => (
+                {map(navLinks, (navItem: NavLinkItem) => (
                     <NavItem
-                        key={index}
+                        key={navItem.id}
                         navItem={navItem}
                         setOpenMenu={setOpenMenu}
+                        expandedItems={expandedItems}
+                        toggleExpanded={toggleExpanded}
                     />
                 ))}
             </ul>
