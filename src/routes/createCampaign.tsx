@@ -8,4 +8,3 @@ export default (parentRoute: RootRoute) =>
         component: CreateEditCampaignPage,
         getParentRoute: () => parentRoute,
     })
-

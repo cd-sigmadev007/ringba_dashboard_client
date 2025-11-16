@@ -80,9 +80,15 @@ export const createAuthInterceptor = (
                     ...config.headers,
                     Authorization: `Bearer ${token}`,
                 }
+            } else {
+                console.warn(
+                    'No access token available for request:',
+                    config.url
+                )
             }
         } catch (error) {
             console.error('Failed to get access token:', error)
+            // Don't block the request, but log the error
         }
 
         // Add request timestamp
@@ -185,6 +191,13 @@ export class ApiClient {
     }
 
     /**
+     * Check if authentication is initialized
+     */
+    isAuthInitialized(): boolean {
+        return this.authInitialized
+    }
+
+    /**
      * Initialize authentication interceptor
      * Must be called after Auth0Provider is mounted
      * @param getAccessToken Function to get Auth0 access token
@@ -215,10 +228,23 @@ export class ApiClient {
     // Generic GET request
     async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
         try {
+            if (!this.authInitialized) {
+                console.warn(
+                    'ApiClient: Making request before auth is initialized:',
+                    url
+                )
+            }
             const response = await this.instance.get<T>(url, config)
             return response.data
         } catch (error) {
-            throw this.handleError(error)
+            const apiError = this.handleError(error)
+            console.error('ApiClient GET error:', {
+                url,
+                message: apiError.message,
+                status: apiError.status,
+                code: apiError.code,
+            })
+            throw apiError
         }
     }
 

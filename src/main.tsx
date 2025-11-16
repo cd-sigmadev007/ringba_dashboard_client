@@ -10,7 +10,6 @@ import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
 import DashboardRoute from './routes/dashboard.tsx'
-import { useCampaignStore } from './modules/org/store/campaignStore'
 import OrganizationRoute from './routes/organization.tsx'
 import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
 import CreateCampaignRoute from './routes/createCampaign.tsx'
@@ -59,10 +58,8 @@ const router = createRouter({
 })
 
 function PreloadProviders({ children }: { children: React.ReactNode }) {
-    const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns)
-    React.useEffect(() => {
-        fetchCampaigns()
-    }, [fetchCampaigns])
+    // Removed fetchCampaigns call - campaigns should be fetched by individual pages
+    // after authentication is ready to avoid race conditions
     return <>{children}</>
 }
 

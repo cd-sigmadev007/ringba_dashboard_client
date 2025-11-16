@@ -11,7 +11,7 @@ import {
     SearchIcon,
 } from '../assets/svg'
 import { usePermissions } from '../hooks/usePermissions'
-import ThemeSwitcher from './utils/theme-switcher'
+import UserDropdown from '../components/ui/UserDropdown'
 
 interface HeaderProps {
     setOpenMenu?: (open: boolean) => void
@@ -22,7 +22,8 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const [openSearchBar, setOpenSearchBar] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0()
+    const { isAuthenticated, isLoading, loginWithRedirect, logout, user } =
+        useAuth0()
     const { role } = usePermissions()
 
     return (
@@ -58,7 +59,7 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                         )}
                     </button>
 
-                    {/* Desktop Menu - Search, User Menu, Theme Switcher, Join Beta */}
+                    {/* Desktop Menu - Search, User Menu, Avatar */}
                     <div className="items-center justify-between flex-grow hidden lg:flex lg:ml-10">
                         {/* Search component */}
                         <div className="flex-grow xl:max-w-[510px] lg:mr-10">
@@ -67,34 +68,23 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
 
                         {/* Right side buttons */}
                         <div className="flex items-center gap-x-1 lg:gap-x-2.5">
-                            <ThemeSwitcher />
                             {isLoading ? (
                                 <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-10 w-20 rounded"></div>
                             ) : isAuthenticated ? (
-                                <>
-                                    {role && (
-                                        <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
-                                            {role === 'super_admin'
-                                                ? 'Super Admin'
-                                                : role === 'org_admin'
-                                                  ? 'Org Admin'
-                                                  : 'User'}
-                                        </span>
-                                    )}
-                                    <Button
-                                        onClick={() =>
-                                            logout({
-                                                logoutParams: {
-                                                    returnTo:
-                                                        window.location.origin,
-                                                },
-                                            })
-                                        }
-                                        variant="ghost"
-                                    >
-                                        Logout
-                                    </Button>
-                                </>
+                                <UserDropdown
+                                    userName={user?.name || user?.nickname}
+                                    userEmail={user?.email}
+                                    userPicture={user?.picture}
+                                    role={role || 'No role Assigned'}
+                                    onLogout={() =>
+                                        logout({
+                                            logoutParams: {
+                                                returnTo:
+                                                    window.location.origin,
+                                            },
+                                        })
+                                    }
+                                />
                             ) : (
                                 <Button onClick={() => loginWithRedirect()}>
                                     Login

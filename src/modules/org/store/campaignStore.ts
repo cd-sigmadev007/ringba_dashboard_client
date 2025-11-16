@@ -8,12 +8,16 @@ interface CampaignState {
     error?: string
     fetchCampaigns: () => Promise<void>
     createCampaign: (
-        data: { name: string; campaign_id?: string },
+        data: { name: string; campaign_id?: string; description?: string },
         logoFile?: File
     ) => Promise<CampaignDto | null>
     updateCampaign: (
         id: string,
-        data: { name?: string; campaign_id?: string | null },
+        data: {
+            name?: string
+            campaign_id?: string | null
+            description?: string | null
+        },
         logoFile?: File
     ) => Promise<CampaignDto | null>
     deleteCampaign: (id: string) => Promise<boolean>
@@ -29,10 +33,15 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
             const list = await campaignApi.fetchCampaigns()
             set({ campaigns: list, loading: false })
         } catch (e: any) {
+            console.error('Error fetching campaigns:', e)
+            const errorMessage =
+                e?.message || e?.details?.message || 'Failed to fetch campaigns'
             set({
-                error: e?.message || 'Failed to fetch campaigns',
+                error: errorMessage,
                 loading: false,
             })
+            // Re-throw to allow components to handle it
+            throw e
         }
     },
     async createCampaign(data, logoFile) {

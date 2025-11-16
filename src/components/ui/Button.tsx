@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
         ghost:
             'text-btn-ghost border border-[#1B456F] ' +
             (isDark ? 'hover:bg-[#0254A5]' : 'hover:bg-[#E0E0E0]'),
-        secondary: 'bg-[#132F4C] hover:bg-opacity-80 text-[#EFF2F5]',
+        secondary: 'bg-[#002B57] hover:bg-opacity-80 text-[#EFF2F5]',
         default: '',
     }
 
