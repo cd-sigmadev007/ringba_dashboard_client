@@ -4,7 +4,11 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth0 } from '@auth0/auth0-react'
-import { getAllUsers, assignUserToOrg, assignUserRole } from '../services/adminApi'
+import {
+    assignUserRole,
+    assignUserToOrg,
+    getAllUsers,
+} from '../services/adminApi'
 
 export function useUsers() {
     const { isAuthenticated } = useAuth0()

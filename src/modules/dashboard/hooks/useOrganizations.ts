@@ -3,7 +3,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getOrganizations, createOrganization } from '../services/adminApi'
+import { createOrganization, getOrganizations } from '../services/adminApi'
 
 export function useOrganizations() {
     return useQuery({

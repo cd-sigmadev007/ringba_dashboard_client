@@ -87,7 +87,7 @@ export default function UserList({ onAssignOrg, onAssignRole }: UserListProps) {
                             </span>
                         )
                     }
-                    return <span className="text-sm">{orgName as string}</span>
+                    return <span className="text-sm">{orgName}</span>
                 },
             },
             {
