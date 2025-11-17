@@ -24,7 +24,6 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const {
-        isAuthenticated: auth0Authenticated,
         isLoading: auth0Loading,
         loginWithRedirect,
         logout: auth0Logout,
