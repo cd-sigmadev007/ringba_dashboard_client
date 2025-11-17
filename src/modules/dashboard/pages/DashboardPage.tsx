@@ -9,8 +9,9 @@ import CreateOrganizationForm from '../components/CreateOrganizationForm'
 import UserList from '../components/UserList'
 import AssignUserToOrgModal from '../components/AssignUserToOrgModal'
 import AssignUserRoleModal from '../components/AssignUserRoleModal'
-import AllowedEmailsList from '../components/AllowedEmailsList'
-import AddAllowedEmailModal from '../components/AddAllowedEmailModal'
+// Deprecated: Allowed emails management moved to Users page
+// import AllowedEmailsList from '../components/AllowedEmailsList'
+// import AddAllowedEmailModal from '../components/AddAllowedEmailModal'
 import type { User } from '../services/adminApi'
 import Button from '@/components/ui/Button'
 import { Tabs } from '@/components/ui/Tabs'
@@ -27,7 +28,8 @@ export default function DashboardPage() {
     const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(
         null
     )
-    const [isAddEmailModalOpen, setIsAddEmailModalOpen] = useState(false)
+    // Deprecated: Allowed emails management moved to Users page
+    // const [isAddEmailModalOpen, setIsAddEmailModalOpen] = useState(false)
 
     if (isLoading) {
         return (
@@ -120,19 +122,20 @@ export default function DashboardPage() {
                                     </div>
                                 ),
                             },
-                            {
-                                id: 'allowed-emails',
-                                label: 'Allowed Emails',
-                                content: (
-                                    <div className="space-y-4">
-                                        <AllowedEmailsList
-                                            onAddEmail={() =>
-                                                setIsAddEmailModalOpen(true)
-                                            }
-                                        />
-                                    </div>
-                                ),
-                            },
+                            // Deprecated: Allowed emails management moved to Users page
+                            // {
+                            //     id: 'allowed-emails',
+                            //     label: 'Allowed Emails',
+                            //     content: (
+                            //         <div className="space-y-4">
+                            //             <AllowedEmailsList
+                            //                 onAddEmail={() =>
+                            //                     setIsAddEmailModalOpen(true)
+                            //                 }
+                            //             />
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         defaultActiveTab="organizations"
                     />
@@ -192,11 +195,11 @@ export default function DashboardPage() {
                 user={selectedUserForRole}
             />
 
-            {/* Add Allowed Email Modal */}
-            <AddAllowedEmailModal
+            {/* Deprecated: Allowed emails management moved to Users page */}
+            {/* <AddAllowedEmailModal
                 open={isAddEmailModalOpen}
                 onClose={() => setIsAddEmailModalOpen(false)}
-            />
+            /> */}
         </div>
     )
 }

@@ -49,7 +49,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
 
             if (result) {
                 toast.success(
-                    'User created successfully! Invitation email will be sent.'
+                    'User created successfully! Email added to allowlist. User can now register with Auth0.'
                 )
                 setName('')
                 setEmail('')
@@ -113,6 +113,9 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
                         placeholder="Enter user email"
                         required
                     />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        This email will be added to the allowlist automatically
+                    </p>
                 </div>
 
                 {error && (
