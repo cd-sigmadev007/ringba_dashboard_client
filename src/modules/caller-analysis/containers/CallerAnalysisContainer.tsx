@@ -1,5 +1,6 @@
 import React from 'react'
 import clsx from 'clsx'
+import { useAuth0 } from '@auth0/auth0-react'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
@@ -11,11 +12,15 @@ import { AudioPlayer, Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
 import { RefreshButton } from '@/components/ui/RefreshButton'
 import { FilterPills, FiltersSection } from '@/modules'
+import { useCampaignStore } from '@/modules/org/store/campaignStore'
+import { apiClient } from '@/services/api'
 
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
+    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { fetchCampaigns, campaigns } = useCampaignStore()
     const [openModal, setOpenModal] = React.useState(false)
     const [openStatusModal, setOpenStatusModal] = React.useState(false)
     const [openTranscriptModal, setOpenTranscriptModal] = React.useState(false)
@@ -42,6 +47,18 @@ export const CallerAnalysisContainer: React.FC = () => {
         refetch,
         lastUpdated,
     } = useCallerAnalysis()
+
+    // Fetch campaigns on mount to ensure logos are available
+    React.useEffect(() => {
+        if (!authLoading && isAuthenticated && apiClient.isAuthInitialized()) {
+            // Only fetch if campaigns are empty
+            if (campaigns.length === 0) {
+                fetchCampaigns().catch((error) => {
+                    console.error('Failed to fetch campaigns for logos:', error)
+                })
+            }
+        }
+    }, [authLoading, isAuthenticated, campaigns.length, fetchCampaigns])
 
     const handleRowClick = (row: CallData) => {
         setSelectedCaller(row)
