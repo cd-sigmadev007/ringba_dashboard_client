@@ -11,6 +11,7 @@ import {
     SearchIcon,
 } from '../assets/svg'
 import { usePermissions } from '../hooks/usePermissions'
+import { useAuthStore } from '../store/authStore'
 import UserDropdown from '../components/ui/UserDropdown'
 
 interface HeaderProps {
@@ -22,9 +23,26 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const [openSearchBar, setOpenSearchBar] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { isAuthenticated, isLoading, loginWithRedirect, logout, user } =
-        useAuth0()
+    const {
+        isAuthenticated: auth0Authenticated,
+        isLoading: auth0Loading,
+        loginWithRedirect,
+        logout: auth0Logout,
+        user: auth0User,
+    } = useAuth0()
+    const { isAuthenticated, isLoading, user, logout } = useAuthStore()
     const { role } = usePermissions()
+
+    const handleLogout = async () => {
+        // Logout from backend (destroys session)
+        await logout()
+        // Logout from Auth0
+        auth0Logout({
+            logoutParams: {
+                returnTo: window.location.origin,
+            },
+        })
+    }
 
     return (
         <>
@@ -68,22 +86,19 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
 
                         {/* Right side buttons */}
                         <div className="flex items-center gap-x-1 lg:gap-x-2.5">
-                            {isLoading ? (
+                            {isLoading || auth0Loading ? (
                                 <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-10 w-20 rounded"></div>
                             ) : isAuthenticated ? (
                                 <UserDropdown
-                                    userName={user?.name || user?.nickname}
-                                    userEmail={user?.email}
-                                    userPicture={user?.picture}
-                                    role={role || undefined}
-                                    onLogout={() =>
-                                        logout({
-                                            logoutParams: {
-                                                returnTo:
-                                                    window.location.origin,
-                                            },
-                                        })
+                                    userName={
+                                        user?.email.split('@')[0] ||
+                                        auth0User?.name ||
+                                        auth0User?.nickname
                                     }
+                                    userEmail={user?.email || auth0User?.email}
+                                    userPicture={auth0User?.picture}
+                                    role={role || undefined}
+                                    onLogout={handleLogout}
                                 />
                             ) : (
                                 <Button onClick={() => loginWithRedirect()}>

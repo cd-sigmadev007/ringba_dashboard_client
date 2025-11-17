@@ -66,48 +66,14 @@ export interface PaginatedApiResponse<T = any> {
     }
 }
 
-// Request Interceptor Factory
-// Creates an interceptor that accepts getAccessToken function from Auth0
-export const createAuthInterceptor = (
-    getAccessToken: () => Promise<string | undefined>
-) => {
-    return async (config: any) => {
-        // Get Auth0 access token
-        try {
-            const token = await getAccessToken()
-            if (token) {
-                config.headers = {
-                    ...config.headers,
-                    Authorization: `Bearer ${token}`,
-                }
-            } else {
-                console.warn(
-                    'No access token available for request:',
-                    config.url
-                )
-            }
-        } catch (error) {
-            console.error('Failed to get access token:', error)
-            // Don't block the request, but log the error
-        }
-
-        // Add request timestamp
-        config.headers = {
-            ...config.headers,
-            'X-Request-Timestamp': new Date().toISOString(),
-        }
-
-        return config
-    }
-}
-
-// Default request interceptor (backward compatible)
+// Request Interceptor - Cookie-based auth (no token needed)
 const requestInterceptor = (config: any) => {
     // Add request timestamp
     config.headers = {
         ...config.headers,
         'X-Request-Timestamp': new Date().toISOString(),
     }
+
     return config
 }
 
@@ -166,12 +132,13 @@ const errorInterceptor = async (error: any) => {
 // Create axios instance
 const createApiInstance = (): AxiosInstance => {
     const instance = axios.create({
-        baseURL: API_CONFIG.BASE_URL,
+        baseURL: `${API_CONFIG.BASE_URL}/api`,
         timeout: API_CONFIG.TIMEOUT,
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
         },
+        withCredentials: true, // Enable cookies for session-based auth
     })
 
     // Add interceptors
@@ -198,31 +165,18 @@ export class ApiClient {
     }
 
     /**
-     * Initialize authentication interceptor
-     * Must be called after Auth0Provider is mounted
-     * @param getAccessToken Function to get Auth0 access token
+     * Initialize authentication (cookie-based, no token needed)
+     * Cookies are automatically sent with requests when withCredentials is true
      */
-    initializeAuth(getAccessToken: () => Promise<string | undefined>): void {
+    initializeAuth(): void {
         if (this.authInitialized) {
             console.warn('ApiClient auth already initialized')
             return
         }
 
-        // Remove default request interceptor
-        this.instance.interceptors.request.clear()
-
-        // Add auth interceptor
-        const authInterceptor = createAuthInterceptor(getAccessToken)
-        this.instance.interceptors.request.use(authInterceptor)
-
-        // Add response interceptor
-        this.instance.interceptors.response.use(
-            responseInterceptor,
-            errorInterceptor
-        )
-
+        // Cookies are automatically sent, no interceptor needed
         this.authInitialized = true
-        console.log('✅ ApiClient authentication initialized')
+        console.log('✅ ApiClient authentication initialized (cookie-based)')
     }
 
     // Generic GET request
