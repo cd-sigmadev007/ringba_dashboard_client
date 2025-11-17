@@ -75,7 +75,7 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                                     userName={user?.name || user?.nickname}
                                     userEmail={user?.email}
                                     userPicture={user?.picture}
-                                    role={role || 'No role Assigned'}
+                                    role={role || undefined}
                                     onLogout={() =>
                                         logout({
                                             logoutParams: {

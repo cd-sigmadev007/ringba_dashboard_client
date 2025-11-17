@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 import { useCampaignStore } from '../store/campaignStore'
 
 interface UseCampaignSubmitProps {
@@ -45,11 +46,14 @@ export function useCampaignSubmit({
                     file
                 )
                 if (updated) {
+                    toast.success('Campaign updated successfully')
                     await fetchCampaigns()
                     navigate({ to: '/organization/campaigns' })
                     return true
                 } else {
-                    setError('Failed to update campaign')
+                    const errorMsg = 'Failed to update campaign'
+                    setError(errorMsg)
+                    toast.error(errorMsg)
                     return false
                 }
             } else {
@@ -62,16 +66,21 @@ export function useCampaignSubmit({
                     file
                 )
                 if (created) {
+                    toast.success('Campaign created successfully')
                     await fetchCampaigns()
                     navigate({ to: '/organization/campaigns' })
                     return true
                 } else {
-                    setError('Failed to create campaign')
+                    const errorMsg = 'Failed to create campaign'
+                    setError(errorMsg)
+                    toast.error(errorMsg)
                     return false
                 }
             }
         } catch (e: any) {
-            setError(e?.message || 'An error occurred')
+            const errorMsg = e?.message || 'An error occurred'
+            setError(errorMsg)
+            toast.error(errorMsg)
             return false
         } finally {
             setSubmitting(false)

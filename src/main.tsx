@@ -6,12 +6,14 @@ import {
     createRouter,
 } from '@tanstack/react-router'
 import { Auth0Provider } from '@auth0/auth0-react'
+import { Toaster } from 'react-hot-toast'
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
 import ApiDemo from './routes/api-demo.tsx'
 import DashboardRoute from './routes/dashboard.tsx'
 import OrganizationRoute from './routes/organization.tsx'
 import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
+import OrganizationUsersRoute from './routes/organizationUsers.tsx'
 import CreateCampaignRoute from './routes/createCampaign.tsx'
 import EditCampaignRoute from './routes/editCampaign.tsx'
 
@@ -41,6 +43,7 @@ const routeTree = rootRoute.addChildren([
     CallbackRoute(rootRoute),
     OrganizationRoute(rootRoute),
     OrganizationCampaignsRoute(rootRoute),
+    OrganizationUsersRoute(rootRoute),
     CreateCampaignRoute(rootRoute),
     EditCampaignRoute(rootRoute),
 ])
@@ -102,6 +105,30 @@ if (rootElement && !rootElement.innerHTML) {
                         <PreloadProviders>
                             <RouterProvider router={router} />
                         </PreloadProviders>
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                duration: 4000,
+                                style: {
+                                    background: 'var(--toast-bg, #363636)',
+                                    color: 'var(--toast-color, #fff)',
+                                },
+                                success: {
+                                    duration: 3000,
+                                    iconTheme: {
+                                        primary: '#4ade80',
+                                        secondary: '#fff',
+                                    },
+                                },
+                                error: {
+                                    duration: 5000,
+                                    iconTheme: {
+                                        primary: '#ef4444',
+                                        secondary: '#fff',
+                                    },
+                                },
+                            }}
+                        />
                     </ApiClientSetup>
                 </TanStackQueryProvider.Provider>
             </Auth0Provider>

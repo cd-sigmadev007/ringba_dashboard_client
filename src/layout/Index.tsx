@@ -1,7 +1,8 @@
 // src/layouts/RootLayout.tsx
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
-import { Outlet } from '@tanstack/react-router'
+import { Outlet, useLocation, useNavigate } from '@tanstack/react-router'
+import { useAuth0 } from '@auth0/auth0-react'
 
 // import LoadingBar from 'react-top-loading-bar';
 import Header from './Header'
@@ -11,6 +12,27 @@ import Styles from '@/styles/index'
 
 const RootLayout: React.FC = () => {
     const [openMenu, setOpenMenu] = useState(false)
+    const { isAuthenticated, isLoading } = useAuth0()
+    const navigate = useNavigate()
+    const location = useLocation()
+
+    // Protected routes that require authentication
+    const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
+
+    useEffect(() => {
+        // Don't redirect if still loading or already on callback/login page
+        if (isLoading) return
+        if (location.pathname === '/callback') return
+
+        const isProtectedRoute = protectedRoutes.some((route) =>
+            location.pathname.startsWith(route)
+        )
+
+        if (isProtectedRoute && !isAuthenticated) {
+            // Redirect to login
+            navigate({ to: '/' })
+        }
+    }, [isAuthenticated, isLoading, location.pathname, navigate])
 
     return (
         <Styles>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 import { useCampaignStore } from '../store/campaignStore'
 import { Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
@@ -213,9 +214,26 @@ const CampaignsPage: React.FC = () => {
                             onClick={async () => {
                                 if (!deleteRow) return
                                 setDeleting(true)
-                                await deleteCampaign(deleteRow.id)
-                                setDeleting(false)
-                                setDeleteRow(null)
+                                try {
+                                    const success = await deleteCampaign(
+                                        deleteRow.id
+                                    )
+                                    if (success) {
+                                        toast.success(
+                                            'Campaign deleted successfully'
+                                        )
+                                        setDeleteRow(null)
+                                    } else {
+                                        toast.error('Failed to delete campaign')
+                                    }
+                                } catch (error: any) {
+                                    toast.error(
+                                        error?.message ||
+                                            'Failed to delete campaign'
+                                    )
+                                } finally {
+                                    setDeleting(false)
+                                }
                             }}
                             disabled={deleting}
                             className="bg-[#F64E60] hover:bg-[#E63950] text-white"
