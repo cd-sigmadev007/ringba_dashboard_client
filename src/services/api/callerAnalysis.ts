@@ -7,11 +7,11 @@ import { convertCampaignFiltersToIds } from '@/modules/caller-analysis/utils/cam
 
 // API Endpoints
 export const CALLER_ANALYSIS_ENDPOINTS = {
-    GET_ALL: '/api/callers',
-    GET_BY_ID: '/api/callers/:id',
-    GET_BY_PHONE: '/api/callers/phone/:phone',
-    GET_SCHEMA: '/api/callers/schema',
-    GET_TAGS: '/api/callers/tags',
+    GET_ALL: '/callers',
+    GET_BY_ID: '/callers/:id',
+    GET_BY_PHONE: '/callers/phone/:phone',
+    GET_SCHEMA: '/callers/schema',
+    GET_TAGS: '/callers/tags',
     HEALTH_CHECK: '/health',
 } as const
 

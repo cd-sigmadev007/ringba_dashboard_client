@@ -1,21 +1,24 @@
 /**
- * Setup ApiClient with Auth0 Authentication
- * This component initializes the apiClient with Auth0 access tokens
+ * Setup ApiClient for Cookie-Based Authentication
+ * This component initializes the apiClient for cookie-based sessions
  */
 
 import { useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useAuthStore } from '../../store/authStore'
 import { apiClient } from './index'
 
 export function ApiClientSetup({ children }: { children: React.ReactNode }) {
-    const { getAccessTokenSilently, isAuthenticated } = useAuth0()
+    const { isAuthenticated, fetchCurrentUser } = useAuthStore()
 
     useEffect(() => {
+        // Initialize API client (cookies are automatically sent)
+        apiClient.initializeAuth()
+
+        // Fetch current user if authenticated
         if (isAuthenticated) {
-            // Initialize apiClient with Auth0 token getter
-            apiClient.initializeAuth(getAccessTokenSilently)
+            fetchCurrentUser()
         }
-    }, [isAuthenticated, getAccessTokenSilently])
+    }, [isAuthenticated, fetchCurrentUser])
 
     return <>{children}</>
 }

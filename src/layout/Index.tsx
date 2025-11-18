@@ -20,9 +20,10 @@ const RootLayout: React.FC = () => {
     const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
 
     useEffect(() => {
-        // Don't redirect if still loading or already on callback/login page
+        // Don't redirect if still loading or already on callback/login/invitation page
         if (isLoading) return
         if (location.pathname === '/callback') return
+        if (location.pathname.startsWith('/invite/')) return
 
         const isProtectedRoute = protectedRoutes.some((route) =>
             location.pathname.startsWith(route)

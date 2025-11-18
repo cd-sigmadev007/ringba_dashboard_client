@@ -30,7 +30,7 @@ export interface CreateOrganizationResponse extends ApiResponse<Organization> {
  * Get all organizations
  */
 export async function getOrganizations(): Promise<OrganizationsResponse> {
-    return apiClient.get<OrganizationsResponse>('/api/admin/organizations')
+    return apiClient.get<OrganizationsResponse>('/admin/organizations')
 }
 
 /**
@@ -40,7 +40,7 @@ export async function createOrganization(
     name: string
 ): Promise<CreateOrganizationResponse> {
     return apiClient.post<CreateOrganizationResponse>(
-        '/api/admin/organizations',
+        '/admin/organizations',
         { name }
     )
 }
@@ -72,7 +72,7 @@ export interface AssignUserRoleRequest {
  * Get all users
  */
 export async function getAllUsers(): Promise<UsersResponse> {
-    return apiClient.get<UsersResponse>('/api/admin/users')
+    return apiClient.get<UsersResponse>('/admin/users')
 }
 
 /**
@@ -83,7 +83,7 @@ export async function assignUserToOrg(
     orgId: string | null
 ): Promise<ApiResponse<User>> {
     return apiClient.patch<ApiResponse<User>>(
-        `/api/admin/users/${userId}/assign-org`,
+        `/admin/users/${userId}/assign-org`,
         { org_id: orgId || null }
     )
 }
@@ -97,7 +97,7 @@ export async function assignUserRole(
     orgId?: string | null
 ): Promise<ApiResponse<User>> {
     return apiClient.patch<ApiResponse<User>>(
-        `/api/admin/users/${userId}/assign-role`,
+        `/admin/users/${userId}/assign-role`,
         { role, org_id: orgId }
     )
 }
@@ -128,7 +128,7 @@ export interface CreateAllowedEmailResponse extends ApiResponse<AllowedEmail> {
  * Get all allowed emails
  */
 export async function getAllowedEmails(): Promise<AllowedEmailsResponse> {
-    return apiClient.get<AllowedEmailsResponse>('/api/admin/allowed-emails')
+    return apiClient.get<AllowedEmailsResponse>('/admin/allowed-emails')
 }
 
 /**
@@ -139,7 +139,7 @@ export async function addAllowedEmail(
     notes?: string
 ): Promise<CreateAllowedEmailResponse> {
     return apiClient.post<CreateAllowedEmailResponse>(
-        '/api/admin/allowed-emails',
+        '/admin/allowed-emails',
         { email, notes }
     )
 }
@@ -151,6 +151,6 @@ export async function removeAllowedEmail(
     emailId: string
 ): Promise<ApiResponse<null>> {
     return apiClient.delete<ApiResponse<null>>(
-        `/api/admin/allowed-emails/${emailId}`
+        `/admin/allowed-emails/${emailId}`
     )
 }

@@ -27,7 +27,7 @@ export const campaignApi = {
             const res = await apiClient.get<{
                 success: boolean
                 data: Array<CampaignDto>
-            }>(`/api/org-admin/campaigns${qs}`)
+            }>(`/org-admin/campaigns${qs}`)
             return res.data
         } catch (error: any) {
             console.error('campaignApi.fetchCampaigns error:', {
@@ -52,7 +52,7 @@ export const campaignApi = {
         const res = await apiClient.post<{
             success: boolean
             data: CampaignDto
-        }>(`/api/org-admin/campaigns${qs}`, form, {
+        }>(`/org-admin/campaigns${qs}`, form, {
             headers: { 'Content-Type': 'multipart/form-data' },
         })
         return res.data
@@ -74,7 +74,7 @@ export const campaignApi = {
             form.append('description', input.description || '')
         if (logoFile) form.append('logo', logoFile)
         const res = await apiClient.put<CampaignDto>(
-            `/api/org-admin/campaigns/${id}`,
+            `/org-admin/campaigns/${id}`,
             form,
             {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -83,6 +83,6 @@ export const campaignApi = {
         return res
     },
     async deleteCampaign(id: string): Promise<void> {
-        await apiClient.delete(`/api/org-admin/campaigns/${id}`)
+        await apiClient.delete(`/org-admin/campaigns/${id}`)
     },
 }
