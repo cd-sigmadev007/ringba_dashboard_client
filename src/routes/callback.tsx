@@ -54,8 +54,7 @@ function Callback() {
                     })
 
                     // Login to backend to create session
-                    await login(accessToken, email)
-                    await login(accessToken, email)
+                    await login(accessToken)
 
                     // Initialize API client
                     apiClient.initializeAuth()
@@ -75,8 +74,6 @@ function Callback() {
         error,
         isAuthenticated,
         getAccessTokenSilently,
-        getIdTokenClaims,
-        user,
         getIdTokenClaims,
         user,
         login,

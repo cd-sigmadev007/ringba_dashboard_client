@@ -31,7 +31,6 @@ export interface CreateOrganizationResponse extends ApiResponse<Organization> {
  */
 export async function getOrganizations(): Promise<OrganizationsResponse> {
     return apiClient.get<OrganizationsResponse>('/admin/organizations')
-    return apiClient.get<OrganizationsResponse>('/admin/organizations')
 }
 
 /**
@@ -73,7 +72,6 @@ export interface AssignUserRoleRequest {
  */
 export async function getAllUsers(): Promise<UsersResponse> {
     return apiClient.get<UsersResponse>('/admin/users')
-    return apiClient.get<UsersResponse>('/admin/users')
 }
 
 /**
@@ -85,8 +83,7 @@ export async function assignUserToOrg(
 ): Promise<ApiResponse<User>> {
     return apiClient.patch<ApiResponse<User>>(
         `/admin/users/${userId}/assign-org`,
-        `/admin/users/${userId}/assign-org`,
-        { org_id: orgId || null }
+        { org_id: orgId }
     )
 }
 
@@ -98,10 +95,13 @@ export async function assignUserRole(
     role: 'super_admin' | 'org_admin' | 'user',
     orgId?: string | null
 ): Promise<ApiResponse<User>> {
+    const data: { role: string; org_id?: string | null } = { role }
+    if (orgId !== undefined) {
+        data.org_id = orgId
+    }
     return apiClient.patch<ApiResponse<User>>(
         `/admin/users/${userId}/assign-role`,
-        `/admin/users/${userId}/assign-role`,
-        { role, org_id: orgId }
+        data
     )
 }
 
@@ -132,7 +132,6 @@ export interface CreateAllowedEmailResponse extends ApiResponse<AllowedEmail> {
  */
 export async function getAllowedEmails(): Promise<AllowedEmailsResponse> {
     return apiClient.get<AllowedEmailsResponse>('/admin/allowed-emails')
-    return apiClient.get<AllowedEmailsResponse>('/admin/allowed-emails')
 }
 
 /**
@@ -155,7 +154,6 @@ export async function removeAllowedEmail(
     emailId: string
 ): Promise<ApiResponse<null>> {
     return apiClient.delete<ApiResponse<null>>(
-        `/admin/allowed-emails/${emailId}`
         `/admin/allowed-emails/${emailId}`
     )
 }
