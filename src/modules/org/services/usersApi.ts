@@ -24,7 +24,7 @@ export const usersApi = {
         const res = await apiClient.get<{
             success: boolean
             data: Array<UserDto>
-        }>('/api/org-admin/users')
+        }>('/org-admin/users')
         return res.data
     },
 
@@ -32,7 +32,7 @@ export const usersApi = {
         const res = await apiClient.post<{
             success: boolean
             data: UserDto
-        }>('/api/org-admin/users', {
+        }>('/org-admin/users', {
             email: input.email,
             invitation_status: input.invitation_status || 'send',
             org_id: input.org_id,
@@ -44,7 +44,7 @@ export const usersApi = {
         const res = await apiClient.get<{
             success: boolean
             data: UserDto
-        }>(`/api/org-admin/users/${id}`)
+        }>(`/org-admin/users/${id}`)
         return res.data
     },
 }

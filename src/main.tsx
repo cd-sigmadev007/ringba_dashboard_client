@@ -23,6 +23,7 @@ import reportWebVitals from './reportWebVitals.ts'
 
 import RootLayout from './layout/Index.tsx'
 import CallbackRoute from './routes/callback.tsx'
+import InvitationRoute from './routes/invitation.tsx'
 import { ApiClientSetup } from './services/api/setupApiClient'
 
 // Initialize theme on app startup
@@ -41,6 +42,7 @@ const routeTree = rootRoute.addChildren([
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
     CallbackRoute(rootRoute),
+    InvitationRoute(rootRoute),
     OrganizationRoute(rootRoute),
     OrganizationCampaignsRoute(rootRoute),
     OrganizationUsersRoute(rootRoute),
@@ -97,6 +99,7 @@ if (rootElement && !rootElement.innerHTML) {
                     scope: 'openid profile email',
                 }}
                 cacheLocation="localstorage"
+                useRefreshTokens={true}
             >
                 <TanStackQueryProvider.Provider
                     {...TanStackQueryProviderContext}

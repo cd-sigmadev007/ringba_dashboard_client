@@ -11,7 +11,7 @@ import { apiClient } from '../services/api'
 import type { RootRoute } from '@tanstack/react-router'
 
 function Callback() {
-    const { isLoading, error, isAuthenticated, getAccessTokenSilently } =
+    const { isLoading, error, isAuthenticated, getAccessTokenSilently, getIdTokenClaims, user } =
         useAuth0()
     const navigate = useNavigate()
     const { login } = useAuthStore()
@@ -29,11 +29,23 @@ function Callback() {
 
             if (isAuthenticated) {
                 try {
-                    // Get Auth0 access token
-                    const accessToken = await getAccessTokenSilently()
+                    // Get Auth0 access token and ID token claims
+                    const [accessToken, idTokenClaims] = await Promise.all([
+                        getAccessTokenSilently(),
+                        getIdTokenClaims(),
+                    ])
+
+                    // Extract email from ID token claims or user object
+                    const email = idTokenClaims?.email || user?.email
+
+                    if (!email) {
+                        throw new Error('Email not found in Auth0 user data')
+                    }
+
+                    console.log('🔐 Login attempt:', { email, hasToken: !!accessToken })
 
                     // Login to backend to create session
-                    await login(accessToken)
+                    await login(accessToken, email)
 
                     // Initialize API client
                     apiClient.initializeAuth()
@@ -53,6 +65,8 @@ function Callback() {
         error,
         isAuthenticated,
         getAccessTokenSilently,
+        getIdTokenClaims,
+        user,
         login,
         navigate,
     ])
