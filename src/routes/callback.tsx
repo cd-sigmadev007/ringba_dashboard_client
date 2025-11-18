@@ -11,8 +11,14 @@ import { apiClient } from '../services/api'
 import type { RootRoute } from '@tanstack/react-router'
 
 function Callback() {
-    const { isLoading, error, isAuthenticated, getAccessTokenSilently, getIdTokenClaims, user } =
-        useAuth0()
+    const {
+        isLoading,
+        error,
+        isAuthenticated,
+        getAccessTokenSilently,
+        getIdTokenClaims,
+        user,
+    } = useAuth0()
     const navigate = useNavigate()
     const { login } = useAuthStore()
     const [loginError, setLoginError] = useState<string | null>(null)
@@ -42,9 +48,13 @@ function Callback() {
                         throw new Error('Email not found in Auth0 user data')
                     }
 
-                    console.log('🔐 Login attempt:', { email, hasToken: !!accessToken })
+                    console.log('🔐 Login attempt:', {
+                        email,
+                        hasToken: !!accessToken,
+                    })
 
                     // Login to backend to create session
+                    await login(accessToken, email)
                     await login(accessToken, email)
 
                     // Initialize API client
@@ -65,6 +75,8 @@ function Callback() {
         error,
         isAuthenticated,
         getAccessTokenSilently,
+        getIdTokenClaims,
+        user,
         getIdTokenClaims,
         user,
         login,

@@ -32,7 +32,8 @@ function Invitation() {
                     success: boolean
                     data: InvitationData
                 }>(`/invitations/validate/${token}`)
-                
+
+                // eslint-disable-next-line
                 if (response.success && response.data) {
                     setInvitation(response.data)
                 } else {
@@ -108,7 +109,8 @@ function Invitation() {
                         Invalid Invitation
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 mb-6">
-                        {error || 'This invitation link is invalid, expired, or has already been used.'}
+                        {error ||
+                            'This invitation link is invalid, expired, or has already been used.'}
                     </p>
                     <button
                         onClick={() => navigate({ to: '/' })}
@@ -150,7 +152,8 @@ function Invitation() {
                     .
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-                    Click the button below to accept your invitation and create your account.
+                    Click the button below to accept your invitation and create
+                    your account.
                 </p>
                 <button
                     onClick={handleContinueToLogin}
@@ -172,4 +175,3 @@ export default (parentRoute: RootRoute) =>
         component: Invitation,
         getParentRoute: () => parentRoute,
     })
-
