@@ -1,5 +1,6 @@
 import React from 'react'
 import clsx from 'clsx'
+import { useAuth0 } from '@auth0/auth0-react'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
@@ -12,7 +13,6 @@ import Button from '@/components/ui/Button'
 import { RefreshButton } from '@/components/ui/RefreshButton'
 import { FilterPills, FiltersSection } from '@/modules'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
-import { useAuth0 } from '@auth0/auth0-react'
 import { apiClient } from '@/services/api'
 
 export const CallerAnalysisContainer: React.FC = () => {

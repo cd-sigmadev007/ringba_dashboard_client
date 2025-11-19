@@ -4,7 +4,11 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 // API Configuration
 // Normalize base URL: remove trailing slash and ensure it doesn't include /api
 const normalizeBaseUrl = (url: string): string => {
-    if (!url) return 'http://localhost:3001'
+    if (!url) {
+        // In development, use relative URL to leverage Vite proxy (same-origin for cookies)
+        // In production, use the provided URL or default
+        return import.meta.env.DEV ? '' : 'http://localhost:3001'
+    }
     // Remove trailing slash
     let normalized = url.replace(/\/+$/, '')
     // Remove /api suffix if present (routes already include /api)
@@ -14,7 +18,8 @@ const normalizeBaseUrl = (url: string): string => {
 
 const API_CONFIG = {
     BASE_URL: normalizeBaseUrl(
-        import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+        import.meta.env.VITE_API_BASE_URL ||
+            (import.meta.env.DEV ? '' : 'http://localhost:3001')
     ),
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
@@ -168,6 +173,7 @@ const createApiInstance = (): AxiosInstance => {
     const instance = axios.create({
         baseURL: API_CONFIG.BASE_URL,
         timeout: API_CONFIG.TIMEOUT,
+        withCredentials: true, // Required for cookies to be sent cross-origin
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',

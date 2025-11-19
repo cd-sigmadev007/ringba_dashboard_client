@@ -17,4 +17,15 @@ export default defineConfig({
             public: resolve(__dirname, 'public'),
         },
     },
+    server: {
+        proxy: {
+            // Proxy API requests to backend to make them same-origin
+            // This allows cookies to work with sameSite: 'lax' in development
+            '/api': {
+                target: 'http://localhost:3001',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
+    },
 })
