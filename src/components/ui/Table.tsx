@@ -71,6 +71,10 @@ interface TableProps<T = any> {
      * Empty state message
      */
     emptyMessage?: string
+    /**
+     * Callback when pagination changes (page index, page size, total pages)
+     */
+    onPaginationChange?: (pageIndex: number, pageSize: number, totalPages: number) => void
 }
 
 const Table = <T,>({
@@ -78,6 +82,7 @@ const Table = <T,>({
     columns,
     showHeader = true,
     className,
+    onPaginationChange,
     collapsible = false,
     initialCollapsed = false,
     size = 'medium',
@@ -186,6 +191,16 @@ const Table = <T,>({
                 : undefined,
         },
     })
+
+    // Notify parent of pagination changes
+    useEffect(() => {
+        if (pagination && onPaginationChange) {
+            const pageIndex = table.getState().pagination.pageIndex
+            const pageSize = table.getState().pagination.pageSize
+            const totalPages = table.getPageCount()
+            onPaginationChange(pageIndex, pageSize, totalPages)
+        }
+    }, [table.getState().pagination.pageIndex, table.getState().pagination.pageSize, table.getPageCount(), pagination, onPaginationChange])
 
     // Handle row click
     const handleRowClick = (row: T) => {

@@ -77,6 +77,7 @@ export const useTableColumns = (
             {
                 header: 'CALLER ID',
                 accessorKey: 'callerId',
+                enableSorting: false,
                 meta: {
                     sticky: 'left',
                     width: 150,
@@ -162,6 +163,7 @@ export const useTableColumns = (
             {
                 header: 'CAMPAIGN',
                 accessorKey: 'campaign',
+                enableSorting: false,
                 meta: {
                     width: 180,
                     align: 'center',
@@ -173,6 +175,7 @@ export const useTableColumns = (
             {
                 header: 'ACTION',
                 accessorKey: 'action',
+                enableSorting: false,
                 meta: { width: 120 },
                 cell: ({ row }) => {
                     return (

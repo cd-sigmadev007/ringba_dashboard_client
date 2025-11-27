@@ -44,8 +44,12 @@ export const CallerAnalysisContainer: React.FC = () => {
         clearAllFilters,
         hasActiveFilters,
         isLoading,
+        isLoadingBatch,
         refetch,
         lastUpdated,
+        loadNextBatch,
+        BATCH_SIZE,
+        totalRecords,
     } = useCallerAnalysis()
 
     // Fetch campaigns on mount to ensure logos are available
@@ -121,6 +125,27 @@ export const CallerAnalysisContainer: React.FC = () => {
         handlePlayAudio,
         currentPlayingRow,
         isPlaying
+    )
+
+    // Handle pagination changes - load next batch when user reaches last page
+    const handlePaginationChange = React.useCallback(
+        (pageIndex: number, _pageSize: number, totalPages: number) => {
+            // Check if user is on the last page
+            const isLastPage = pageIndex + 1 === totalPages
+            
+            if (isLastPage) {
+                // Calculate current batch based on loaded data
+                const currentBatch = Math.ceil(filteredData.length / BATCH_SIZE)
+                const totalBatches = Math.ceil(totalRecords / BATCH_SIZE)
+                
+                // If we have more batches to load, load the next one
+                if (currentBatch < totalBatches && !isLoadingBatch) {
+                    console.log(`📄 User reached last page, loading batch ${currentBatch + 1}`)
+                    loadNextBatch()
+                }
+            }
+        },
+        [filteredData.length, BATCH_SIZE, totalRecords, isLoadingBatch, loadNextBatch]
     )
 
     return (
@@ -210,8 +235,9 @@ export const CallerAnalysisContainer: React.FC = () => {
                         clickableRows={true}
                         onRowClick={handleRowClick}
                         size="medium"
-                        loading={isLoading}
+                        loading={isLoading || isLoadingBatch}
                         className="w-full"
+                        onPaginationChange={handlePaginationChange}
                     />
                 </div>
 
