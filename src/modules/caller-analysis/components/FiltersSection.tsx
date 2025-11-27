@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import {
     DurationRangeFilter,
     FilterSelect,
@@ -9,6 +10,8 @@ import { useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { SelectOption } from '@/components/ui/FilterSelect'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
+import { apiClient } from '@/services/api'
+import { useCampaignStore } from '@/modules/org/store/campaignStore'
 
 interface FiltersSectionProps {
     filters: FilterState
@@ -28,10 +31,12 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
     const [statusOptions, setStatusOptions] = useState<Array<SelectOption>>([])
     const [isLoadingTags, setIsLoadingTags] = useState(true)
     const campaignOptions = useCampaignOptions()
+    const campaignsLoading = useCampaignStore((s) => s.loading)
+    const { isAuthenticated, isLoading: authLoading } = useAuth0()
 
-    // Fetch tags from database on component mount
+    // Fetch tags from database when auth is ready
     useEffect(() => {
-        const fetchTags = async () => {
+        const fetchTagsInternal = async () => {
             try {
                 setIsLoadingTags(true)
                 const tags = await callerAnalysisApi.getTags()
@@ -52,8 +57,41 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
             }
         }
 
+        const fetchTags = () => {
+            // Don't fetch if auth is still loading
+            if (authLoading) {
+                return
+            }
+
+            // Wait for auth initialization before fetching tags
+            if (!isAuthenticated || !apiClient.isAuthInitialized()) {
+                // Wait for apiClient to be initialized (max 2 seconds)
+                const maxAttempts = 20
+                let attempts = 0
+                const checkAuth = setInterval(() => {
+                    attempts++
+                    if (
+                        apiClient.isAuthInitialized() ||
+                        attempts >= maxAttempts
+                    ) {
+                        clearInterval(checkAuth)
+                        if (apiClient.isAuthInitialized() && isAuthenticated) {
+                            // Now fetch tags
+                            fetchTagsInternal()
+                        } else {
+                            setIsLoadingTags(false)
+                        }
+                    }
+                }, 100)
+                return () => clearInterval(checkAuth)
+            }
+
+            // Auth is ready, fetch tags
+            fetchTagsInternal()
+        }
+
         fetchTags()
-    }, [])
+    }, [authLoading, isAuthenticated])
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
@@ -67,14 +105,22 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
                 onSearch={onFiltersChange.search}
                 disableDropdown={true}
             />
-            <FilterSelect
-                defaultValue={{ title: 'Campaign', value: 'campaign' }}
-                filterList={campaignOptions}
-                setFilter={onFiltersChange.campaign}
-                multiple={true}
-                selectedValues={filters.campaignFilter}
-                className="col-span-1"
-            />
+            {campaignsLoading ? (
+                <div className="col-span-1 flex items-center justify-center">
+                    <span className="text-sm text-gray-500">
+                        Loading campaigns...
+                    </span>
+                </div>
+            ) : (
+                <FilterSelect
+                    defaultValue={{ title: 'Campaign', value: 'campaign' }}
+                    filterList={campaignOptions}
+                    setFilter={onFiltersChange.campaign}
+                    multiple={true}
+                    selectedValues={filters.campaignFilter}
+                    className="col-span-1"
+                />
+            )}
             {isLoadingTags ? (
                 <div className="col-span-1 flex items-center justify-center">
                     <span className="text-sm text-gray-500">

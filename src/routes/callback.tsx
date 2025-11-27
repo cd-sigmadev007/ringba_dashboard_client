@@ -43,13 +43,13 @@ function Callback() {
 
                     console.log('✅ Backend login successful, session created')
 
-                    // Redirect to home after successful login
-                    navigate({ to: '/' })
+                    // Redirect to caller analysis after successful login
+                    navigate({ to: '/caller-analysis' })
                 } catch (err: any) {
                     console.error('❌ Backend login failed:', err)
                     setLoginError(err.message || 'Failed to create session')
-                    // Still redirect to home, but with error state
-                    navigate({ to: '/' })
+                    // Still redirect to caller analysis, but with error state
+                    navigate({ to: '/caller-analysis' })
                 } finally {
                     setIsLoggingIn(false)
                 }

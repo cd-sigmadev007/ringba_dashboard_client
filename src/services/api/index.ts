@@ -191,9 +191,25 @@ const createApiInstance = (): AxiosInstance => {
 export class ApiClient {
     private instance: AxiosInstance
     private authInitialized = false
+    private authReadyPromise: Promise<void>
+    private resolveAuthReady: (() => void) | null = null
+    private authCheckTimeout: NodeJS.Timeout | null = null
 
     constructor() {
         this.instance = createApiInstance()
+        // Create a promise that will be resolved when auth is initialized
+        this.authReadyPromise = new Promise((resolve) => {
+            this.resolveAuthReady = resolve
+        })
+        
+        // Set a timeout to resolve the promise after 10 seconds if auth is never initialized
+        // This handles cases where the user might not be authenticated
+        this.authCheckTimeout = setTimeout(() => {
+            if (!this.authInitialized && this.resolveAuthReady) {
+                console.warn('ApiClient: Auth not initialized after 10s, proceeding without auth')
+                this.resolveAuthReady()
+            }
+        }, 10000)
     }
 
     /**
@@ -201,6 +217,26 @@ export class ApiClient {
      */
     isAuthInitialized(): boolean {
         return this.authInitialized
+    }
+
+    /**
+     * Wait for authentication to be initialized
+     * This will wait for the authReadyPromise which resolves when:
+     * 1. Auth is initialized via initializeAuth(), OR
+     * 2. 10 seconds timeout (handles unauthenticated users)
+     */
+    private async waitForAuth(): Promise<void> {
+        if (this.authInitialized) {
+            return
+        }
+
+        // Wait for auth initialization (with built-in 10s timeout from constructor)
+        try {
+            await this.authReadyPromise
+        } catch (error) {
+            // If error, log warning but continue (for non-authenticated requests)
+            console.warn('ApiClient: Auth initialization error, proceeding without auth')
+        }
     }
 
     /**
@@ -228,18 +264,23 @@ export class ApiClient {
         )
 
         this.authInitialized = true
+        // Clear the timeout since auth is now initialized
+        if (this.authCheckTimeout) {
+            clearTimeout(this.authCheckTimeout)
+            this.authCheckTimeout = null
+        }
+        // Resolve the promise to unblock waiting requests
+        if (this.resolveAuthReady) {
+            this.resolveAuthReady()
+        }
         console.log('✅ ApiClient authentication initialized')
     }
 
     // Generic GET request
     async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
         try {
-            if (!this.authInitialized) {
-                console.warn(
-                    'ApiClient: Making request before auth is initialized:',
-                    url
-                )
-            }
+            // Wait for auth initialization before making request
+            await this.waitForAuth()
             const response = await this.instance.get<T>(url, config)
             return response.data
         } catch (error) {
@@ -261,6 +302,8 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
+            // Wait for auth initialization before making request
+            await this.waitForAuth()
             const response = await this.instance.post<T>(url, data, config)
             return response.data
         } catch (error) {
@@ -275,6 +318,8 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
+            // Wait for auth initialization before making request
+            await this.waitForAuth()
             const response = await this.instance.put<T>(url, data, config)
             return response.data
         } catch (error) {
@@ -289,6 +334,8 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
+            // Wait for auth initialization before making request
+            await this.waitForAuth()
             const response = await this.instance.patch<T>(url, data, config)
             return response.data
         } catch (error) {
@@ -302,6 +349,8 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
+            // Wait for auth initialization before making request
+            await this.waitForAuth()
             const response = await this.instance.delete<T>(url, config)
             return response.data
         } catch (error) {

@@ -12,7 +12,7 @@ import Styles from '@/styles/index'
 
 const RootLayout: React.FC = () => {
     const [openMenu, setOpenMenu] = useState(false)
-    const { isAuthenticated, isLoading } = useAuth0()
+    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -20,7 +20,7 @@ const RootLayout: React.FC = () => {
     const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
 
     useEffect(() => {
-        // Don't redirect if still loading or already on callback/login page
+        // Don't redirect if still loading or already on callback page
         if (isLoading) return
         if (location.pathname === '/callback') return
 
@@ -28,11 +28,22 @@ const RootLayout: React.FC = () => {
             location.pathname.startsWith(route)
         )
 
-        if (isProtectedRoute && !isAuthenticated) {
-            // Redirect to login
-            navigate({ to: '/' })
+        // If user is authenticated and on root path, redirect to caller analysis
+        if (isAuthenticated && location.pathname === '/') {
+            navigate({ to: '/caller-analysis' })
+            return
         }
-    }, [isAuthenticated, isLoading, location.pathname, navigate])
+
+        // If user is not authenticated and trying to access protected route, redirect to login
+        if (isProtectedRoute && !isAuthenticated) {
+            loginWithRedirect({
+                appState: {
+                    returnTo: location.pathname,
+                },
+            })
+            return
+        }
+    }, [isAuthenticated, isLoading, location.pathname, navigate, loginWithRedirect])
 
     return (
         <Styles>
