@@ -190,6 +190,8 @@ const Table = <T,>({
                   }
                 : undefined,
         },
+        // Prevent page reset when data changes
+        autoResetPageIndex: false,
     })
 
     // Notify parent of pagination changes

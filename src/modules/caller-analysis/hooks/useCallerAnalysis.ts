@@ -120,10 +120,15 @@ export const useCallerAnalysis = () => {
             const processedData = processCallData(convertedData)
 
             // Merge with existing data
-            setData((prevData) => [...prevData, ...processedData])
+            setData((prevData) => {
+                const merged = [...prevData, ...processedData]
+                console.log(`✅ Batch ${nextBatchNumber} loaded: ${processedData.length} records, total: ${merged.length}`)
+                return merged
+            })
             setLoadedBatches((prev) => new Set([...prev, nextBatchNumber]))
             setTotalRecords(pagination.total)
-            console.log(`✅ Batch ${nextBatchNumber} loaded and merged`)
+            // Note: Don't reset pagination - let the table maintain current page
+            // The new data will be added, increasing total rows, but we stay on the same page number
         } catch (error) {
             console.error(`❌ Failed to load batch ${nextBatchNumber}:`, error)
         } finally {
