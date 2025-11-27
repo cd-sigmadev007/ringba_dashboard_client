@@ -31,103 +31,117 @@ export const useCallerAnalysis = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [totalRecords, setTotalRecords] = useState(0)
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+    
+    // Pagination batch tracking
+    const BATCH_SIZE = 1000
+    const [loadedBatches, setLoadedBatches] = useState<Set<number>>(new Set([1]))
+    const [isLoadingBatch, setIsLoadingBatch] = useState(false)
 
-    // Fetch all data for client-side pagination
+    // Fetch a specific batch of data
+    const fetchBatch = async (batchNumber: number) => {
+        try {
+            console.log(`🔄 Fetching batch ${batchNumber}...`)
+            const response = await callerAnalysisApi.getAllCallers({
+                filters,
+                page: batchNumber,
+                limit: BATCH_SIZE,
+            })
+            console.log(`✅ Batch ${batchNumber} fetched:`, response)
+
+            // Convert API response to CallData format (this includes latestPayout)
+            const convertedData: Array<CallData> = response.data.map(
+                (apiData) =>
+                    callerApiService.convertApiResponseToCallData(apiData)
+            )
+
+            return { convertedData, pagination: response.pagination }
+        } catch (error) {
+            console.error(`❌ Failed to fetch batch ${batchNumber}:`, error)
+            throw error
+        }
+    }
+
+    // Helper function to process and aggregate LTR data
+    const processCallData = (convertedData: Array<CallData>): Array<CallData> => {
+        // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
+        const callerIdLtrMap = new Map<string, number>()
+
+        // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
+        const parseLatestPayout = (
+            value: string | number | null | undefined
+        ): number => {
+            if (value === null || value === undefined) return 0
+            if (typeof value === 'number')
+                return isNaN(value) ? 0 : value
+            if (typeof value === 'string') {
+                // Remove currency symbols, commas, and whitespace
+                const cleaned = value.replace(/[$,\s]/g, '')
+                const parsed = parseFloat(cleaned)
+                return isNaN(parsed) ? 0 : parsed
+            }
+            return 0
+        }
+
+        // First pass: sum all latestPayout values for each callerId
+        convertedData.forEach((call: CallData) => {
+            const callerId = call.callerId
+            const latestPayout = parseLatestPayout(call.latestPayout)
+
+            if (latestPayout > 0) {
+                const currentSum = callerIdLtrMap.get(callerId) || 0
+                const newSum = currentSum + latestPayout
+                callerIdLtrMap.set(callerId, newSum)
+            }
+        })
+
+        // Second pass: update lifetimeRevenue for each call with the aggregated LTR
+        return convertedData.map((call: CallData) => ({
+            ...call,
+            lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
+        }))
+    }
+
+    // Load next batch when user reaches last page
+    const loadNextBatch = async () => {
+        if (isLoadingBatch) return
+
+        const nextBatchNumber = Math.max(...Array.from(loadedBatches)) + 1
+        const totalBatches = Math.ceil(totalRecords / BATCH_SIZE)
+
+        // Check if there are more batches to load
+        if (nextBatchNumber > totalBatches) {
+            console.log('📄 No more batches to load')
+            return
+        }
+
+        setIsLoadingBatch(true)
+        try {
+            const { convertedData, pagination } = await fetchBatch(nextBatchNumber)
+            const processedData = processCallData(convertedData)
+
+            // Merge with existing data
+            setData((prevData) => [...prevData, ...processedData])
+            setLoadedBatches((prev) => new Set([...prev, nextBatchNumber]))
+            setTotalRecords(pagination.total)
+            console.log(`✅ Batch ${nextBatchNumber} loaded and merged`)
+        } catch (error) {
+            console.error(`❌ Failed to load batch ${nextBatchNumber}:`, error)
+        } finally {
+            setIsLoadingBatch(false)
+        }
+    }
+
+    // Fetch initial data for client-side pagination
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true)
+            setLoadedBatches(new Set([1])) // Reset batches when filters change
             try {
-                console.log('🔄 Fetching all callers data...')
-                const response = await callerAnalysisApi.getAllCallers({
-                    filters,
-                    page: 1,
-                    limit: 1000, // Fetch 1000 records for client-side pagination
-                })
-                console.log('✅ Data fetched:', response)
-
-                // Convert API response to CallData format (this includes latestPayout)
-                const convertedData: Array<CallData> = response.data.map(
-                    (apiData) =>
-                        callerApiService.convertApiResponseToCallData(apiData)
-                )
-
-                console.log('✅ Data converted, sample:', convertedData[0])
-                console.log(
-                    '✅ Sample latestPayout:',
-                    convertedData[0]?.latestPayout
-                )
-
-                // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
-                const callerIdLtrMap = new Map<string, number>()
-
-                // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
-                const parseLatestPayout = (
-                    value: string | number | null | undefined
-                ): number => {
-                    if (value === null || value === undefined) return 0
-                    if (typeof value === 'number')
-                        return isNaN(value) ? 0 : value
-                    if (typeof value === 'string') {
-                        // Remove currency symbols, commas, and whitespace
-                        const cleaned = value.replace(/[$,\s]/g, '')
-                        const parsed = parseFloat(cleaned)
-                        return isNaN(parsed) ? 0 : parsed
-                    }
-                    return 0
-                }
-
-                // First pass: sum all latestPayout values for each callerId
-                convertedData.forEach((call: CallData) => {
-                    const callerId = call.callerId
-                    const latestPayout = parseLatestPayout(call.latestPayout)
-
-                    // Debug log for each call to see what we're parsing
-                    if (
-                        call.latestPayout &&
-                        typeof call.latestPayout === 'string' &&
-                        call.latestPayout.includes('30')
-                    ) {
-                        console.log('Found $30 latestPayout:', {
-                            callerId,
-                            rawLatestPayout: call.latestPayout,
-                            parsedLatestPayout: latestPayout,
-                            currentLTR: call.lifetimeRevenue,
-                            ringbaCost: call.ringbaCost,
-                        })
-                    }
-
-                    if (latestPayout > 0) {
-                        const currentSum = callerIdLtrMap.get(callerId) || 0
-                        const newSum = currentSum + latestPayout
-                        callerIdLtrMap.set(callerId, newSum)
-
-                        // Debug log for suspicious values
-                        if (latestPayout > 10 && newSum < 1) {
-                            console.warn('LTR calculation issue:', {
-                                callerId,
-                                latestPayout,
-                                currentSum,
-                                newSum,
-                                rawValue: call.latestPayout,
-                            })
-                        }
-                    }
-                })
-
-                // Debug: log the LTR map for verification
-                console.log(
-                    'LTR Map (first 10 entries):',
-                    Array.from(callerIdLtrMap.entries()).slice(0, 10)
-                )
-
-                // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-                const processedData = convertedData.map((call: CallData) => ({
-                    ...call,
-                    lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
-                }))
+                const { convertedData, pagination } = await fetchBatch(1)
+                const processedData = processCallData(convertedData)
 
                 setData(processedData)
-                setTotalRecords(response.pagination.total)
+                setTotalRecords(pagination.total)
                 setLastUpdated(new Date())
             } catch (error) {
                 console.error('❌ Failed to fetch data:', error)
@@ -140,19 +154,52 @@ export const useCallerAnalysis = () => {
     }, [filters])
 
     // Helper function to parse lastCall date string to Date object
+    // Handles formats: "Nov 07, 2025, 4:19:00 PM ET" or "Nov 07, 4:19:00 PM ET"
     const parseLastCallDate = (lastCall: string): Date | null => {
         try {
-            // Parse the date string format: "Aug 05, 06:00:00 AM ET"
-            const dateMatch = lastCall.match(
-                /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
+            // Try parsing with year first: "Nov 07, 2025, 4:19:00 PM ET"
+            let dateMatch = lastCall.match(
+                /(\w+)\s+(\d+),\s+(\d{4}),\s+(\d{1,2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
             )
-            if (!dateMatch) return null
+            
+            let year: number
+            let month: string
+            let day: string
+            let hour: string
+            let minute: string
+            let second: string
+            let ampm: string
 
-            const [, month, day, hour, minute, second, ampm] = dateMatch
+            if (dateMatch) {
+                // Format with year
+                const [, monthStr, dayStr, yearStr, hourStr, minuteStr, secondStr, ampmStr] = dateMatch
+                month = monthStr
+                day = dayStr
+                year = parseInt(yearStr)
+                hour = hourStr
+                minute = minuteStr
+                second = secondStr
+                ampm = ampmStr
+            } else {
+                // Try parsing without year: "Aug 05, 06:00:00 AM ET"
+                dateMatch = lastCall.match(
+                    /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
+                )
+                if (!dateMatch) return null
+                
+                const [, monthStr, dayStr, hourStr, minuteStr, secondStr, ampmStr] = dateMatch
+                month = monthStr
+                day = dayStr
+                hour = hourStr
+                minute = minuteStr
+                second = secondStr
+                ampm = ampmStr
+                year = new Date().getFullYear() // Use current year as fallback
+            }
+
             const monthIndex = new Date(
                 Date.parse(month + ' 1, 2000')
             ).getMonth()
-            const year = new Date().getFullYear() // Use current year as fallback
 
             let hour24 = parseInt(hour)
             if (ampm === 'PM' && hour24 !== 12) hour24 += 12
@@ -317,54 +364,13 @@ export const useCallerAnalysis = () => {
     // Refresh function
     const refetch = async () => {
         setIsLoading(true)
+        setLoadedBatches(new Set([1])) // Reset batches on refetch
         try {
-            const response = await callerAnalysisApi.getAllCallers({
-                filters,
-                page: 1,
-                limit: 1000,
-            })
-
-            // Data is already converted by callerAnalysisApi, but ensure latestPayout is preserved
-            // The response.data should already be CallData[] if callerAnalysisApi converts it
-            // But we'll work with it directly since it should have latestPayout from our fix
-            const convertedData: Array<CallData> = response.data
-
-            // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
-            const callerIdLtrMap = new Map<string, number>()
-
-            // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
-            const parseLatestPayout = (
-                value: string | number | null | undefined
-            ): number => {
-                if (value === null || value === undefined) return 0
-                if (typeof value === 'number') return isNaN(value) ? 0 : value
-                if (typeof value === 'string') {
-                    // Remove currency symbols, commas, and whitespace
-                    const cleaned = value.replace(/[$,\s]/g, '')
-                    const parsed = parseFloat(cleaned)
-                    return isNaN(parsed) ? 0 : parsed
-                }
-                return 0
-            }
-
-            // First pass: sum all latestPayout values for each callerId
-            convertedData.forEach((call: CallData) => {
-                const callerId = call.callerId
-                const latestPayout = parseLatestPayout(call.latestPayout)
-                if (callerId && latestPayout > 0) {
-                    const currentLTR = callerIdLtrMap.get(callerId) || 0
-                    callerIdLtrMap.set(callerId, currentLTR + latestPayout)
-                }
-            })
-
-            // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-            const processedData = convertedData.map((call: CallData) => ({
-                ...call,
-                lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
-            }))
+            const { convertedData, pagination } = await fetchBatch(1)
+            const processedData = processCallData(convertedData)
 
             setData(processedData)
-            setTotalRecords(response.pagination.total)
+            setTotalRecords(pagination.total)
             setLastUpdated(new Date())
         } catch (error) {
             console.error('❌ Failed to refetch data:', error)
@@ -383,7 +389,11 @@ export const useCallerAnalysis = () => {
         hasActiveFilters,
         totalRecords,
         isLoading,
+        isLoadingBatch,
         refetch,
         lastUpdated,
+        loadNextBatch,
+        loadedBatches,
+        BATCH_SIZE,
     }
 }
