@@ -25,6 +25,17 @@ export default defineConfig({
                 target: 'http://localhost:3001',
                 changeOrigin: true,
                 secure: false,
+                cookieDomainRewrite: '',
+                cookiePathRewrite: '/',
+                // Ensure cookies are forwarded
+                configure: (proxy, _options) => {
+                    proxy.on('proxyReq', (proxyReq, req, _res) => {
+                        // Forward cookies from the original request
+                        if (req.headers.cookie) {
+                            proxyReq.setHeader('Cookie', req.headers.cookie);
+                        }
+                    });
+                },
             },
         },
     },
