@@ -37,11 +37,23 @@ function Callback() {
                     }
 
                     // Call backend login endpoint to create session
-                    await apiClient.post('/api/auth/login', {
+                    // This endpoint doesn't require auth, so apiClient.post will skip auth wait
+                    const loginResponse = await apiClient.post('/api/auth/login', {
                         accessToken,
                     })
 
-                    console.log('✅ Backend login successful, session created')
+                    console.log('✅ Backend login successful, session created', loginResponse)
+
+                    // Verify session was created by checking /api/auth/me
+                    // Wait a bit to ensure cookie is set
+                    await new Promise((resolve) => setTimeout(resolve, 100))
+                    
+                    try {
+                        const meResponse = await apiClient.get('/api/auth/me')
+                        console.log('✅ Session verified:', meResponse)
+                    } catch (meError) {
+                        console.warn('⚠️ Session verification failed, but continuing:', meError)
+                    }
 
                     // Redirect to caller analysis after successful login
                     navigate({ to: '/caller-analysis' })

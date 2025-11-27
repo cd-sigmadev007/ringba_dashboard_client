@@ -302,8 +302,11 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
-            // Wait for auth initialization before making request
-            await this.waitForAuth()
+            // Don't wait for auth if this is the login endpoint (creates the session)
+            if (!url.includes('/api/auth/login')) {
+                // Wait for auth initialization before making request
+                await this.waitForAuth()
+            }
             const response = await this.instance.post<T>(url, data, config)
             return response.data
         } catch (error) {
