@@ -22,8 +22,8 @@ export default function AssignUserRoleModal({
     user,
 }: AssignUserRoleModalProps) {
     const [selectedRole, setSelectedRole] = useState<
-        'super_admin' | 'org_admin' | 'user'
-    >('user')
+        'super_admin' | 'org_admin' | 'media_buyer'
+    >('media_buyer')
     const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const { data: orgsData, isLoading: orgsLoading } = useOrganizations()
@@ -50,10 +50,12 @@ export default function AssignUserRoleModal({
         if (!user) return
 
         if (
-            (selectedRole === 'org_admin' || selectedRole === 'user') &&
+            (selectedRole === 'org_admin' || selectedRole === 'media_buyer') &&
             !selectedOrgId
         ) {
-            setError('Organization is required for org_admin and user roles')
+            setError(
+                'Organization is required for org_admin and media_buyer roles'
+            )
             return
         }
 
@@ -76,7 +78,7 @@ export default function AssignUserRoleModal({
 
     const handleClose = () => {
         if (!assignMutation.isPending) {
-            setSelectedRole('user')
+            setSelectedRole('media_buyer')
             setSelectedOrgId(null)
             setError(null)
             onClose()
@@ -84,7 +86,8 @@ export default function AssignUserRoleModal({
     }
 
     const organizations = orgsData?.data || []
-    const requiresOrg = selectedRole === 'org_admin' || selectedRole === 'user'
+    const requiresOrg =
+        selectedRole === 'org_admin' || selectedRole === 'media_buyer'
 
     return (
         <Modal
@@ -116,7 +119,7 @@ export default function AssignUserRoleModal({
                                     e.target.value as
                                         | 'super_admin'
                                         | 'org_admin'
-                                        | 'user'
+                                        | 'media_buyer'
                                 )
                             }
                             disabled={assignMutation.isPending}
@@ -125,7 +128,7 @@ export default function AssignUserRoleModal({
                         >
                             <option value="super_admin">Super Admin</option>
                             <option value="org_admin">Org Admin</option>
-                            <option value="user">User</option>
+                            <option value="media_buyer">Media Buyer</option>
                         </select>
                         {selectedRole === 'super_admin' && (
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">

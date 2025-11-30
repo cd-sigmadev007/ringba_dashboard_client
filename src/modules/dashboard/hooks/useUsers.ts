@@ -53,7 +53,7 @@ export function useAssignUserRole() {
             orgId,
         }: {
             userId: string
-            role: 'super_admin' | 'org_admin' | 'user'
+            role: 'super_admin' | 'org_admin' | 'media_buyer'
             orgId?: string | null
         }) => {
             return assignUserRole(userId, role, orgId)

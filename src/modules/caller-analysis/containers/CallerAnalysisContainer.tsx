@@ -132,23 +132,31 @@ export const CallerAnalysisContainer: React.FC = () => {
         (pageIndex: number, _pageSize: number, totalPages: number) => {
             // Check if user is on the last page
             const isLastPage = pageIndex + 1 === totalPages
-            
+
             if (isLastPage) {
                 // Calculate current batch based on loaded data
                 const currentBatch = Math.ceil(filteredData.length / BATCH_SIZE)
                 const totalBatches = Math.ceil(totalRecords / BATCH_SIZE)
-                
+
                 // If we have more batches to load, load the next one
                 // Only load if we're actually on the last page and have more data
                 if (currentBatch < totalBatches && !isLoadingBatch) {
-                    console.log(`📄 User reached last page (${pageIndex + 1}/${totalPages}), loading batch ${currentBatch + 1}`)
+                    console.log(
+                        `📄 User reached last page (${pageIndex + 1}/${totalPages}), loading batch ${currentBatch + 1}`
+                    )
                     loadNextBatch()
                     // Note: Don't change page index - let the table stay on the current page
                     // The new data will be added, increasing total pages, but we stay on the same page number
                 }
             }
         },
-        [filteredData.length, BATCH_SIZE, totalRecords, isLoadingBatch, loadNextBatch]
+        [
+            filteredData.length,
+            BATCH_SIZE,
+            totalRecords,
+            isLoadingBatch,
+            loadNextBatch,
+        ]
     )
 
     return (

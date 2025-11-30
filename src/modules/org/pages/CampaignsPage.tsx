@@ -24,11 +24,14 @@ const CampaignsPage: React.FC = () => {
     const navigate = useNavigate()
     const { campaigns, loading, fetchCampaigns, deleteCampaign } =
         useCampaignStore()
-    const { isAuthenticated, isLoading: authLoading } = usePermissions()
+    const { isAuthenticated, isLoading: authLoading, role } = usePermissions()
     const [deleteRow, setDeleteRow] = React.useState<CampaignRow | null>(null)
     const [deleting, setDeleting] = React.useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+
+    // Media buyers can only view campaigns, not create/edit/delete
+    const canManageCampaigns = role === 'super_admin' || role === 'org_admin'
 
     const handleEdit = useCallback(
         (row: CampaignRow) => {
@@ -61,8 +64,8 @@ const CampaignsPage: React.FC = () => {
         return `${base}${path}`
     }
 
-    const columns = React.useMemo(
-        () => [
+    const columns = React.useMemo(() => {
+        const baseColumns = [
             {
                 header: 'Name',
                 accessorKey: 'name',
@@ -97,6 +100,10 @@ const CampaignsPage: React.FC = () => {
                 accessorKey: 'id',
                 cell: ({ row }: any) => {
                     const { original } = row
+                    // Only show actions for super_admin and org_admin
+                    if (!canManageCampaigns) {
+                        return <span className="text-sm text-gray-400">-</span>
+                    }
                     return (
                         <div className="flex items-center gap-[5px]">
                             <Button
@@ -122,9 +129,15 @@ const CampaignsPage: React.FC = () => {
                 },
                 meta: { width: 160, align: 'left' as any },
             },
-        ],
-        [isDark, handleEdit, handleDelete]
-    )
+        ]
+
+        // Only show Action column for users who can manage campaigns
+        if (!canManageCampaigns) {
+            return baseColumns.filter((col) => col.accessorKey !== 'id')
+        }
+
+        return baseColumns
+    }, [isDark, handleEdit, handleDelete, canManageCampaigns])
 
     useEffect(() => {
         // Only fetch campaigns when authentication is ready, user is authenticated, and apiClient is initialized
@@ -169,15 +182,17 @@ const CampaignsPage: React.FC = () => {
         <div className={clsx('p-4 md:p-6 lg:p-8 space-y-4')}>
             <div className="flex items-center max-md:gap-y-6 max-md:flex-col max-md:items-start justify-between mb-6 py-6">
                 <h1 className="text-xl font-semibold">Campaigns</h1>
-                <Button
-                    id="open-create-campaign"
-                    variant="secondary"
-                    onClick={handleCreate}
-                    className="flex items-center gap-2"
-                >
-                    <AddIcon className="w-5 h-5" />
-                    New Campaign
-                </Button>
+                {canManageCampaigns && (
+                    <Button
+                        id="open-create-campaign"
+                        variant="secondary"
+                        onClick={handleCreate}
+                        className="flex items-center gap-2"
+                    >
+                        <AddIcon className="w-5 h-5" />
+                        New Campaign
+                    </Button>
+                )}
             </div>
             <div className="w-full">
                 <Table

@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { useUsersStore } from '../store/usersStore'
 import { AddUserModal } from '../components/AddUserModal'
 import { UserDetailModal } from '../components/UserDetailModal'
+import { usersApi } from '../services/usersApi'
 import type { UserDto } from '../services/usersApi'
 import { Modal, Table } from '@/components/ui'
 import Button from '@/components/ui/Button'
@@ -13,11 +14,12 @@ import { AddIcon } from '@/assets/svg/AddIcon'
 import { apiClient } from '@/services/api'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 import { DefaultAvatar } from '@/assets/svg'
+import { DeleteIcon } from '@/assets/svg/DeleteIcon'
 
 interface UserRow {
     id: string
     email: string
-    role: 'super_admin' | 'org_admin' | 'user'
+    role: 'super_admin' | 'org_admin' | 'media_buyer'
     invitation_status?: 'send' | 'accepted' | 'expired' | null
     logo_url?: string | null
 }
@@ -69,7 +71,8 @@ const UsersPage: React.FC = () => {
     const getRoleLabel = (userRole: string) => {
         if (userRole === 'super_admin') return 'Super Admin'
         if (userRole === 'org_admin') return 'Org Admin'
-        return 'User'
+        if (userRole === 'media_buyer') return 'Media Buyer'
+        return userRole // Fallback for unknown roles
     }
 
     const getInvitationStatusLabel = (status?: string | null) => {
@@ -79,6 +82,30 @@ const UsersPage: React.FC = () => {
         if (status === 'expired') return 'Expired'
         return status
     }
+
+    const handleDeleteUser = useCallback(
+        async (userId: string, e: React.MouseEvent) => {
+            e.stopPropagation() // Prevent row click
+            if (
+                !window.confirm(
+                    'Are you sure you want to delete this user? This action cannot be undone.'
+                )
+            ) {
+                return
+            }
+
+            try {
+                await usersApi.deleteUser(userId)
+                toast.success('User deleted successfully')
+                await fetchUsers() // Refresh list
+            } catch (error: any) {
+                toast.error(
+                    error?.message || 'Failed to delete user. Please try again.'
+                )
+            }
+        },
+        [fetchUsers]
+    )
 
     const columns = React.useMemo(
         () => [
@@ -140,8 +167,30 @@ const UsersPage: React.FC = () => {
                 },
                 meta: { width: 120 },
             },
+            {
+                header: 'Actions',
+                accessorKey: 'actions',
+                enableSorting: false,
+                cell: ({ row }: any) => {
+                    return (
+                        <div className="flex items-center justify-center">
+                            <Button
+                                variant="ghost"
+                                className="p-1 min-w-0 h-auto"
+                                onClick={(e) =>
+                                    handleDeleteUser(row.original.id, e)
+                                }
+                                title="Delete User"
+                            >
+                                <DeleteIcon className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    )
+                },
+                meta: { width: 80, sticky: 'right', align: 'center' },
+            },
         ],
-        [isDark]
+        [isDark, handleDeleteUser]
     )
 
     useEffect(() => {
@@ -218,6 +267,7 @@ const UsersPage: React.FC = () => {
                     pagination={true}
                     loading={loading}
                     className={clsx(theme === 'dark' ? 'dark' : '')}
+                    clickableRows={true}
                     onRowClick={handleRowClick}
                 />
             </div>
@@ -245,12 +295,22 @@ const UsersPage: React.FC = () => {
                 position={isMobile ? 'bottom' : 'right'}
                 title="User Details"
                 size="full"
-                className={isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'}
+                className={isMobile ? 'max-w-full max-h-[80vh]' : 'w-[600px]'}
                 animation={isMobile ? 'slide' : 'fade'}
             >
-                <div className="h-full overflow-y-auto custom-scroll">
-                    <UserDetailModal user={selectedUser} />
-                </div>
+                <UserDetailModal
+                    user={selectedUser}
+                    onClose={() => {
+                        setIsDetailModalOpen(false)
+                        setSelectedUser(null)
+                    }}
+                    onUserUpdated={async () => {
+                        await fetchUsers()
+                    }}
+                    onUserDeleted={async () => {
+                        await fetchUsers()
+                    }}
+                />
             </Modal>
         </div>
     )

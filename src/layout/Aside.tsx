@@ -9,6 +9,7 @@ import { useThemeStore } from '@/store/themeStore'
 import ThemeSwitcher from '@/layout/utils/theme-switcher'
 import { navLinks } from '@/layout/utils/navLinks'
 import { ChevronDownDark, ChevronDownLight } from '@/assets/svg'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface NavItemProps {
     navItem: NavLinkItem
@@ -26,6 +27,7 @@ const NavItem: React.FC<NavItemProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const location = useLocation()
+    const { role } = usePermissions()
     const hasSubmenu = navItem.submenu && navItem.submenu.length > 0
     const isExpanded = expandedItems.has(navItem.id)
     const isActive =
@@ -82,45 +84,51 @@ const NavItem: React.FC<NavItemProps> = ({
                 </Button>
                 {isExpanded && (
                     <ul className="ml-4 mt-[14px] flex flex-col gap-y-[14px]">
-                        {navItem.submenu?.map((subItem) => {
-                            const isSubActive =
-                                location.pathname === subItem.path
-                            return get(subItem, 'disable') ? (
-                                <Tooltip
-                                    key={subItem.id}
-                                    id={String(subItem.id)}
-                                    tooltipText="Coming soon"
-                                >
-                                    <Button
-                                        className={clsx(
-                                            'sidebar-item group cursor-pointer w-full text-sm pl-8 bg-transparent',
-                                            'opacity-50 cursor-not-allowed'
-                                        )}
-                                        disabled
+                        {navItem.submenu
+                            ?.filter((subItem) => {
+                                // Filter out items that should be hidden for current role
+                                const hideForRoles = subItem.hideForRoles || []
+                                return !hideForRoles.includes(role || '')
+                            })
+                            .map((subItem) => {
+                                const isSubActive =
+                                    location.pathname === subItem.path
+                                return get(subItem, 'disable') ? (
+                                    <Tooltip
+                                        key={subItem.id}
+                                        id={String(subItem.id)}
+                                        tooltipText="Coming soon"
                                     >
-                                        <span>{subItem.title}</span>
-                                    </Button>
-                                </Tooltip>
-                            ) : (
-                                <li key={subItem.id} className="w-full">
-                                    <Link
-                                        to={subItem.path}
-                                        className={clsx(
-                                            'sidebar-item group text-sm pl-8',
-                                            isSubActive &&
-                                                'sidebar-item-active sidebar-subitem-active'
-                                        )}
-                                        activeProps={{
-                                            className:
-                                                'sidebar-item-active sidebar-subitem-active group is-active',
-                                        }}
-                                        onClick={() => setOpenMenu(false)}
-                                    >
-                                        <span>{subItem.title}</span>
-                                    </Link>
-                                </li>
-                            )
-                        })}
+                                        <Button
+                                            className={clsx(
+                                                'sidebar-item group cursor-pointer w-full text-sm pl-8 bg-transparent',
+                                                'opacity-50 cursor-not-allowed'
+                                            )}
+                                            disabled
+                                        >
+                                            <span>{subItem.title}</span>
+                                        </Button>
+                                    </Tooltip>
+                                ) : (
+                                    <li key={subItem.id} className="w-full">
+                                        <Link
+                                            to={subItem.path}
+                                            className={clsx(
+                                                'sidebar-item group text-sm pl-8',
+                                                isSubActive &&
+                                                    'sidebar-item-active sidebar-subitem-active'
+                                            )}
+                                            activeProps={{
+                                                className:
+                                                    'sidebar-item-active sidebar-subitem-active group is-active',
+                                            }}
+                                            onClick={() => setOpenMenu(false)}
+                                        >
+                                            <span>{subItem.title}</span>
+                                        </Link>
+                                    </li>
+                                )
+                            })}
                     </ul>
                 )}
             </li>

@@ -31,10 +31,12 @@ export const useCallerAnalysis = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [totalRecords, setTotalRecords] = useState(0)
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-    
+
     // Pagination batch tracking
     const BATCH_SIZE = 1000
-    const [loadedBatches, setLoadedBatches] = useState<Set<number>>(new Set([1]))
+    const [loadedBatches, setLoadedBatches] = useState<Set<number>>(
+        new Set([1])
+    )
     const [isLoadingBatch, setIsLoadingBatch] = useState(false)
 
     // Fetch a specific batch of data
@@ -62,7 +64,9 @@ export const useCallerAnalysis = () => {
     }
 
     // Helper function to process and aggregate LTR data
-    const processCallData = (convertedData: Array<CallData>): Array<CallData> => {
+    const processCallData = (
+        convertedData: Array<CallData>
+    ): Array<CallData> => {
         // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
         const callerIdLtrMap = new Map<string, number>()
 
@@ -71,8 +75,7 @@ export const useCallerAnalysis = () => {
             value: string | number | null | undefined
         ): number => {
             if (value === null || value === undefined) return 0
-            if (typeof value === 'number')
-                return isNaN(value) ? 0 : value
+            if (typeof value === 'number') return isNaN(value) ? 0 : value
             if (typeof value === 'string') {
                 // Remove currency symbols, commas, and whitespace
                 const cleaned = value.replace(/[$,\s]/g, '')
@@ -116,13 +119,16 @@ export const useCallerAnalysis = () => {
 
         setIsLoadingBatch(true)
         try {
-            const { convertedData, pagination } = await fetchBatch(nextBatchNumber)
+            const { convertedData, pagination } =
+                await fetchBatch(nextBatchNumber)
             const processedData = processCallData(convertedData)
 
             // Merge with existing data
             setData((prevData) => {
                 const merged = [...prevData, ...processedData]
-                console.log(`✅ Batch ${nextBatchNumber} loaded: ${processedData.length} records, total: ${merged.length}`)
+                console.log(
+                    `✅ Batch ${nextBatchNumber} loaded: ${processedData.length} records, total: ${merged.length}`
+                )
                 return merged
             })
             setLoadedBatches((prev) => new Set([...prev, nextBatchNumber]))
@@ -166,7 +172,7 @@ export const useCallerAnalysis = () => {
             let dateMatch = lastCall.match(
                 /(\w+)\s+(\d+),\s+(\d{4}),\s+(\d{1,2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
             )
-            
+
             let year: number
             let month: string
             let day: string
@@ -177,7 +183,16 @@ export const useCallerAnalysis = () => {
 
             if (dateMatch) {
                 // Format with year
-                const [, monthStr, dayStr, yearStr, hourStr, minuteStr, secondStr, ampmStr] = dateMatch
+                const [
+                    ,
+                    monthStr,
+                    dayStr,
+                    yearStr,
+                    hourStr,
+                    minuteStr,
+                    secondStr,
+                    ampmStr,
+                ] = dateMatch
                 month = monthStr
                 day = dayStr
                 year = parseInt(yearStr)
@@ -191,8 +206,16 @@ export const useCallerAnalysis = () => {
                     /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
                 )
                 if (!dateMatch) return null
-                
-                const [, monthStr, dayStr, hourStr, minuteStr, secondStr, ampmStr] = dateMatch
+
+                const [
+                    ,
+                    monthStr,
+                    dayStr,
+                    hourStr,
+                    minuteStr,
+                    secondStr,
+                    ampmStr,
+                ] = dateMatch
                 month = monthStr
                 day = dayStr
                 hour = hourStr
