@@ -41,7 +41,7 @@ export default function AssignUserToOrgModal({
 
         if (selectedOrgId === null) {
             setError(
-                'Cannot remove organization from org_admin or user. Change role first.'
+                'Cannot remove organization from org_admin or media_buyer. Change role first.'
             )
             return
         }

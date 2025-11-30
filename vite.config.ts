@@ -32,9 +32,9 @@ export default defineConfig({
                     proxy.on('proxyReq', (proxyReq, req, _res) => {
                         // Forward cookies from the original request
                         if (req.headers.cookie) {
-                            proxyReq.setHeader('Cookie', req.headers.cookie);
+                            proxyReq.setHeader('Cookie', req.headers.cookie)
                         }
-                    });
+                    })
                 },
             },
         },

@@ -201,12 +201,14 @@ export class ApiClient {
         this.authReadyPromise = new Promise((resolve) => {
             this.resolveAuthReady = resolve
         })
-        
+
         // Set a timeout to resolve the promise after 10 seconds if auth is never initialized
         // This handles cases where the user might not be authenticated
         this.authCheckTimeout = setTimeout(() => {
             if (!this.authInitialized && this.resolveAuthReady) {
-                console.warn('ApiClient: Auth not initialized after 10s, proceeding without auth')
+                console.warn(
+                    'ApiClient: Auth not initialized after 10s, proceeding without auth'
+                )
                 this.resolveAuthReady()
             }
         }, 10000)
@@ -235,7 +237,9 @@ export class ApiClient {
             await this.authReadyPromise
         } catch (error) {
             // If error, log warning but continue (for non-authenticated requests)
-            console.warn('ApiClient: Auth initialization error, proceeding without auth')
+            console.warn(
+                'ApiClient: Auth initialization error, proceeding without auth'
+            )
         }
     }
 

@@ -11,6 +11,7 @@ export interface NavLinkItem {
         title: string
         path: string
         disable?: boolean
+        hideForRoles?: Array<string> // Roles that should not see this menu item
     }>
 }
 
@@ -39,6 +40,7 @@ export const navLinks: Array<NavLinkItem> = [
                 title: 'Manage Users',
                 path: '/organization/users',
                 disable: false,
+                hideForRoles: ['media_buyer'], // Hide for media buyers
             },
             {
                 id: 'org-campaigns',

@@ -51,7 +51,7 @@ export default function UserList({ onAssignOrg, onAssignRole }: UserListProps) {
                     const roleLabels: Record<string, string> = {
                         super_admin: 'Super Admin',
                         org_admin: 'Org Admin',
-                        user: 'User',
+                        media_buyer: 'Media Buyer',
                     }
                     return (
                         <span className="px-2 py-1 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">

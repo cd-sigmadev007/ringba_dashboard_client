@@ -49,7 +49,7 @@ export interface User {
     id: string
     auth0_user_id: string
     email: string
-    role: 'super_admin' | 'org_admin' | 'user'
+    role: 'super_admin' | 'org_admin' | 'media_buyer'
     org_id: string | null
     created_at: string
     created_by: string | null
@@ -64,7 +64,7 @@ export interface AssignUserToOrgRequest {
 }
 
 export interface AssignUserRoleRequest {
-    role: 'super_admin' | 'org_admin' | 'user'
+    role: 'super_admin' | 'org_admin' | 'media_buyer'
     org_id?: string | null
 }
 
@@ -93,7 +93,7 @@ export async function assignUserToOrg(
  */
 export async function assignUserRole(
     userId: string,
-    role: 'super_admin' | 'org_admin' | 'user',
+    role: 'super_admin' | 'org_admin' | 'media_buyer',
     orgId?: string | null
 ): Promise<ApiResponse<User>> {
     return apiClient.patch<ApiResponse<User>>(

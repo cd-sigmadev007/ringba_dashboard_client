@@ -76,9 +76,10 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
         <Modal
             open={isOpen}
             onClose={handleClose}
+            className="w-full"
             title="Add New User"
-            size="md"
-            position="center"
+            size="full"
+            position="bottom"
         >
             <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
                 <div>
@@ -113,9 +114,6 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
                         placeholder="Enter user email"
                         required
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        This email will be added to the allowlist automatically
-                    </p>
                 </div>
 
                 {error && (
@@ -124,11 +122,12 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
                     </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="ghost" onClick={handleClose}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleSubmit}>
+                <div className="flex justify-end gap-2 pt-4 w-full">
+                    <Button
+                        variant="primary"
+                        onClick={handleSubmit}
+                        className="w-full"
+                    >
                         Add User
                     </Button>
                 </div>

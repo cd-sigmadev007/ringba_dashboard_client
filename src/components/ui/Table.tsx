@@ -74,7 +74,11 @@ interface TableProps<T = any> {
     /**
      * Callback when pagination changes (page index, page size, total pages)
      */
-    onPaginationChange?: (pageIndex: number, pageSize: number, totalPages: number) => void
+    onPaginationChange?: (
+        pageIndex: number,
+        pageSize: number,
+        totalPages: number
+    ) => void
 }
 
 const Table = <T,>({
@@ -198,11 +202,17 @@ const Table = <T,>({
     useEffect(() => {
         if (pagination && onPaginationChange) {
             const pageIndex = table.getState().pagination.pageIndex
-            const pageSize = table.getState().pagination.pageSize
+            const currentPageSize = table.getState().pagination.pageSize
             const totalPages = table.getPageCount()
-            onPaginationChange(pageIndex, pageSize, totalPages)
+            onPaginationChange(pageIndex, currentPageSize, totalPages)
         }
-    }, [table.getState().pagination.pageIndex, table.getState().pagination.pageSize, table.getPageCount(), pagination, onPaginationChange])
+    }, [
+        table.getState().pagination.pageIndex,
+        table.getState().pagination.pageSize,
+        table.getPageCount(),
+        pagination,
+        onPaginationChange,
+    ])
 
     // Handle row click
     const handleRowClick = (row: T) => {
@@ -330,17 +340,34 @@ const Table = <T,>({
                                                         )?.align === 'center'
                                                             ? 'text-center'
                                                             : 'text-left',
-                                                        (
-                                                            header.column
-                                                                .columnDef
-                                                                .meta as any
-                                                        )?.sticky
-                                                            ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${
-                                                                  isDark
-                                                                      ? 'bg-[#001E3C]'
-                                                                      : 'bg-[#F5F8FA]'
-                                                              } relative`
-                                                            : 'static w-auto',
+                                                        (() => {
+                                                            const sticky = (
+                                                                header.column
+                                                                    .columnDef
+                                                                    .meta as any
+                                                            )?.sticky
+                                                            if (
+                                                                sticky ===
+                                                                'left'
+                                                            ) {
+                                                                return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${
+                                                                    isDark
+                                                                        ? 'bg-[#001E3C]'
+                                                                        : 'bg-[#F5F8FA]'
+                                                                } relative`
+                                                            }
+                                                            if (
+                                                                sticky ===
+                                                                'right'
+                                                            ) {
+                                                                return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right-th isolate ${
+                                                                    isDark
+                                                                        ? 'bg-[#001E3C]'
+                                                                        : 'bg-[#F5F8FA]'
+                                                                } relative`
+                                                            }
+                                                            return 'static w-auto'
+                                                        })(),
                                                         isDark
                                                             ? 'text-[#A1A5B7]'
                                                             : 'text-[#5E6278]',
@@ -462,16 +489,27 @@ const Table = <T,>({
                                                 )?.align === 'center'
                                                     ? 'text-center'
                                                     : '',
-                                                (
-                                                    cell.column.columnDef
-                                                        .meta as any
-                                                )?.sticky
-                                                    ? `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
-                                                          isDark
-                                                              ? 'bg-[#001E3C]'
-                                                              : 'bg-white'
-                                                      } relative`
-                                                    : 'static',
+                                                (() => {
+                                                    const sticky = (
+                                                        cell.column.columnDef
+                                                            .meta as any
+                                                    )?.sticky
+                                                    if (sticky === 'left') {
+                                                        return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
+                                                            isDark
+                                                                ? 'bg-[#001E3C]'
+                                                                : 'bg-white'
+                                                        } relative`
+                                                    }
+                                                    if (sticky === 'right') {
+                                                        return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right isolate ${
+                                                            isDark
+                                                                ? 'bg-[#001E3C]'
+                                                                : 'bg-white'
+                                                        } relative`
+                                                    }
+                                                    return 'static'
+                                                })(),
                                                 isDark
                                                     ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]'
                                                     : 'text-[#3F4254] bg-white group-hover:bg-[#F5F8FA]/80'

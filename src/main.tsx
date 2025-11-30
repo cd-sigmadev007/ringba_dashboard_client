@@ -106,7 +106,7 @@ if (rootElement && !rootElement.innerHTML) {
                             <RouterProvider router={router} />
                         </PreloadProviders>
                         <Toaster
-                            position="top-right"
+                            position="bottom-center"
                             toastOptions={{
                                 duration: 4000,
                                 style: {

@@ -43,7 +43,13 @@ const RootLayout: React.FC = () => {
             })
             return
         }
-    }, [isAuthenticated, isLoading, location.pathname, navigate, loginWithRedirect])
+    }, [
+        isAuthenticated,
+        isLoading,
+        location.pathname,
+        navigate,
+        loginWithRedirect,
+    ])
 
     return (
         <Styles>

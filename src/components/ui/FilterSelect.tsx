@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import clsx from 'clsx'
 import { get, isEqual } from 'lodash'
@@ -46,6 +46,8 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     )
     const theme = useThemeStore((s) => s.theme) // 'dark' | 'light'
     const isMobile = useIsMobile()
+    const isInitialMount = useRef(true)
+    const userInteractionRef = useRef(false)
     const selectRef = useClickOutside<HTMLDivElement>(() => {
         // Only close on click outside for desktop (when not using mobile modal)
         if (!isMobile) {
@@ -69,12 +71,33 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         }
     }, [openSelect, isMobile, filterList.length])
 
+    // Sync selected state with defaultValue prop changes (without triggering callbacks)
+    useEffect(() => {
+        if (
+            !multiple &&
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            defaultValue &&
+            defaultValue.value &&
+            !isEqual(selected, defaultValue)
+        ) {
+            setSelected(defaultValue)
+        }
+    }, [defaultValue, multiple, selected])
+
     useEffect(() => {
         if (!multiple) {
-            setOpenSelect(false)
-            setFilter(get(selected, 'value'))
+            // Only call setFilter if it's from user interaction, not initial mount or prop change
+            if (isInitialMount.current) {
+                isInitialMount.current = false
+                return
+            }
+            if (userInteractionRef.current) {
+                setOpenSelect(false)
+                setFilter(get(selected, 'value'))
+                userInteractionRef.current = false
+            }
         }
-    }, [selected])
+    }, [selected, multiple, setFilter])
 
     useEffect(() => {
         if (multiple) {
@@ -89,6 +112,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                 : [...multiSelected, option.value]
             setMultiSelected(newSelected)
         } else {
+            userInteractionRef.current = true // Mark as user interaction
             setSelected(option)
             setOpenSelect(false)
         }

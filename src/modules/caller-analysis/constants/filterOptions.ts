@@ -21,7 +21,10 @@ export function useCampaignOptions(): Array<SelectOption> {
             // Check if apiClient is initialized, if not wait a bit and retry
             if (apiClient.isAuthInitialized()) {
                 fetchCampaigns().catch((error) => {
-                    console.error('Failed to fetch campaigns in useCampaignOptions:', error)
+                    console.error(
+                        'Failed to fetch campaigns in useCampaignOptions:',
+                        error
+                    )
                 })
             } else {
                 // Wait for apiClient to be initialized (max 2 seconds)
@@ -36,7 +39,10 @@ export function useCampaignOptions(): Array<SelectOption> {
                         clearInterval(checkAuth)
                         if (apiClient.isAuthInitialized()) {
                             fetchCampaigns().catch((error) => {
-                                console.error('Failed to fetch campaigns in useCampaignOptions:', error)
+                                console.error(
+                                    'Failed to fetch campaigns in useCampaignOptions:',
+                                    error
+                                )
                             })
                         }
                     }

@@ -7,12 +7,12 @@ import { useState } from 'react'
 import OrganizationList from '../components/OrganizationList'
 import CreateOrganizationForm from '../components/CreateOrganizationForm'
 import UserList from '../components/UserList'
-import AssignUserToOrgModal from '../components/AssignUserToOrgModal'
-import AssignUserRoleModal from '../components/AssignUserRoleModal'
+// Deprecated: Assign role/org moved to Users page (org tab)
+// import AssignUserToOrgModal from '../components/AssignUserToOrgModal'
+// import AssignUserRoleModal from '../components/AssignUserRoleModal'
 // Deprecated: Allowed emails management moved to Users page
 // import AllowedEmailsList from '../components/AllowedEmailsList'
 // import AddAllowedEmailModal from '../components/AddAllowedEmailModal'
-import type { User } from '../services/adminApi'
 import Button from '@/components/ui/Button'
 import { Tabs } from '@/components/ui/Tabs'
 import { UserRole } from '@/types/auth'
@@ -22,12 +22,9 @@ import { AuthDebugPanel } from '@/components/debug/AuthDebugPanel'
 export default function DashboardPage() {
     const { role, isAuthenticated, isLoading } = usePermissions()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const [selectedUserForOrg, setSelectedUserForOrg] = useState<User | null>(
-        null
-    )
-    const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(
-        null
-    )
+    // Deprecated: Assign role/org moved to Users page (org tab)
+    // const [selectedUserForOrg, setSelectedUserForOrg] = useState<User | null>(null)
+    // const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null)
     // Deprecated: Allowed emails management moved to Users page
     // const [isAddEmailModalOpen, setIsAddEmailModalOpen] = useState(false)
 
@@ -112,12 +109,8 @@ export default function DashboardPage() {
                                         </div>
 
                                         <UserList
-                                            onAssignOrg={(user) =>
-                                                setSelectedUserForOrg(user)
-                                            }
-                                            onAssignRole={(user) =>
-                                                setSelectedUserForRole(user)
-                                            }
+                                            onAssignOrg={() => {}}
+                                            onAssignRole={() => {}}
                                         />
                                     </div>
                                 ),
@@ -155,7 +148,7 @@ export default function DashboardPage() {
             )}
 
             {/* Regular User Section */}
-            {role === UserRole.USER && (
+            {role === UserRole.MEDIA_BUYER && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
                     <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                         User Dashboard
@@ -181,19 +174,18 @@ export default function DashboardPage() {
                 onClose={() => setIsCreateModalOpen(false)}
             />
 
-            {/* Assign User to Org Modal */}
-            <AssignUserToOrgModal
+            {/* Deprecated: Assign role/org moved to Users page (org tab) */}
+            {/* <AssignUserToOrgModal
                 isOpen={!!selectedUserForOrg}
                 onClose={() => setSelectedUserForOrg(null)}
                 user={selectedUserForOrg}
             />
 
-            {/* Assign User Role Modal */}
             <AssignUserRoleModal
                 isOpen={!!selectedUserForRole}
                 onClose={() => setSelectedUserForRole(null)}
                 user={selectedUserForRole}
-            />
+            /> */}
 
             {/* Deprecated: Allowed emails management moved to Users page */}
             {/* <AddAllowedEmailModal
