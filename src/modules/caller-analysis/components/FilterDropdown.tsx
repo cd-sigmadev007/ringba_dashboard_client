@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import { useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
-import type { SelectOption } from '@/components/ui/FilterSelect'
-import { CheckboxIcon } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import Button from '@/components/ui/Button'
 import { DurationRangeFilter, FilterSelect, TimeFilter } from '@/components/ui'
 import { Search } from '@/components/common'
-import { callerAnalysisApi } from '@/services/api/callerAnalysis'
-import { apiClient } from '@/services/api'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
+import { useFilterTags } from '../hooks/useFilterTags'
+import { useFilterCategorySearch } from '../hooks/useFilterSearch'
+import { CampaignFilterSection } from './CampaignFilterSection'
 
 type FilterType = 'campaigns' | 'duration' | 'date' | 'type' | 'status' | 'disputeDate' | 'disputeAmount' | 'disputeStatus'
 
@@ -38,74 +36,18 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
     isOpen,
     triggerRef,
 }) => {
-    const { theme } = useThemeStore()
-    const isDark = theme === 'dark'
     const [selectedFilter, setSelectedFilter] = useState<FilterType>('campaigns')
     const [campaignSearchQuery, setCampaignSearchQuery] = useState('')
     const [filterSearchQuery, setFilterSearchQuery] = useState('')
-    const [statusOptions, setStatusOptions] = useState<Array<SelectOption>>([])
-    const [isLoadingTags, setIsLoadingTags] = useState(true)
+    const { statusOptions, isLoadingTags } = useFilterTags(isOpen)
     const campaignOptions = useCampaignOptions()
-    const campaigns = useCampaignStore((s) => s.campaigns)
     const campaignsLoading = useCampaignStore((s) => s.loading)
-    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { shouldShowFilter, shouldShowSection } = useFilterCategorySearch(filterSearchQuery)
     const dropdownRef = useClickOutside<HTMLDivElement>(() => {
         if (isOpen) {
             onClose()
         }
     })
-
-    // Fetch tags from database when auth is ready
-    useEffect(() => {
-        const fetchTagsInternal = async () => {
-            try {
-                setIsLoadingTags(true)
-                const tags = await callerAnalysisApi.getTags()
-                const options: Array<SelectOption> = tags.map(
-                    (tag: { tag_name: string; priority: string }) => ({
-                        title: tag.tag_name,
-                        value: tag.tag_name,
-                    })
-                )
-                setStatusOptions(options)
-            } catch (error) {
-                console.error('Failed to fetch tags:', error)
-                setStatusOptions([])
-            } finally {
-                setIsLoadingTags(false)
-            }
-        }
-
-        const fetchTags = () => {
-            if (authLoading) {
-                return
-            }
-
-            if (!isAuthenticated || !apiClient.isAuthInitialized()) {
-                const maxAttempts = 20
-                let attempts = 0
-                const checkAuth = setInterval(() => {
-                    attempts++
-                    if (
-                        apiClient.isAuthInitialized() ||
-                        attempts >= maxAttempts
-                    ) {
-                        clearInterval(checkAuth)
-                        if (apiClient.isAuthInitialized() && isAuthenticated) {
-                            fetchTagsInternal()
-                        } else {
-                            setIsLoadingTags(false)
-                        }
-                    }
-                }, 100)
-                return () => clearInterval(checkAuth)
-            }
-
-            fetchTagsInternal()
-        }
-
-        fetchTags()
-    }, [authLoading, isAuthenticated, isOpen])
 
     // Calculate active filter count
     const activeFilterCount =
@@ -146,26 +88,6 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         }
     }, [isOpen, triggerRef])
 
-    // Filter campaigns based on search
-    const filteredCampaigns = campaignOptions.filter((campaign) =>
-        campaign.title.toLowerCase().includes(campaignSearchQuery.toLowerCase())
-    )
-
-    // Filter filter categories based on search
-    const shouldShowFilter = (filterName: string) => {
-        if (!filterSearchQuery.trim()) return true
-        return filterName.toLowerCase().includes(filterSearchQuery.toLowerCase())
-    }
-
-    const shouldShowSection = (sectionName: string, filterList: Array<string>) => {
-        if (!filterSearchQuery.trim()) return true
-        return (
-            sectionName.toLowerCase().includes(filterSearchQuery.toLowerCase()) ||
-            filterList.some((f) =>
-                f.toLowerCase().includes(filterSearchQuery.toLowerCase())
-            )
-        )
-    }
 
     // Handle campaign toggle
     const handleCampaignToggle = (campaignValue: string) => {
@@ -479,192 +401,14 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
                     {/* Right Panel: Filter Content */}
                     <div className="flex-1 flex flex-col gap-[10px] h-full overflow-hidden">
                         {selectedFilter === 'campaigns' && (
-                            <>
-                                <div className="flex flex-col gap-[5px] items-start shrink-0">
-                                    <p
-                                        className={cn(
-                                            'font-["Poppins:SemiBold",sans-serif]',
-                                            'leading-[normal] not-italic text-[14px]',
-                                            'text-[#a1a5b7] text-nowrap uppercase'
-                                        )}
-                                    >
-                                        Campaigns
-                                    </p>
-                                    <Search
-                                        placeholder="Search Campaigns"
-                                        className="w-full"
-                                        onSearch={(query) =>
-                                            setCampaignSearchQuery(query)
-                                        }
-                                        disableDropdown={true}
-                                    />
-                                </div>
-                                <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[5px]">
-                                    {campaignsLoading ? (
-                                        <div className="flex items-center justify-center py-4">
-                                            <span className="text-[14px] text-[#a1a5b7]">
-                                                Loading campaigns...
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        filteredCampaigns.map((campaign) => {
-                                            const isSelected =
-                                                filters.campaignFilter.includes(
-                                                    campaign.value
-                                                )
-                                            return (
-                                                <button
-                                                    key={campaign.value}
-                                                    onClick={() =>
-                                                        handleCampaignToggle(
-                                                            campaign.value
-                                                        )
-                                                    }
-                                                    className={cn(
-                                                        'flex gap-[10px] items-center p-[5px]',
-                                                        'rounded-[7px] w-full text-left',
-                                                        'hover:opacity-80 transition-opacity'
-                                                    )}
-                                                >
-                                                    <CheckboxIcon
-                                                        checked={isSelected}
-                                                        isDark={isDark}
-                                                        className="size-[20px] shrink-0"
-                                                    />
-                                                    <div className="flex gap-[10px] items-center">
-                                                        {(() => {
-                                                            // Find campaign in store by value (campaign ID) or name
-                                                            const campaignData =
-                                                                campaigns.find(
-                                                                    (c) =>
-                                                                        (c.campaign_id &&
-                                                                            c.campaign_id ===
-                                                                                campaign.value) ||
-                                                                        (c.id &&
-                                                                            c.id ===
-                                                                                campaign.value) ||
-                                                                        c.name ===
-                                                                            campaign.title
-                                                                )
-
-                                                            if (
-                                                                campaignData &&
-                                                                campaignData.logo_url
-                                                            ) {
-                                                                // Use original campaign logo
-                                                                const getApiBaseUrl =
-                                                                    () => {
-                                                                        const baseUrl =
-                                                                            import.meta.env
-                                                                                .VITE_API_BASE_URL ||
-                                                                            'http://localhost:3001'
-                                                                        return baseUrl
-                                                                            .replace(
-                                                                                /\/api$/,
-                                                                                ''
-                                                                            )
-                                                                            .replace(
-                                                                                /\/+$/,
-                                                                                ''
-                                                                            )
-                                                                    }
-                                                                const logoUrl =
-                                                                    campaignData.logo_url.startsWith(
-                                                                        'http'
-                                                                    )
-                                                                        ? campaignData.logo_url
-                                                                        : `${getApiBaseUrl()}${
-                                                                              campaignData.logo_url.startsWith(
-                                                                                  '/'
-                                                                              )
-                                                                                  ? ''
-                                                                                  : '/'
-                                                                          }${campaignData.logo_url}`
-
-                                                                return (
-                                                                    <div className="size-[20px] rounded-[30px] shrink-0 overflow-hidden">
-                                                                        <img
-                                                                            src={
-                                                                                logoUrl
-                                                                            }
-                                                                            alt={
-                                                                                campaignData.name
-                                                                            }
-                                                                            className="w-full h-full object-cover"
-                                                                        />
-                                                                    </div>
-                                                                )
-                                                            } else {
-                                                                // Fallback to default icon with initial
-                                                                const initial =
-                                                                    campaign.title
-                                                                        .toUpperCase()
-                                                                        .charAt(0)
-                                                                const bgColor =
-                                                                    (() => {
-                                                                        let hash = 0
-                                                                        for (
-                                                                            let i = 0;
-                                                                            i <
-                                                                            campaign.title.length;
-                                                                            i++
-                                                                        ) {
-                                                                            hash =
-                                                                                campaign.title.charCodeAt(
-                                                                                    i
-                                                                                ) +
-                                                                                ((hash <<
-                                                                                    5) -
-                                                                                    hash)
-                                                                        }
-                                                                        const hue =
-                                                                            Math.abs(
-                                                                                hash
-                                                                            ) %
-                                                                            360
-                                                                        const saturation =
-                                                                            30 +
-                                                                            (Math.abs(
-                                                                                hash
-                                                                            ) %
-                                                                                21)
-                                                                        const lightness =
-                                                                            50 +
-                                                                            (Math.abs(
-                                                                                hash
-                                                                            ) %
-                                                                                11)
-                                                                        return `hsl(${hue}, ${saturation}%, ${lightness}%)`
-                                                                    })()
-                                                                return (
-                                                                    <div
-                                                                        className="size-[20px] rounded-[30px] shrink-0 flex items-center justify-center text-xs font-bold text-white"
-                                                                        style={{
-                                                                            backgroundColor:
-                                                                                bgColor,
-                                                                        }}
-                                                                    >
-                                                                        {initial}
-                                                                    </div>
-                                                                )
-                                                            }
-                                                        })()}
-                                                        <p
-                                                            className={cn(
-                                                                'font-["Poppins:Regular",sans-serif]',
-                                                                'leading-[normal] not-italic text-[14px]',
-                                                                'text-[#f5f8fa] text-nowrap'
-                                                            )}
-                                                        >
-                                                            {campaign.title}
-                                                        </p>
-                                                    </div>
-                                                </button>
-                                            )
-                                        })
-                                    )}
-                                </div>
-                            </>
+                            <CampaignFilterSection
+                                campaigns={campaignOptions}
+                                selectedCampaigns={filters.campaignFilter}
+                                onCampaignToggle={handleCampaignToggle}
+                                searchQuery={campaignSearchQuery}
+                                onSearchChange={setCampaignSearchQuery}
+                                isLoading={campaignsLoading}
+                            />
                         )}
 
                         {selectedFilter === 'duration' && (
