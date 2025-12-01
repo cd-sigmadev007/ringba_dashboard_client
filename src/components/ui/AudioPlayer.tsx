@@ -130,7 +130,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         return (
             <div
                 className={cn(
-                    'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
+                    'fixed bottom-6  w-[40%] left-1/2 transform -translate-x-1/2 z-50',
                     'flex items-center justify-center px-[20px] py-[16px] rounded-lg',
                     isDark
                         ? 'bg-red-900/20 text-red-400'
@@ -146,7 +146,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return (
         <div
             className={cn(
-                'audio-player fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50',
+                'audio-player fixed bottom-6  w-[40%] left-1/2 transform -translate-x-1/2 z-50',
                 'flex items-center gap-2.5 p-4 shadow-lg',
                 'w-[533px] h-[55px]',
                 'rounded-[50px] shadow-[0_24px_30px_0_rgba(0,0,0,0.10)]',

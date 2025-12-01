@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import WaveSurfer from 'wavesurfer.js'
+import Button from './Button'
 import { cn } from '@/lib'
 import { useThemeStore } from '@/store/themeStore'
 import { PauseIcon, PlayIcon } from '@/assets/svg'
-import Button from './Button'
 
 interface WaveformAudioPlayerProps {
     audioUrl: string
@@ -13,23 +13,29 @@ interface WaveformAudioPlayerProps {
     className?: string
     showBorder?: boolean // Control border visibility
     onClose?: () => void // Optional close handler for fixed position players
+
+    variant?: 'default' | 'floating' // Floating variant for main table bottom player
 }
 
 // Get proxy URL for audio to avoid CORS issues
 const getProxyUrl = (audioUrl: string): string => {
     if (!audioUrl) return audioUrl
-    
+
     // If URL is already from our backend, use it directly
-    if (audioUrl.startsWith('/api/') || audioUrl.startsWith('http://localhost:3001') || audioUrl.includes('insidefi.co')) {
+    if (
+        audioUrl.startsWith('/api/') ||
+        audioUrl.startsWith('http://localhost:3001') ||
+        audioUrl.includes('insidefi.co')
+    ) {
         return audioUrl
     }
-    
+
     // Otherwise, proxy through our backend
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
     const apiBaseUrl = baseUrl.endsWith('/api')
         ? baseUrl
         : baseUrl.replace(/\/$/, '') + '/api'
-    
+
     return `${apiBaseUrl}/audio-proxy?url=${encodeURIComponent(audioUrl)}`
 }
 
@@ -41,6 +47,7 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
     className,
     showBorder = true,
     onClose,
+    variant = 'default',
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -72,6 +79,8 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
 
     // Use external isPlaying state if provided
     const isPlaying = externalIsPlaying
+
+    const isFloating = variant === 'floating'
 
     // Format time to MM:SS
     const formatTime = (time: number): string => {
@@ -132,13 +141,16 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
 
         // Load audio through proxy to avoid CORS issues
         const proxyUrl = getProxyUrl(audioUrl)
-        
+
         // Handle the load promise to catch AbortErrors
         const loadPromise = wavesurfer.load(proxyUrl)
         if (loadPromise && typeof loadPromise.catch === 'function') {
             loadPromise.catch((err: any) => {
                 // Silently ignore AbortError - it's expected when component unmounts or audio changes
-                if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
+                if (
+                    err?.name === 'AbortError' ||
+                    err?.message?.includes('aborted')
+                ) {
                     return
                 }
                 // Only log non-abort errors if component is still mounted
@@ -171,7 +183,11 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
 
         const handleError = (err: Error | any) => {
             // Silently ignore AbortError - it's expected during cleanup/unmount
-            if (err?.name === 'AbortError' || err?.message?.includes('aborted') || err?.message?.includes('BodyStreamBuffer was aborted')) {
+            if (
+                err?.name === 'AbortError' ||
+                err?.message?.includes('aborted') ||
+                err?.message?.includes('BodyStreamBuffer was aborted')
+            ) {
                 return
             }
             if (!isMountedRef.current) return
@@ -231,7 +247,10 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
         if (isPlaying && !wavesurfer.isPlaying()) {
             wavesurfer.play().catch((err: any) => {
                 // Ignore AbortError during play
-                if (err?.name !== 'AbortError' && !err?.message?.includes('aborted')) {
+                if (
+                    err?.name !== 'AbortError' &&
+                    !err?.message?.includes('aborted')
+                ) {
                     console.warn('WaveSurfer play error:', err)
                 }
                 onPlayPauseRef.current?.(false)
@@ -251,7 +270,10 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
         } else {
             wavesurfer.play().catch((err: any) => {
                 // Ignore AbortError during play
-                if (err?.name !== 'AbortError' && !err?.message?.includes('aborted')) {
+                if (
+                    err?.name !== 'AbortError' &&
+                    !err?.message?.includes('aborted')
+                ) {
                     console.warn('WaveSurfer play error:', err)
                 }
                 onPlayPauseRef.current?.(false)
@@ -280,12 +302,19 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
     return (
         <div
             className={cn(
-                'flex items-center justify-between p-4 gap-x-2 shadow-lg',
-                'rounded-[7px] shadow-[0_12px_24px_0_rgba(10,24,40,1)]',
-                isDark
-                    ? 'bg-[#0A1828]'
-                    : 'bg-white',
-                showBorder && (isDark ? 'border border-[#1B456F]' : 'border border-[#E1E5E9]'),
+                'flex items-center gap-x-2 shadow-lg',
+                'shadow-[0_12px_24px_0_rgba(10,24,40,1)]',
+                isFloating
+                    ? 'justify-center px-[20px] py-[15px] rounded-[50px] bg-[#132F4C] border border-[#007FFF]'
+                    : 'justify-between p-4 rounded-[7px]',
+                !isFloating &&
+                    (showBorder
+                        ? isDark
+                            ? 'bg-[#0A1828] border border-[#1B456F]'
+                            : 'bg-white border border-[#E1E5E9]'
+                        : isDark
+                          ? 'bg-[#0A1828]'
+                          : 'bg-white'),
                 className
             )}
         >
@@ -327,7 +356,10 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
             <div className="flex-1 flex justify-center mx-4">
                 <div
                     ref={waveformRef}
-                    className="h-[21px] w-[428px] max-w-full"
+                    className={cn(
+                        'h-[21px] w-full',
+                        isFloating && 'max-w-[337px]'
+                    )}
                     style={{ minHeight: '21px' }}
                 />
             </div>
@@ -348,7 +380,9 @@ export const WaveformAudioPlayer: React.FC<WaveformAudioPlayerProps> = ({
                     onClick={onClose}
                     className={cn(
                         'ml-2 w-6 h-6 rounded-full flex items-center justify-center transition-colors shrink-0',
-                        isDark ? 'text-[#A1A5B7] hover:text-[#F5F8FA]' : 'text-[#5E6278] hover:text-[#3F4254]'
+                        isDark
+                            ? 'text-[#A1A5B7] hover:text-[#F5F8FA]'
+                            : 'text-[#5E6278] hover:text-[#3F4254]'
                     )}
                 >
                     <svg

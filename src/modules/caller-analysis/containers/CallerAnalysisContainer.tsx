@@ -294,7 +294,7 @@ export const CallerAnalysisContainer: React.FC = () => {
 
                 {/* Audio Player */}
                 {audioPlayerVisible && (
-                    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+                    <div className="fixed bottom-6 w-[40%] left-1/2 transform -translate-x-1/2 z-50">
                         <WaveformAudioPlayer
                             audioUrl={currentAudioUrl}
                             isVisible={audioPlayerVisible}
@@ -302,6 +302,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                             onPlayPause={handleAudioPlayPause}
                             isPlaying={isPlaying}
                             showBorder={true}
+                            variant="floating"
                         />
                     </div>
                 )}

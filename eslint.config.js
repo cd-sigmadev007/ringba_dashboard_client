@@ -8,6 +8,12 @@ export default [
     },
     ...tanstackConfig,
     {
+        // Global rules override
+        rules: {
+            '@typescript-eslint/no-unnecessary-condition': 'off',
+        },
+    },
+    {
         // Override PNPM rules for package.json
         files: ['package.json', '**/package.json'],
         rules: {

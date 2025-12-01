@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { getCampaignLogo } from '../../utils/campaignLogos'
+import { TranscriptContent } from '../TranscriptContent'
+import { parseTranscriptToEntries } from '../../utils/transcriptUtils'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { mockHistoryData } from '@/data/caller-tabs-data'
@@ -10,8 +12,6 @@ import {
 } from '@/assets/svg'
 import { cn } from '@/lib'
 import { WaveformAudioPlayer } from '@/components/ui/WaveformAudioPlayer'
-import { TranscriptContent } from '../TranscriptContent'
-import { parseTranscriptToEntries } from '../../utils/transcriptUtils'
 
 export interface HistoryTabContentProps {
     historyData?: Array<HistoryEntry>
@@ -48,17 +48,15 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    
+
     // Track which entries are expanded (using entry index + date as key)
     const [expandedEntries, setExpandedEntries] = useState<Set<string>>(
         new Set()
     )
-    
+
     // Track playing state for each entry
-    const [playingEntries, setPlayingEntries] = useState<Set<string>>(
-        new Set()
-    )
-    
+    const [playingEntries, setPlayingEntries] = useState<Set<string>>(new Set())
+
     const toggleEntry = (entryKey: string) => {
         setExpandedEntries((prev) => {
             const next = new Set(prev)
@@ -76,7 +74,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
             return next
         })
     }
-    
+
     const handlePlayPause = (entryKey: string, playing: boolean) => {
         setPlayingEntries((prev) => {
             const next = new Set(prev)
@@ -158,12 +156,12 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                         const campaignLogo = getCampaignLogo(
                             entry.campaignId || entry.campaignName || ''
                         )
-                        
+
                         // Create unique key for this entry
                         const entryKey = `${group.date}-${entryIndex}`
                         const isExpanded = expandedEntries.has(entryKey)
                         const isPlaying = playingEntries.has(entryKey)
-                        
+
                         // Parse transcript if available
                         const transcriptEntries = entry.transcript
                             ? parseTranscriptToEntries(entry.transcript)
@@ -175,7 +173,9 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                 <div
                                     className={cn(
                                         'flex gap-[14px] items-start p-[16px] cursor-pointer',
-                                        !isLastEntry && !isExpanded && 'border-b',
+                                        !isLastEntry &&
+                                            !isExpanded &&
+                                            'border-b',
                                         isDark
                                             ? 'border-[#1B456F]'
                                             : 'border-[#E1E5E9]'
@@ -209,7 +209,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                                         ? 'Converted'
                                                         : 'Not Converted'}
                                                 </p>
-                                                
+
                                                 {/* Campaign Badge */}
                                                 {campaignLogo && (
                                                     <div
@@ -221,8 +221,12 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                                         )}
                                                     >
                                                         <img
-                                                            src={campaignLogo.image}
-                                                            alt={campaignLogo.name}
+                                                            src={
+                                                                campaignLogo.image
+                                                            }
+                                                            alt={
+                                                                campaignLogo.name
+                                                            }
                                                             className="size-4 rounded-full object-cover"
                                                         />
                                                         <p
@@ -289,7 +293,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                             </p>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Chevron Icon */}
                                     <div className="flex items-center justify-center shrink-0">
                                         <div
@@ -302,7 +306,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {/* Expanded Content: Audio Player + Transcript */}
                                 {isExpanded && entry.audioUrl && (
                                     <div
@@ -328,13 +332,16 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                                 isVisible={true}
                                                 isPlaying={isPlaying}
                                                 onPlayPause={(playing) =>
-                                                    handlePlayPause(entryKey, playing)
+                                                    handlePlayPause(
+                                                        entryKey,
+                                                        playing
+                                                    )
                                                 }
                                                 showBorder={false}
                                                 className="w-full"
                                             />
                                         </div>
-                                        
+
                                         {/* Transcript */}
                                         {transcriptEntries.length > 0 && (
                                             <div
@@ -346,7 +353,9 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                                 )}
                                             >
                                                 <TranscriptContent
-                                                    transcriptData={transcriptEntries}
+                                                    transcriptData={
+                                                        transcriptEntries
+                                                    }
                                                     border={false}
                                                 />
                                             </div>

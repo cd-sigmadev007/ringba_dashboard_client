@@ -29,7 +29,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
         if (id) return String(id)
         // Use crypto.randomUUID() for unique ID generation with fallback
         try {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+             
             if (crypto.randomUUID) {
                 return `tooltip-${crypto.randomUUID()}`
             } else {

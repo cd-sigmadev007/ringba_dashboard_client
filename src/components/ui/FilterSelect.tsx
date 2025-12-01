@@ -75,7 +75,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     useEffect(() => {
         if (
             !multiple &&
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+             
             defaultValue &&
             defaultValue.value &&
             !isEqual(selected, defaultValue)
