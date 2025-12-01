@@ -14,6 +14,8 @@ export interface HistoryEntry {
     revenue: number // Revenue amount
     campaignId?: string // Campaign ID for badge
     campaignName?: string // Campaign name for badge (fallback)
+    audioUrl?: string // Audio URL for this history entry
+    transcript?: string // Transcript for this history entry
 }
 
 export interface CallerAnalysisData {

@@ -46,6 +46,7 @@ class CallerApiService {
 
         try {
             const response = await fetch(url, {
+                credentials: 'include', // Required for cookies to be sent
                 headers: {
                     'Content-Type': 'application/json',
                     ...options?.headers,

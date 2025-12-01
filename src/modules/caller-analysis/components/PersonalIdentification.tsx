@@ -2,13 +2,12 @@ import React from 'react'
 import clsx from 'clsx'
 import { useCallerAnalysisApi } from '../hooks'
 import { buildAddressFromCallData } from '../utils/addressUtils'
-import { parseTranscriptToEntries } from '../utils/transcriptUtils'
 import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
 import { PriorityStatusSection } from './PriorityStatusSection'
-import { HistoryTabContent, JSONTabContent, TranscriptTabContent } from './tabs'
+import { HistoryTabContent, JSONTabContent } from './tabs'
 import type { CallData } from '../types'
 import type { TabItem } from '@/components/ui/Tabs'
-import type { HistoryEntry, TranscriptEntry } from '@/data/caller-tabs-data'
+import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 import { Tabs } from '@/components/ui'
@@ -104,24 +103,12 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         callerData.callerId
     )
 
-    // Parse transcript string to entries with timestamps
-    const transcriptEntries: Array<TranscriptEntry> = parseTranscriptToEntries(
-        callerData.transcript
-    )
-
     // Map history API rows to HistoryEntry[] used by tab
     const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
         historyResp?.data || []
     )
 
     const tabs: Array<TabItem> = [
-        {
-            id: 'transcription',
-            label: 'Call Transcription',
-            content: (
-                <TranscriptTabContent transcriptData={transcriptEntries} />
-            ),
-        },
         {
             id: 'history',
             label: 'History',
@@ -169,7 +156,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                 {/* Lifetime Revenue Section inside */}
                 <div
                     className={clsx(
-                        'flex p-3.5 items-start flex-row gap-x-[32px] border-b',
+                        'flex p-3.5 items-start flex-row gap-x-[32px]',
                         isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]',
                         isMobile ? 'flex-col gap-y-4' : 'flex-row'
                     )}
@@ -265,7 +252,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
             {/* Tabs Section */}
             <div className="mt-6">
-                <Tabs tabs={tabs} defaultActiveTab="transcription" />
+                <Tabs tabs={tabs} defaultActiveTab="history" />
             </div>
         </div>
     )

@@ -23,7 +23,7 @@ export const TranscriptContent: React.FC<TranscriptContentProps> = ({
             {/* Transcript Content */}
             <div
                 className={clsx(
-                    'p-4 rounded-[7px]',
+                    'rounded-[7px]',
                     border
                         ? isDark
                             ? 'border border-[#1B456F]'
@@ -31,7 +31,7 @@ export const TranscriptContent: React.FC<TranscriptContentProps> = ({
                         : 'border-none'
                 )}
             >
-                <div className="space-y-4">
+                <div className="space-y-4 p-4">
                     {transcriptData.map((entry, index) => (
                         <div key={index} className="flex gap-4">
                             {/* Timestamp */}

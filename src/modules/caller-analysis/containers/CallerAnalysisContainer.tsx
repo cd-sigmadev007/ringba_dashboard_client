@@ -8,7 +8,8 @@ import { CallDetailsModal } from '../components/CallDetailsModal'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
-import { AudioPlayer, Modal, Table } from '@/components/ui'
+import { Modal, Table } from '@/components/ui'
+import { WaveformAudioPlayer } from '@/components/ui/WaveformAudioPlayer'
 import Button from '@/components/ui/Button'
 import { RefreshButton } from '@/components/ui/RefreshButton'
 import { FilterPills, FiltersSection } from '@/modules'
@@ -260,7 +261,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                     title="Caller Details"
                     size={isMobile ? 'full' : 'full'}
                     className={
-                        isMobile ? 'max-w-full max-h-[80vh]' : 'max-w-[40%]'
+                        isMobile ? 'max-w-full max-h-[80vh]' : 'w-[600px]'
                     }
                     animation={isMobile ? 'slide' : 'fade'}
                 >
@@ -293,13 +294,16 @@ export const CallerAnalysisContainer: React.FC = () => {
 
                 {/* Audio Player */}
                 {audioPlayerVisible && (
-                    <AudioPlayer
-                        audioUrl={currentAudioUrl}
-                        isVisible={audioPlayerVisible}
-                        onClose={handleCloseAudioPlayer}
-                        onPlayPause={handleAudioPlayPause}
-                        isPlaying={isPlaying}
-                    />
+                    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+                        <WaveformAudioPlayer
+                            audioUrl={currentAudioUrl}
+                            isVisible={audioPlayerVisible}
+                            onClose={handleCloseAudioPlayer}
+                            onPlayPause={handleAudioPlayPause}
+                            isPlaying={isPlaying}
+                            showBorder={true}
+                        />
+                    </div>
                 )}
             </div>
         </div>

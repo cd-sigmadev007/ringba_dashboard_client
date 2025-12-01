@@ -46,6 +46,8 @@ export function mapApiDataToHistoryEntries(
             revenue,
             campaignId,
             campaignName: undefined, // Will be resolved by getCampaignLogo
+            audioUrl: h.audioUrl,
+            transcript: h.transcript,
         }
     })
 }
