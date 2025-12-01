@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
-import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import Button from '@/components/ui/Button'
 import { DurationRangeFilter, FilterSelect, TimeFilter } from '@/components/ui'
