@@ -8,6 +8,8 @@ import { CallDetailsModal } from '../components/CallDetailsModal'
 import { TableHeader } from '../components/TableHeader'
 import { ColumnsDropdown } from '../components/ColumnsDropdown'
 import { FilterDropdown } from '../components/FilterDropdown'
+import { useColumnStore } from '../store/columnStore'
+import { useFilterStore } from '../store/filterStore'
 import type { ColumnOption } from '../components/ColumnsDropdown'
 import type { CallData } from '../types'
 import type { ColumnVisibility } from '../hooks/useTableColumns'
@@ -50,17 +52,8 @@ export const CallerAnalysisContainer: React.FC = () => {
     const filterButtonRef = React.useRef<HTMLButtonElement | null>(null)
     const columnsButtonRef = React.useRef<HTMLButtonElement | null>(null)
 
-    // Column visibility state
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<ColumnVisibility>({
-            callerId: true,
-            lastCall: true,
-            duration: true,
-            lifetimeRevenue: true,
-            campaign: true,
-            action: true,
-            status: true,
-        })
+    // Column visibility state from Zustand store
+    const { columnVisibility, toggleColumn } = useColumnStore()
 
     // Column options for dropdown
     const columnOptions: Array<ColumnOption> = React.useMemo(
@@ -125,6 +118,12 @@ export const CallerAnalysisContainer: React.FC = () => {
         BATCH_SIZE,
         totalRecords,
     } = useCallerAnalysis()
+
+    // Sync filter store with hook's filter state
+    const { setFilters: setStoreFilters } = useFilterStore()
+    React.useEffect(() => {
+        setStoreFilters(filters)
+    }, [filters, setStoreFilters])
 
     // Fetch campaigns on mount to ensure logos are available
     React.useEffect(() => {
@@ -204,10 +203,7 @@ export const CallerAnalysisContainer: React.FC = () => {
 
     // Handle column toggle
     const handleColumnToggle = (columnId: string) => {
-        setColumnVisibility((prev) => ({
-            ...prev,
-            [columnId]: !prev[columnId],
-        }))
+        toggleColumn(columnId as keyof ColumnVisibility)
     }
 
     // Handle pagination changes - load next batch when user reaches last page

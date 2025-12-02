@@ -116,11 +116,7 @@ export const DurationRangeFilter: React.FC<DurationRangeFilterProps> = ({
 
     if (filterType === 'raw') {
         // In raw mode, only update tempRange (don't call onChange until Apply is clicked)
-        return (
-            <div className={className}>
-                {RangeInputs}
-            </div>
-        )
+        return <div className={className}>{RangeInputs}</div>
     }
 
     return (

@@ -260,8 +260,19 @@ export const Search: React.FC<SearchProps> = ({
         suggestions.nfts.length > 0
 
     return (
-        <div className={cn('relative w-full', customBg ? '' : 'max-w-[490px]', className)}>
-            <div className={cn(customBg && 'rounded-[7px] overflow-hidden', customBg)}>
+        <div
+            className={cn(
+                'relative w-full',
+                customBg ? '' : 'max-w-[490px]',
+                className
+            )}
+        >
+            <div
+                className={cn(
+                    customBg && 'rounded-[7px] overflow-hidden',
+                    customBg
+                )}
+            >
                 <Input
                     value={searchQuery}
                     onChange={handleInputChange}

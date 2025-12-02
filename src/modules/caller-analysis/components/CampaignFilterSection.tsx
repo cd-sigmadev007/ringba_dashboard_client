@@ -95,15 +95,15 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
                 >
                     Campaigns
                 </p>
-                    <Search
-                        placeholder="Search Campaigns"
-                        className="w-full"
-                        onSearch={onSearchChange}
-                        disableDropdown={true}
-                        customBg="bg-[#132f4c]"
-                        customHeight="h-[37px]"
-                        inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
-                    />
+                <Search
+                    placeholder="Search Campaigns"
+                    className="w-full"
+                    onSearch={onSearchChange}
+                    disableDropdown={true}
+                    customBg="bg-[#132f4c]"
+                    customHeight="h-[37px]"
+                    inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
+                />
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[5px]">

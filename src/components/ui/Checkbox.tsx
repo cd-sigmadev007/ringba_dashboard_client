@@ -23,7 +23,7 @@ interface CheckboxProps {
 
 /**
  * Checkbox component matching Figma design
- * 
+ *
  * @example
  * ```tsx
  * <Checkbox checked={isSelected} />
@@ -40,9 +40,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             className={cn(
                 'flex items-center justify-center shrink-0',
                 'rounded-[2px] transition-all',
-                checked
-                    ? 'bg-white'
-                    : 'bg-transparent border border-[#F5F8FA]',
+                checked ? 'bg-white' : 'bg-transparent border border-[#F5F8FA]',
                 className
             )}
             style={{ width: size, height: size }}
@@ -67,4 +65,3 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         </div>
     )
 }
-

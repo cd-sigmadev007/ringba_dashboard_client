@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react'
-import type { SelectOption } from '@/components/ui/FilterSelect'
+import { useMemo } from 'react'
 
 export function useFilterSearch<T extends { title: string }>(
     items: Array<T>,

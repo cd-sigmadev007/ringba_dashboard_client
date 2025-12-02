@@ -256,7 +256,9 @@ const Table = <T,>({
                     {customHeader && (
                         <div
                             className="border-b"
-                            style={{ borderColor: isDark ? '#1B456F' : '#ECECEC' }}
+                            style={{
+                                borderColor: isDark ? '#1B456F' : '#ECECEC',
+                            }}
                         >
                             {customHeader}
                         </div>
