@@ -31,8 +31,12 @@ export const CheckboxIcon: React.FC<
         {title ? <title id={titleId}>{title}</title> : null}
         {checked ? (
             <>
-                <path
-                    d="M2.5 2.5H15C16.3807 2.5 17.5 3.61929 17.5 5V15C17.5 16.3807 16.3807 17.5 15 17.5H5C3.61929 17.5 2.5 16.3807 2.5 15V5C2.5 3.61929 3.61929 2.5 5 2.5H15C16.3807 2.5 17.5 3.61929 17.5 5V15C17.5 16.3807 16.3807 17.5 15 17.5H5C3.61929 17.5 2.5 16.3807 2.5 15V5Z"
+                <rect
+                    x="2.5"
+                    y="2.5"
+                    width="15"
+                    height="15"
+                    rx="2.5"
                     fill={isDark ? '#F5F8FA' : '#007FFF'}
                 />
                 <path

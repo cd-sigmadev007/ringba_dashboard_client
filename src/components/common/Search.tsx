@@ -31,6 +31,18 @@ interface SearchProps {
      * Disable the dropdown suggestions
      */
     disableDropdown?: boolean
+    /**
+     * Custom background color class
+     */
+    customBg?: string
+    /**
+     * Custom height class
+     */
+    customHeight?: string
+    /**
+     * Custom input className
+     */
+    inputClassName?: string
 }
 
 /**
@@ -48,6 +60,9 @@ export const Search: React.FC<SearchProps> = ({
     placeholder = 'Search any Address, dApps, NFT Collection',
     onSearch,
     disableDropdown = false,
+    customBg,
+    customHeight,
+    inputClassName,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -245,31 +260,47 @@ export const Search: React.FC<SearchProps> = ({
         suggestions.nfts.length > 0
 
     return (
-        <div className={cn('relative w-full max-w-[490px]', className)}>
-            <Input
-                value={searchQuery}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                placeholder={placeholder}
-                leftIcon={
-                    <svg
-                        className="w-4 h-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                    </svg>
-                }
-                className={cn('pr-12', isWhite && !isDark && 'bg-white')}
-                shadow={false}
-            />
+        <div className={cn('relative w-full', customBg ? '' : 'max-w-[490px]', className)}>
+            <div className={cn(customBg && 'rounded-[7px] overflow-hidden', customBg)}>
+                <Input
+                    value={searchQuery}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    placeholder={placeholder}
+                    leftIcon={
+                        <svg
+                            className="w-4 h-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                    }
+                    className={cn(
+                        'pr-12',
+                        isWhite && !isDark && 'bg-white',
+                        customHeight,
+                        // Only apply inputClassName if it doesn't override focus states
+                        // If inputClassName includes focus overrides, use it as-is
+                        inputClassName?.includes('focus:!border-none')
+                            ? inputClassName
+                            : cn(
+                                  inputClassName,
+                                  // Preserve default focus states
+                                  'focus:border-[#007FFF]',
+                                  isDark && 'focus:bg-[#001E3C]'
+                              )
+                    )}
+                    shadow={false}
+                />
+            </div>
 
             {/* Search suggestions dropdown */}
             {showSuggestions && (

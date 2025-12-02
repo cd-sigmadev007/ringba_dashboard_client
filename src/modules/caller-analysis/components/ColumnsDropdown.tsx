@@ -105,19 +105,24 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
             const rect = triggerRef.current.getBoundingClientRect()
             const spaceBelow = window.innerHeight - rect.bottom
             const spaceAbove = rect.top
+            const dropdownWidth = 374
 
             // Calculate right position to align dropdown's right edge with button's right edge
             const rightPosition = window.innerWidth - rect.right
 
+            // Ensure dropdown doesn't go off screen on the left
+            const maxRight = window.innerWidth - dropdownWidth
+            const finalRight = Math.min(rightPosition, maxRight)
+
             if (spaceBelow < 400 && spaceAbove > spaceBelow) {
                 setPosition({
                     bottom: window.innerHeight - rect.top,
-                    right: rightPosition,
+                    right: finalRight,
                 })
             } else {
                 setPosition({
                     top: rect.bottom + 8,
-                    right: rightPosition,
+                    right: finalRight,
                 })
             }
         } else {
@@ -131,7 +136,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         <div
             ref={dropdownRef}
             className={cn(
-                'fixed z-[1000] bg-[#002b57] border border-[#132f4c]',
+                'fixed z-[1000] absolute right-5 bg-[#002b57] border border-[#132f4c]',
                 'rounded-[7px] shadow-lg',
                 'w-[374px] max-h-[440px] flex flex-col'
             )}
@@ -271,4 +276,3 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         </div>
     )
 }
-

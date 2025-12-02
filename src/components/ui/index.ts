@@ -4,6 +4,7 @@
  */
 
 export * from './Button'
+export * from './Checkbox'
 export * from './DurationRangeFilter'
 export * from './Input'
 export * from './Modal'

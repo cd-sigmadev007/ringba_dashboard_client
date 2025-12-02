@@ -19,13 +19,29 @@ import type { Preset, TimeFilterProps } from './types'
 import type { DateRange, SelectRangeEventHandler } from 'react-day-picker'
 import { useIsMobile } from '@/lib'
 
-const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
+const TimeFilter: React.FC<TimeFilterProps> = ({
+    onChange,
+    className,
+    filterType = 'dropdown',
+    value,
+}) => {
     const { theme } = useThemeStore()
     const isMobile = useIsMobile()
     const isDark = theme === 'dark'
     const [open, setOpen] = useState(false)
-    const [range, setRange] = useState<DateRange | undefined>()
+    const [range, setRange] = useState<DateRange | undefined>(
+        value ? { from: value.from, to: value.to } : undefined
+    )
     const [activePreset, setActivePreset] = useState<string | null>(null)
+
+    // Sync range state with value prop
+    React.useEffect(() => {
+        if (value) {
+            setRange({ from: value.from, to: value.to })
+        } else {
+            setRange(undefined)
+        }
+    }, [value])
 
     // Click outside handler for desktop popover only
     const triggerRef = useClickOutside<HTMLDivElement>(() => {
@@ -39,13 +55,22 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
         const { from, to } = calculatePresetDateRange(preset)
         setRange({ from, to })
         setActivePreset(preset.label)
-        // Immediately apply the change for preset selections
-        onChange?.({ from, to })
+        // Only apply immediately if not in raw mode (for backward compatibility)
+        if (filterType !== 'raw') {
+            onChange?.({ from, to })
+        } else {
+            // In raw mode, only update state, onChange will be called on Apply
+            onChange?.({ from, to })
+        }
     }
 
     const handleSelect: SelectRangeEventHandler = (rng) => {
         setRange(rng)
         setActivePreset('Custom')
+        // In raw mode, update onChange immediately for calendar selection
+        if (filterType === 'raw' && rng?.from && rng?.to) {
+            onChange?.({ from: rng.from, to: rng.to })
+        }
     }
 
     const handleClear = () => {
@@ -74,10 +99,35 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ onChange, className }) => {
                 {/* Calendar */}
                 <DatePickerCalendar selected={range} onSelect={handleSelect} />
             </div>
-            <div className="horizontal-line my-4" />
-            <ActionButtons onClear={handleClear} onDone={handleDone} />
+            {filterType === 'dropdown' && (
+                <>
+                    <div className="horizontal-line my-4" />
+                    <ActionButtons onClear={handleClear} onDone={handleDone} />
+                </>
+            )}
         </>
     )
+
+    // Raw mode: just show presets and calendar, no input trigger or action buttons
+    if (filterType === 'raw') {
+        return (
+            <div className={twMerge('flex flex-col gap-[15px]', className)}>
+                <div className="flex flex-col md:flex-row gap-[15px] text-body-xs">
+                    {/* Presets */}
+                    <PresetButtons
+                        activePreset={activePreset}
+                        onPresetClick={handlePresetClick}
+                    />
+
+                    {/* Calendar */}
+                    <DatePickerCalendar
+                        selected={range}
+                        onSelect={handleSelect}
+                    />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div ref={triggerRef} className={twMerge('relative', className)}>

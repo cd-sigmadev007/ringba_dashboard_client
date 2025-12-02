@@ -79,6 +79,10 @@ interface TableProps<T = any> {
         pageSize: number,
         totalPages: number
     ) => void
+    /**
+     * Custom header component to render above the table (inside the card)
+     */
+    customHeader?: React.ReactNode
 }
 
 const Table = <T,>({
@@ -96,6 +100,7 @@ const Table = <T,>({
     onRowClick,
     loading = false,
     emptyMessage = 'No data available',
+    customHeader,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -246,22 +251,33 @@ const Table = <T,>({
     if (data.length === 0) {
         return (
             <div className={cn('w-full', className)}>
-                <div className="card rounded-[10px] p-8 text-center">
-                    <div
-                        className={clsx(
-                            'text-lg font-medium mb-2',
-                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
-                        )}
-                    >
-                        {emptyMessage}
-                    </div>
-                    <div
-                        className={clsx(
-                            'text-sm',
-                            isDark ? 'text-[#7E8299]' : 'text-[#A1A5B7]'
-                        )}
-                    >
-                        No records found to display
+                <div className="card rounded-[10px] overflow-hidden">
+                    {/* Custom header (e.g., TableHeader with filters) - always show even with no data */}
+                    {customHeader && (
+                        <div
+                            className="border-b"
+                            style={{ borderColor: isDark ? '#1B456F' : '#ECECEC' }}
+                        >
+                            {customHeader}
+                        </div>
+                    )}
+                    <div className="p-8 text-center">
+                        <div
+                            className={clsx(
+                                'text-lg font-medium mb-2',
+                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                            )}
+                        >
+                            {emptyMessage}
+                        </div>
+                        <div
+                            className={clsx(
+                                'text-sm',
+                                isDark ? 'text-[#7E8299]' : 'text-[#A1A5B7]'
+                            )}
+                        >
+                            No records found to display
+                        </div>
                     </div>
                 </div>
             </div>
@@ -274,6 +290,16 @@ const Table = <T,>({
                 className="card rounded-[10px] overflow-hidden table-container"
                 ref={containerRef}
             >
+                {/* Custom header (e.g., TableHeader with filters) */}
+                {customHeader && (
+                    <div
+                        className="border-b"
+                        style={{ borderColor: isDark ? '#1B456F' : '#ECECEC' }}
+                    >
+                        {customHeader}
+                    </div>
+                )}
+
                 {/* Collapsible header */}
                 {collapsible ? (
                     <div

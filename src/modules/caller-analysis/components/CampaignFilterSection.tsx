@@ -1,9 +1,9 @@
+import type { SelectOption } from '@/components/ui/FilterSelect'
 import { CheckboxIcon } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn } from '@/lib'
 import { Search } from '@/components/common'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
-import type { SelectOption } from '@/components/ui/FilterSelect'
 
 interface CampaignFilterSectionProps {
     campaigns: Array<SelectOption>
@@ -41,8 +41,7 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
         if (campaignData && campaignData.logo_url) {
             const getApiBaseUrl = () => {
                 const baseUrl =
-                    import.meta.env.VITE_API_BASE_URL ||
-                    'http://localhost:3001'
+                    import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
                 return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
             }
             const logoUrl = campaignData.logo_url.startsWith('http')
@@ -66,8 +65,7 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
         const bgColor = (() => {
             let hash = 0
             for (let i = 0; i < campaign.title.length; i++) {
-                hash =
-                    campaign.title.charCodeAt(i) + ((hash << 5) - hash)
+                hash = campaign.title.charCodeAt(i) + ((hash << 5) - hash)
             }
             const hue = Math.abs(hash) % 360
             const saturation = 30 + (Math.abs(hash) % 21)
@@ -97,13 +95,17 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
                 >
                     Campaigns
                 </p>
-                <Search
-                    placeholder="Search Campaigns"
-                    className="w-full"
-                    onSearch={onSearchChange}
-                    disableDropdown={true}
-                />
+                    <Search
+                        placeholder="Search Campaigns"
+                        className="w-full"
+                        onSearch={onSearchChange}
+                        disableDropdown={true}
+                        customBg="bg-[#132f4c]"
+                        customHeight="h-[37px]"
+                        inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
+                    />
             </div>
+
             <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[5px]">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-4">
@@ -123,7 +125,8 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
                                 className={cn(
                                     'flex gap-[10px] items-center p-[5px]',
                                     'rounded-[7px] w-full text-left',
-                                    'hover:opacity-80 transition-opacity'
+                                    'hover:opacity-80 transition-opacity',
+                                    'box-border'
                                 )}
                             >
                                 <CheckboxIcon
@@ -151,4 +154,3 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
         </>
     )
 }
-

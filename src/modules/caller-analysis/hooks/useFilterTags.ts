@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
+import type { SelectOption } from '@/components/ui/FilterSelect'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import { apiClient } from '@/services/api'
-import type { SelectOption } from '@/components/ui/FilterSelect'
 
 export function useFilterTags(isOpen: boolean) {
     const [statusOptions, setStatusOptions] = useState<Array<SelectOption>>([])
@@ -62,4 +62,3 @@ export function useFilterTags(isOpen: boolean) {
 
     return { statusOptions, isLoadingTags }
 }
-

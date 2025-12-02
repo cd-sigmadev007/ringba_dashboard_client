@@ -75,7 +75,6 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     useEffect(() => {
         if (
             !multiple &&
-             
             defaultValue &&
             defaultValue.value &&
             !isEqual(selected, defaultValue)

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { SelectOption } from '@/components/ui/FilterSelect'
 
 export function useFilterSearch<T extends { title: string }>(
@@ -20,7 +20,10 @@ export function useFilterCategorySearch(searchQuery: string) {
         return filterName.toLowerCase().includes(searchQuery.toLowerCase())
     }
 
-    const shouldShowSection = (sectionName: string, filterList: Array<string>) => {
+    const shouldShowSection = (
+        sectionName: string,
+        filterList: Array<string>
+    ) => {
         if (!searchQuery.trim()) return true
         return (
             sectionName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,4 +35,3 @@ export function useFilterCategorySearch(searchQuery: string) {
 
     return { shouldShowFilter, shouldShowSection }
 }
-

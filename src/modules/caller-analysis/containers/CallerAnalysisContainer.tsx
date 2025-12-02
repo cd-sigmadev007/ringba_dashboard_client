@@ -44,30 +44,69 @@ export const CallerAnalysisContainer: React.FC = () => {
     const [filterDropdownOpen, setFilterDropdownOpen] = React.useState(false)
     const [columnsDropdownOpen, setColumnsDropdownOpen] = React.useState(false)
     const [selectAllChecked, setSelectAllChecked] = React.useState(false)
+    const [selectedFilterType, setSelectedFilterType] = React.useState<
+        'campaigns' | 'duration' | 'date' | 'status' | undefined
+    >(undefined)
     const filterButtonRef = React.useRef<HTMLButtonElement | null>(null)
     const columnsButtonRef = React.useRef<HTMLButtonElement | null>(null)
 
     // Column visibility state
-    const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibility>({
-        callerId: true,
-        lastCall: true,
-        duration: true,
-        lifetimeRevenue: true,
-        campaign: true,
-        action: true,
-        status: true,
-    })
+    const [columnVisibility, setColumnVisibility] =
+        React.useState<ColumnVisibility>({
+            callerId: true,
+            lastCall: true,
+            duration: true,
+            lifetimeRevenue: true,
+            campaign: true,
+            action: true,
+            status: true,
+        })
 
     // Column options for dropdown
     const columnOptions: Array<ColumnOption> = React.useMemo(
         () => [
-            { id: 'callerId', label: 'Caller ID', category: 'applied', visible: columnVisibility.callerId ?? true },
-            { id: 'lastCall', label: 'Last Call', category: 'applied', visible: columnVisibility.lastCall ?? true },
-            { id: 'duration', label: 'Duration', category: 'applied', visible: columnVisibility.duration ?? true },
-            { id: 'lifetimeRevenue', label: 'LTR', category: 'applied', visible: columnVisibility.lifetimeRevenue ?? true },
-            { id: 'campaign', label: 'Campaign', category: 'applied', visible: columnVisibility.campaign ?? true },
-            { id: 'action', label: 'Action', category: 'applied', visible: columnVisibility.action ?? true },
-            { id: 'status', label: 'Status', category: 'applied', visible: columnVisibility.status ?? true },
+            {
+                id: 'callerId',
+                label: 'Caller ID',
+                category: 'applied',
+                visible: columnVisibility.callerId ?? true,
+            },
+            {
+                id: 'lastCall',
+                label: 'Last Call',
+                category: 'applied',
+                visible: columnVisibility.lastCall ?? true,
+            },
+            {
+                id: 'duration',
+                label: 'Duration',
+                category: 'applied',
+                visible: columnVisibility.duration ?? true,
+            },
+            {
+                id: 'lifetimeRevenue',
+                label: 'LTR',
+                category: 'applied',
+                visible: columnVisibility.lifetimeRevenue ?? true,
+            },
+            {
+                id: 'campaign',
+                label: 'Campaign',
+                category: 'applied',
+                visible: columnVisibility.campaign ?? true,
+            },
+            {
+                id: 'action',
+                label: 'Action',
+                category: 'applied',
+                visible: columnVisibility.action ?? true,
+            },
+            {
+                id: 'status',
+                label: 'Status',
+                category: 'applied',
+                visible: columnVisibility.status ?? true,
+            },
         ],
         [columnVisibility]
     )
@@ -171,7 +210,6 @@ export const CallerAnalysisContainer: React.FC = () => {
         }))
     }
 
-
     // Handle pagination changes - load next batch when user reaches last page
     const handlePaginationChange = React.useCallback(
         (pageIndex: number, _pageSize: number, totalPages: number) => {
@@ -248,40 +286,8 @@ export const CallerAnalysisContainer: React.FC = () => {
                     </div>
                 </div> */}
 
-                {/* Table Header */}
-                <div className="mb-4 relative">
-                    <TableHeader
-                        filters={filters}
-                        onRemoveFilter={removeFilters}
-                        onFilterClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
-                        onColumnsClick={() => setColumnsDropdownOpen(!columnsDropdownOpen)}
-                        onSelectAll={(checked) => setSelectAllChecked(checked)}
-                        selectAllChecked={selectAllChecked}
-                    />
-                    {filterDropdownOpen && (
-                        <FilterDropdown
-                            filters={filters}
-                            onFiltersChange={updateFilters}
-                            onClearAll={clearAllFilters}
-                            onClose={() => setFilterDropdownOpen(false)}
-                            isOpen={filterDropdownOpen}
-                            triggerRef={filterButtonRef}
-                        />
-                    )}
-                    {columnsDropdownOpen && (
-                        <ColumnsDropdown
-                            columns={columnOptions}
-                            onColumnToggle={handleColumnToggle}
-                            onClose={() => setColumnsDropdownOpen(false)}
-                            isOpen={columnsDropdownOpen}
-                            triggerRef={columnsButtonRef}
-                        />
-                    )}
-                </div>
-
-
-                {/* Main Table */}
-                <div className="w-full overflow-x-auto">
+                {/* Main Table with integrated header */}
+                <div className="w-full overflow-x-auto relative">
                     <Table
                         data={filteredData}
                         columns={columns}
@@ -293,6 +299,57 @@ export const CallerAnalysisContainer: React.FC = () => {
                         loading={isLoading || isLoadingBatch}
                         className="w-full"
                         onPaginationChange={handlePaginationChange}
+                        customHeader={
+                            <div className="relative">
+                                <TableHeader
+                                    filters={filters}
+                                    onRemoveFilter={removeFilters}
+                                    onFilterClick={() => {
+                                        setSelectedFilterType(undefined)
+                                        setFilterDropdownOpen(
+                                            !filterDropdownOpen
+                                        )
+                                    }}
+                                    onFilterPillClick={(filterType) => {
+                                        setSelectedFilterType(filterType)
+                                        setFilterDropdownOpen(true)
+                                    }}
+                                    onColumnsClick={() =>
+                                        setColumnsDropdownOpen(
+                                            !columnsDropdownOpen
+                                        )
+                                    }
+                                    onSelectAll={(checked) =>
+                                        setSelectAllChecked(checked)
+                                    }
+                                    selectAllChecked={selectAllChecked}
+                                />
+                                {filterDropdownOpen && (
+                                    <FilterDropdown
+                                        filters={filters}
+                                        onFiltersChange={updateFilters}
+                                        onClearAll={clearAllFilters}
+                                        onClose={() =>
+                                            setFilterDropdownOpen(false)
+                                        }
+                                        isOpen={filterDropdownOpen}
+                                        triggerRef={filterButtonRef}
+                                        filterType={selectedFilterType}
+                                    />
+                                )}
+                                {columnsDropdownOpen && (
+                                    <ColumnsDropdown
+                                        columns={columnOptions}
+                                        onColumnToggle={handleColumnToggle}
+                                        onClose={() =>
+                                            setColumnsDropdownOpen(false)
+                                        }
+                                        isOpen={columnsDropdownOpen}
+                                        triggerRef={columnsButtonRef}
+                                    />
+                                )}
+                            </div>
+                        }
                     />
                 </div>
 

@@ -3,9 +3,15 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { useCampaignOptions } from '../constants/filterOptions'
+import { useFilterTags } from '../hooks/useFilterTags'
 import type { DurationRange } from '@/components/ui/DurationRangeFilter'
 import type { FilterState } from '../types'
-import { CancelIcon, CheckboxIcon, FilterIcon, ViewColumnIcon } from '@/assets/svg'
+import {
+    CancelIcon,
+    CheckboxIcon,
+    FilterIcon,
+    ViewColumnIcon,
+} from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn } from '@/lib'
 import Button from '@/components/ui/Button'
@@ -23,6 +29,9 @@ interface TableHeaderProps {
         dateRange: () => void
     }
     onFilterClick: () => void
+    onFilterPillClick?: (
+        filterType: 'campaigns' | 'duration' | 'date' | 'status'
+    ) => void
     onColumnsClick: () => void
     onSelectAll?: (checked: boolean) => void
     selectAllChecked?: boolean
@@ -32,6 +41,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     filters,
     onRemoveFilter,
     onFilterClick,
+    onFilterPillClick,
     onColumnsClick,
     onSelectAll,
     selectAllChecked = false,
@@ -39,6 +49,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const campaignOptions = useCampaignOptions()
+    const { statusOptions } = useFilterTags(true)
 
     const formatDurationRange = (range: DurationRange) => {
         if (range.min !== undefined && range.max !== undefined) {
@@ -67,8 +78,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     return (
         <div
             className={cn(
-                'border border-solid box-border flex items-center justify-between',
-                'px-[20px] py-[16px] rounded-[10px]',
+                'flex items-center justify-between',
+                'px-[20px] py-[16px]',
                 isDark
                     ? 'bg-[#001e3c] border-[#132f4c]'
                     : 'bg-white border-[#E1E5E9]'
@@ -139,10 +150,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                             <Button
                                 key={filter}
                                 variant="secondary"
+                                onClick={() => onFilterPillClick?.('campaigns')}
                                 className={cn(
                                     'box-border flex gap-[5px] items-center',
                                     'px-[10px] py-[7px] rounded-[10px] shrink-0',
-                                    'h-auto min-h-0'
+                                    'h-auto min-h-0 cursor-pointer'
                                 )}
                             >
                                 <div
@@ -193,15 +205,80 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                         )
                     })}
 
+                    {/* Status Filter Pills */}
+                    {filters.statusFilter.map((filter) => {
+                        const option = statusOptions.find(
+                            (opt) => opt.value === filter
+                        )
+                        return (
+                            <Button
+                                key={filter}
+                                variant="secondary"
+                                onClick={() => onFilterPillClick?.('status')}
+                                className={cn(
+                                    'box-border flex gap-[5px] items-center',
+                                    'px-[10px] py-[7px] rounded-[10px] shrink-0',
+                                    'h-auto min-h-0 cursor-pointer'
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        'flex font-["Poppins:Medium",sans-serif]',
+                                        'gap-[5px] items-center leading-[normal]',
+                                        'not-italic relative shrink-0 text-[14px] text-nowrap'
+                                    )}
+                                >
+                                    <p
+                                        className={cn(
+                                            'relative shrink-0',
+                                            isDark
+                                                ? 'text-[#f5f8fa]'
+                                                : 'text-[#3F4254]'
+                                        )}
+                                    >
+                                        Status:
+                                    </p>
+                                    <p
+                                        className={cn(
+                                            'relative shrink-0',
+                                            isDark
+                                                ? 'text-[#007fff]'
+                                                : 'text-[#007FFF]'
+                                        )}
+                                    >
+                                        {option?.title || filter}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onRemoveFilter.status(filter)
+                                    }}
+                                    className="relative shrink-0 size-[20px] flex items-center justify-center ml-1"
+                                >
+                                    <CancelIcon
+                                        className={cn(
+                                            'size-[20px]',
+                                            isDark
+                                                ? 'text-[#F5F8FA]'
+                                                : 'text-[#3F4254]'
+                                        )}
+                                    />
+                                </button>
+                            </Button>
+                        )
+                    })}
+
                     {/* Duration Range Pill */}
                     {(filters.durationRange.min !== undefined ||
                         filters.durationRange.max !== undefined) && (
                         <Button
                             variant="secondary"
+                            onClick={() => onFilterPillClick?.('duration')}
                             className={cn(
                                 'box-border flex gap-[5px] items-center',
                                 'px-[10px] py-[7px] rounded-[10px] shrink-0',
-                                'h-auto min-h-0'
+                                'h-auto min-h-0 cursor-pointer'
                             )}
                         >
                             <div
@@ -255,10 +332,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                     {filters.dateRange.from && (
                         <Button
                             variant="secondary"
+                            onClick={() => onFilterPillClick?.('date')}
                             className={cn(
                                 'box-border flex gap-[5px] items-center',
                                 'px-[10px] py-[7px] rounded-[10px] shrink-0',
-                                'h-auto min-h-0'
+                                'h-auto min-h-0 cursor-pointer'
                             )}
                         >
                             <div
@@ -296,12 +374,19 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                               )
                                             : null
 
-                                        if (toDate && fromDate.isSame(toDate, 'day')) {
-                                            return fromDate.format('MMM DD, YYYY')
+                                        if (
+                                            toDate &&
+                                            fromDate.isSame(toDate, 'day')
+                                        ) {
+                                            return fromDate.format(
+                                                'MMM DD, YYYY'
+                                            )
                                         } else if (toDate) {
                                             return `${fromDate.format('MMM DD, YYYY')} - ${toDate.format('MMM DD, YYYY')}`
                                         } else {
-                                            return fromDate.format('MMM DD, YYYY')
+                                            return fromDate.format(
+                                                'MMM DD, YYYY'
+                                            )
                                         }
                                     })()}
                                 </p>
@@ -357,4 +442,3 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         </div>
     )
 }
-

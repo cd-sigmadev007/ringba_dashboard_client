@@ -19,7 +19,7 @@ export const PresetButtons: React.FC<PresetButtonsProps> = ({
     onPresetClick,
 }) => {
     return (
-        <ul className="flex flex-col gap-[5px] basis-[150px] flex-[2_0_0]">
+        <ul className="flex flex-col gap-[5px] basis-[120px] flex-shrink-0">
             {presets.map((p) => (
                 <li key={p.label}>
                     <Button

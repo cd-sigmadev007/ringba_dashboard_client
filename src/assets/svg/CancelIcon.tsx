@@ -29,4 +29,3 @@ export const CancelIcon: React.FC<
         />
     </svg>
 )
-

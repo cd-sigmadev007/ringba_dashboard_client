@@ -12,6 +12,10 @@ export interface TimeFilterProps {
     /** Callback fired when the range changes */
     onChange?: (range: { from?: Date; to?: Date }) => void
     className?: string
+    /** Filter type: 'dropdown' shows input trigger, 'raw' shows only presets and calendar */
+    filterType?: 'dropdown' | 'raw'
+    /** Current date range value */
+    value?: { from?: Date; to?: Date }
 }
 
 /**
