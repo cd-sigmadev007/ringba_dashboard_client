@@ -586,7 +586,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                     />
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[5px]">
+                                <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[5px] max-h-[300px]">
                                     {isLoadingTags ? (
                                         <div className="flex items-center justify-center py-4">
                                             <span className="text-[14px] text-[#a1a5b7]">

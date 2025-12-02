@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { CheckboxIcon, ChevronDownDark, SearchIcon } from '@/assets/svg'
+import { CheckboxIcon, ChevronDownDark } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
-import { Input } from '@/components/ui/Input'
+import { Search } from '@/components/common'
 import Button from '@/components/ui/Button'
 
 export interface ColumnOption {
@@ -144,24 +144,13 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         >
             {/* Search Input */}
             <div className="m-[14px] mb-0">
-                <Input
-                    type="text"
+                <Search
                     placeholder="Search Columns"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    leftIcon={
-                        <SearchIcon
-                            className={cn(
-                                'size-[20px]',
-                                isDark ? 'text-[#a1a5b7]' : 'text-[#5E6278]'
-                            )}
-                        />
-                    }
-                    className={cn(
-                        'h-[41px]',
-                        isDark ? 'bg-[#001e3c]' : 'bg-white'
-                    )}
-                    shadow={false}
+                    onSearch={(query) => setSearchQuery(query)}
+                    disableDropdown={true}
+                    customBg="bg-[#132f4c]"
+                    customHeight="h-[37px]"
+                    inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
                 />
             </div>
 
