@@ -121,7 +121,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                     {activeFilterCount > 0 && (
                         <div
                             className={cn(
-                                'absolute left-[22px] top-[-9px] rounded-[13px] size-[24px]',
+                                'absolute left-[22px] top-[-9px] rounded-[13px] z-[99] size-[24px]',
                                 'flex items-center justify-center',
                                 'bg-[#0254a5]'
                             )}

@@ -4,6 +4,7 @@ import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import { Search } from '@/components/common'
 import Button from '@/components/ui/Button'
+import { Modal } from '@/components/ui/Modal'
 
 export interface ColumnOption {
     id: string
@@ -25,6 +26,7 @@ interface ColumnsDropdownProps {
     onClose: () => void
     isOpen: boolean
     triggerRef?: React.RefObject<HTMLButtonElement | null>
+    isMobile: boolean
 }
 
 export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
@@ -33,6 +35,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
     onClose,
     isOpen,
     triggerRef,
+    isMobile,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -101,7 +104,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
     }>({})
 
     useEffect(() => {
-        if (isOpen && triggerRef?.current) {
+        if (!isMobile && isOpen && triggerRef?.current) {
             const rect = triggerRef.current.getBoundingClientRect()
             const spaceBelow = window.innerHeight - rect.bottom
             const spaceAbove = rect.top
@@ -128,34 +131,37 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         } else {
             setPosition({})
         }
-    }, [isOpen, triggerRef])
+    }, [isOpen, triggerRef, isMobile])
 
     if (!isOpen) return null
 
-    return (
-        <div
-            ref={dropdownRef}
-            className={cn(
-                'fixed z-[1000] absolute right-5 bg-[#002b57] border border-[#132f4c]',
-                'rounded-[7px] shadow-lg',
-                'w-[374px] max-h-[440px] flex flex-col'
-            )}
-            style={position}
-        >
+    // Shared content for both desktop and mobile
+    const columnContent = (
+        <>
             {/* Search Input */}
-            <div className="m-[14px] mb-0">
+            <div
+                className={cn(
+                    isMobile
+                        ? 'w-full sticky top-0 z-10 bg-[#071b2f]'
+                        : 'm-[14px] mb-0'
+                )}
+            >
                 <Search
                     placeholder="Search Columns"
                     onSearch={(query) => setSearchQuery(query)}
                     disableDropdown={true}
-                    customBg="bg-[#132f4c]"
-                    customHeight="h-[37px]"
-                    inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
+                    // Desktop search uses #001E3C, mobile uses Primary/#002B57 per Figma
+                    background={isMobile ? 'bg-[#002b57]' : 'bg-[#001e3c]'}
                 />
             </div>
 
             {/* Column Groups */}
-            <div className="flex-1 overflow-y-auto custom-scroll p-[14px] pt-0">
+            <div
+                className={cn(
+                    'flex-1 overflow-y-auto custom-scroll pt-2',
+                    isMobile ? 'p-0' : 'p-[14px] pt-0'
+                )}
+            >
                 {filteredGroups.map((group) => {
                     if (group.columns.length === 0) return null
 
@@ -171,7 +177,9 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                 className={cn(
                                     'box-border flex gap-[8px] items-center',
                                     'px-0 py-[10px] rounded-[7px] shrink-0 w-full',
-                                    'justify-start h-auto min-h-0 border-none'
+                                    'justify-start h-auto min-h-0 border-none',
+                                    // Disable hover background/opacity
+                                    'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
                                 )}
                             >
                                 <div
@@ -190,7 +198,8 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                         )}
                                     />
                                 </div>
-                                {group.id === 'applied' && (
+                                {/* Per Figma: section header checkbox for non-Applied groups */}
+                                {group.id !== 'applied' && (
                                     <div className="relative shrink-0 size-[20px]">
                                         <CheckboxIcon
                                             checked={group.columns.every(
@@ -229,7 +238,9 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                 'box-border flex items-center',
                                                 'px-[24px] py-[8px] rounded-[7px]',
                                                 'shrink-0 w-full justify-start',
-                                                'h-auto min-h-0 border-none'
+                                                'h-auto min-h-0 border-none',
+                                            // Disable hover & selected background
+                                            'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
                                             )}
                                         >
                                             <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
@@ -262,6 +273,40 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                     )
                 })}
             </div>
+        </>
+    )
+
+    // Mobile: Use Modal component as bottom sheet
+    if (isMobile) {
+        return (
+            <Modal
+                open={isOpen}
+                onClose={onClose}
+                title="Columns"
+                position="bottom"
+                size="full"
+                animation="slide"
+                overlay="default"
+                className="h-[50vh] flex flex-col rounded-t-[10px]"
+                showCloseButton
+            >
+                {columnContent}
+            </Modal>
+        )
+    }
+
+    // Desktop: Use dropdown
+    return (
+        <div
+            ref={dropdownRef}
+            className={cn(
+                'fixed z-[1000] absolute right-5 bg-[#002b57] border border-[#132f4c]',
+                'rounded-[7px] shadow-lg',
+                'w-[374px] max-h-[440px] flex flex-col'
+            )}
+            style={position}
+        >
+            {columnContent}
         </div>
     )
 }

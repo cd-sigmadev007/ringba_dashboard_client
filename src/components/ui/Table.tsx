@@ -226,29 +226,13 @@ const Table = <T,>({
         }
     }
 
-    if (loading) {
-        // Create headers configuration from columns for the loader
-        const loaderHeaders = columns.map((column: any) => ({
-            title: column.header || column.id || 'Column',
-            width: column.meta?.width || undefined,
-        }))
+    // Create headers configuration from columns for the loader (used when loading)
+    const loaderHeaders = columns.map((column: any) => ({
+        title: column.header || column.id || 'Column',
+        width: column.meta?.width || undefined,
+    }))
 
-        return (
-            <div className={cn('w-full', className)}>
-                <div className="card rounded-[10px] overflow-hidden">
-                    <TableLoader
-                        headers={loaderHeaders}
-                        withThead={showHeader}
-                        withHeading={false}
-                        rowCount={pageSize || 5}
-                        className="w-full"
-                    />
-                </div>
-            </div>
-        )
-    }
-
-    if (data.length === 0) {
+    if (!loading && data.length === 0) {
         return (
             <div className={cn('w-full', className)}>
                 <div className="card rounded-[10px] overflow-hidden">
@@ -492,65 +476,90 @@ const Table = <T,>({
 
                         {/* Table Body */}
                         <tbody>
-                            {table.getRowModel().rows.map((row) => (
-                                <tr
-                                    key={row.id}
-                                    className={clsx(
-                                        'transition-all duration-300 ease-linear group tr',
-                                        isDark
-                                            ? 'hover:bg-[#001E3C]/50'
-                                            : 'hover:bg-[#F5F8FA]/50',
-                                        clickableRows && 'cursor-pointer'
-                                    )}
-                                    onClick={() => handleRowClick(row.original)}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <td
-                                            key={cell.id}
-                                            className={clsx(
-                                                'font-medium transition-colors',
-                                                sizeVariants[size],
-                                                // Use alignment from meta, default to left
-                                                (
-                                                    cell.column.columnDef
-                                                        .meta as any
-                                                )?.align === 'center'
-                                                    ? 'text-center'
-                                                    : '',
-                                                (() => {
-                                                    const sticky = (
+                            {loading ? (
+                                <tr>
+                                    <td
+                                        colSpan={
+                                            table.getAllLeafColumns().length ||
+                                            1
+                                        }
+                                        className="p-0"
+                                    >
+                                        <TableLoader
+                                            headers={loaderHeaders}
+                                            withThead={false}
+                                            withHeading={false}
+                                            rowCount={pageSize || 5}
+                                            className="w-full"
+                                        />
+                                    </td>
+                                </tr>
+                            ) : (
+                                table.getRowModel().rows.map((row) => (
+                                    <tr
+                                        key={row.id}
+                                        className={clsx(
+                                            'transition-all duration-300 ease-linear group tr',
+                                            isDark
+                                                ? 'hover:bg-[#001E3C]/50'
+                                                : 'hover:bg-[#F5F8FA]/50',
+                                            clickableRows && 'cursor-pointer'
+                                        )}
+                                        onClick={() =>
+                                            handleRowClick(row.original)
+                                        }
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td
+                                                key={cell.id}
+                                                className={clsx(
+                                                    'font-medium transition-colors',
+                                                    sizeVariants[size],
+                                                    // Use alignment from meta, default to left
+                                                    (
                                                         cell.column.columnDef
                                                             .meta as any
-                                                    )?.sticky
-                                                    if (sticky === 'left') {
-                                                        return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
-                                                            isDark
-                                                                ? 'bg-[#001E3C]'
-                                                                : 'bg-white'
-                                                        } relative`
-                                                    }
-                                                    if (sticky === 'right') {
-                                                        return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right isolate ${
-                                                            isDark
-                                                                ? 'bg-[#001E3C]'
-                                                                : 'bg-white'
-                                                        } relative`
-                                                    }
-                                                    return 'static'
-                                                })(),
-                                                isDark
-                                                    ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]'
-                                                    : 'text-[#3F4254] bg-white group-hover:bg-[#F5F8FA]/80'
-                                            )}
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
+                                                    )?.align === 'center'
+                                                        ? 'text-center'
+                                                        : '',
+                                                    (() => {
+                                                        const sticky = (
+                                                            cell.column
+                                                                .columnDef
+                                                                .meta as any
+                                                        )?.sticky
+                                                        if (sticky === 'left') {
+                                                            return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
+                                                                isDark
+                                                                    ? 'bg-[#001E3C]'
+                                                                    : 'bg-white'
+                                                            } relative`
+                                                        }
+                                                        if (
+                                                            sticky === 'right'
+                                                        ) {
+                                                            return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right isolate ${
+                                                                isDark
+                                                                    ? 'bg-[#001E3C]'
+                                                                    : 'bg-white'
+                                                            } relative`
+                                                        }
+                                                        return 'static'
+                                                    })(),
+                                                    isDark
+                                                        ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]'
+                                                        : 'text-[#3F4254] bg-white group-hover:bg-[#F5F8FA]/80'
+                                                )}
+                                            >
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -42,9 +42,7 @@ export const FilterCategoriesPanel: React.FC<FilterCategoriesPanelProps> = ({
                 className="w-full"
                 onSearch={onSearchChange}
                 disableDropdown={true}
-                customBg="bg-[#132f4c]"
-                customHeight="h-[37px]"
-                inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
+                background="bg-[#132f4c]"
             />
 
             <div className="flex-1 overflow-y-auto custom-scroll flex flex-col gap-[16px]">

@@ -341,7 +341,8 @@ export const CallerAnalysisContainer: React.FC = () => {
                                             setColumnsDropdownOpen(false)
                                         }
                                         isOpen={columnsDropdownOpen}
-                                        triggerRef={columnsButtonRef}
+                                        triggerRef={isMobile ? undefined : columnsButtonRef}
+                                        isMobile={isMobile}
                                     />
                                 )}
                             </div>

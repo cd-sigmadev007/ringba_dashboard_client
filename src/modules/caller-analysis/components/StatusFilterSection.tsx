@@ -44,9 +44,7 @@ export const StatusFilterSection: React.FC<StatusFilterSectionProps> = ({
                     className="w-full"
                     onSearch={onSearchChange}
                     disableDropdown={true}
-                    customBg="bg-[#132f4c]"
-                    customHeight="h-[37px]"
-                    inputClassName="!bg-transparent !border-none focus:!border-none text-[#7e8299] placeholder:!text-[#7e8299]"
+                    background="bg-[#132f4c]"
                 />
             </div>
 
