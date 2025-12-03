@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useAuth0 } from '@auth0/auth0-react'
 import Logo from '../components/logo'
 import Button from '../components/ui/Button'
@@ -12,6 +12,7 @@ import {
 } from '../assets/svg'
 import { usePermissions } from '../hooks/usePermissions'
 import UserDropdown from '../components/ui/UserDropdown'
+import { useAuth } from '@/hooks/useAuth'
 
 interface HeaderProps {
     setOpenMenu?: (open: boolean) => void
@@ -22,9 +23,10 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const [openSearchBar, setOpenSearchBar] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { isAuthenticated, isLoading, loginWithRedirect, logout, user } =
-        useAuth0()
+    const { isAuthenticated, isLoading } = useAuth()
+    const { logout, user } = useAuth0() // Keep for user data and logout
     const { role } = usePermissions()
+    const navigate = useNavigate()
 
     return (
         <>
@@ -86,7 +88,9 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                                     }
                                 />
                             ) : (
-                                <Button onClick={() => loginWithRedirect()}>
+                                <Button
+                                    onClick={() => navigate({ to: '/login' })}
+                                >
                                     Login
                                 </Button>
                             )}

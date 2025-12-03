@@ -260,7 +260,9 @@ export const Search: React.FC<SearchProps> = ({
                     <svg
                         className={cn(
                             'w-4 h-4',
-                            background ? 'text-[#7e8299]' : 'text-muted-foreground'
+                            background
+                                ? 'text-[#7e8299]'
+                                : 'text-muted-foreground'
                         )}
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

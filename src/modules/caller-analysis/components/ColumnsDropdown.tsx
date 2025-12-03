@@ -239,8 +239,8 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                 'px-[24px] py-[8px] rounded-[7px]',
                                                 'shrink-0 w-full justify-start',
                                                 'h-auto min-h-0 border-none',
-                                            // Disable hover & selected background
-                                            'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
+                                                // Disable hover & selected background
+                                                'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
                                             )}
                                         >
                                             <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
@@ -288,6 +288,8 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                 animation="slide"
                 overlay="default"
                 className="h-[50vh] flex flex-col rounded-t-[10px]"
+                // Remove outer scroll; let inner list handle scrolling
+                contentClassName="flex flex-col h-full overflow-hidden p-0"
                 showCloseButton
             >
                 {columnContent}

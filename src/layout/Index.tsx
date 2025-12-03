@@ -2,27 +2,29 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router'
-import { useAuth0 } from '@auth0/auth0-react'
 
 // import LoadingBar from 'react-top-loading-bar';
 import Header from './Header'
 import Footer from './Footer'
 import Aside from './Aside'
+import { useAuth } from '@/hooks/useAuth'
 import Styles from '@/styles/index'
 
 const RootLayout: React.FC = () => {
     const [openMenu, setOpenMenu] = useState(false)
-    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+    const { isAuthenticated, isLoading } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
     // Protected routes that require authentication
     const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
+    const isLoginPage = location.pathname === '/login'
+    const isCallbackPage = location.pathname === '/callback'
 
     useEffect(() => {
-        // Don't redirect if still loading or already on callback page
+        // Don't redirect if still loading or already on callback/login page
         if (isLoading) return
-        if (location.pathname === '/callback') return
+        if (isCallbackPage || isLoginPage) return
 
         const isProtectedRoute = protectedRoutes.some((route) =>
             location.pathname.startsWith(route)
@@ -36,11 +38,7 @@ const RootLayout: React.FC = () => {
 
         // If user is not authenticated and trying to access protected route, redirect to login
         if (isProtectedRoute && !isAuthenticated) {
-            loginWithRedirect({
-                appState: {
-                    returnTo: location.pathname,
-                },
-            })
+            navigate({ to: '/login' })
             return
         }
     }, [
@@ -48,7 +46,8 @@ const RootLayout: React.FC = () => {
         isLoading,
         location.pathname,
         navigate,
-        loginWithRedirect,
+        isLoginPage,
+        isCallbackPage,
     ])
 
     return (
@@ -63,14 +62,25 @@ const RootLayout: React.FC = () => {
                 {/* <LoadingBar color="#007FFF" progress={progress} onLoaderFinished={() => setProgress(0)} /> */}
                 <Header setOpenMenu={setOpenMenu} openMenu={openMenu} />
                 <div className="flex">
-                    <Aside openMenu={openMenu} setOpenMenu={setOpenMenu} />
+                    {!isLoginPage && (
+                        <Aside openMenu={openMenu} setOpenMenu={setOpenMenu} />
+                    )}
                     <div
                         className={clsx(
-                            'xl:ml-64 w-full xl:w-[calc(100vw-256px)] transition-all duration-200 ease-out flex flex-col content'
+                            !isLoginPage &&
+                                'xl:ml-64 w-full xl:w-[calc(100vw-256px)]',
+                            isLoginPage && 'w-full',
+                            'transition-all duration-200 ease-out flex flex-col content'
                         )}
                     >
-                        <main className="mt-[110px] lg:mt-[100px] min-h-[calc(100vh-55px)] md:min-h-[calc(100vh-65px)] relative">
-                            {openMenu && (
+                        <main
+                            className={clsx(
+                                !isLoginPage &&
+                                    'mt-[110px] lg:mt-[100px] min-h-[calc(100vh-55px)] md:min-h-[calc(100vh-65px)]',
+                                'relative'
+                            )}
+                        >
+                            {openMenu && !isLoginPage && (
                                 <div
                                     className="hidden lg:block xl:hidden absolute inset-0 z-50 bg-black bg-opacity-50"
                                     onClick={() => setOpenMenu(false)}

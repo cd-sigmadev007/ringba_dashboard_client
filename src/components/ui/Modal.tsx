@@ -161,7 +161,7 @@ export const Modal: FC<ModalProps> = ({
                     modalContentVariants({ size, position, animation }),
                     isDark ? 'bg-[#071B2F]' : 'bg-white',
                     className,
-                    'flex flex-col',
+                    'flex flex-col'
                 )}
                 onClick={(e) => {
                     // Stop propagation to prevent the modal content from closing when clicked
@@ -244,7 +244,7 @@ export const Modal: FC<ModalProps> = ({
                     <div
                         className={cn(
                             'h-full',
-                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
                         )}
                     >
                         {children}

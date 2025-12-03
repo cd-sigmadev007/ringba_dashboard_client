@@ -23,6 +23,10 @@ import reportWebVitals from './reportWebVitals.ts'
 
 import RootLayout from './layout/Index.tsx'
 import CallbackRoute from './routes/callback.tsx'
+import LoginRoute from './routes/login.tsx'
+import ForgotPasswordRoute from './routes/forgot-password.tsx'
+import ChangePasswordRoute from './routes/change-password.tsx'
+import PasswordChangedRoute from './routes/password-changed.tsx'
 import { ApiClientSetup } from './services/api/setupApiClient'
 
 // Initialize theme on app startup
@@ -41,6 +45,10 @@ const routeTree = rootRoute.addChildren([
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
     CallbackRoute(rootRoute),
+    LoginRoute(rootRoute),
+    ForgotPasswordRoute(rootRoute),
+    ChangePasswordRoute(rootRoute),
+    PasswordChangedRoute(rootRoute),
     OrganizationRoute(rootRoute),
     OrganizationCampaignsRoute(rootRoute),
     OrganizationUsersRoute(rootRoute),
