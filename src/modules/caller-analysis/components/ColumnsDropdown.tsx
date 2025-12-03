@@ -288,6 +288,8 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                 animation="slide"
                 overlay="default"
                 className="h-[50vh] flex flex-col rounded-t-[10px]"
+                // Remove outer scroll; let inner list handle scrolling
+                contentClassName="flex flex-col h-full overflow-hidden p-0"
                 showCloseButton
             >
                 {columnContent}
