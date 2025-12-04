@@ -76,10 +76,9 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
         <Modal
             open={isOpen}
             onClose={handleClose}
-            className="w-full"
             title="Add New User"
-            size="full"
-            position="bottom"
+            size="md"
+            position="center"
         >
             <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
                 <div>
