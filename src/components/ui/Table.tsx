@@ -14,7 +14,11 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import clsx from 'clsx'
 import TableLoader from './TableLoader'
 import Button from './Button'
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import type {
+    ColumnDef,
+    RowSelectionState,
+    SortingState,
+} from '@tanstack/react-table'
 import { useThemeStore } from '@/store/themeStore.ts'
 import { cn, useIsMobile } from '@/lib'
 
@@ -88,6 +92,26 @@ interface TableProps<T = any> {
      * Right sticky columns will only work on desktop/tablets, not mobile
      */
     enableStickyColumns?: boolean
+    /**
+     * Whether to enable row selection
+     */
+    enableRowSelection?: boolean
+    /**
+     * Row selection state (controlled)
+     */
+    rowSelection?: RowSelectionState
+    /**
+     * Callback when row selection changes
+     */
+    onRowSelectionChange?: (selection: RowSelectionState) => void
+    /**
+     * Callback to get row ID (defaults to using row.id)
+     */
+    getRowId?: (row: T) => string
+    /**
+     * Callback when selection changes (returns Set of selected IDs)
+     */
+    onSelectionChange?: (selectedIds: Set<string>) => void
 }
 
 const Table = <T,>({
@@ -107,6 +131,11 @@ const Table = <T,>({
     emptyMessage = 'No data available',
     customHeader,
     enableStickyColumns = true,
+    enableRowSelection = false,
+    rowSelection,
+    onRowSelectionChange,
+    getRowId,
+    onSelectionChange,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -189,8 +218,22 @@ const Table = <T,>({
         columns,
         state: {
             sorting,
+            rowSelection: rowSelection || {},
         },
         onSortingChange: setSorting,
+        onRowSelectionChange: onRowSelectionChange
+            ? (updater) => {
+                  if (typeof updater === 'function') {
+                      const currentSelection = rowSelection || {}
+                      const newSelection = updater(currentSelection)
+                      onRowSelectionChange(newSelection)
+                  } else {
+                      onRowSelectionChange(updater)
+                  }
+              }
+            : undefined,
+        enableRowSelection: enableRowSelection,
+        getRowId: getRowId || ((row: any) => row.id),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: pagination ? getPaginationRowModel() : undefined,
@@ -209,6 +252,19 @@ const Table = <T,>({
         // Prevent page reset when data changes
         autoResetPageIndex: false,
     })
+
+    // Notify parent of selection changes
+    useEffect(() => {
+        if (enableRowSelection && onSelectionChange && rowSelection) {
+            const selectedIds = new Set<string>()
+            Object.keys(rowSelection).forEach((rowId) => {
+                if (rowSelection[rowId]) {
+                    selectedIds.add(rowId)
+                }
+            })
+            onSelectionChange(selectedIds)
+        }
+    }, [rowSelection, enableRowSelection, onSelectionChange])
 
     // Notify parent of pagination changes
     useEffect(() => {
@@ -360,7 +416,9 @@ const Table = <T,>({
                                                             ? 'text-center'
                                                             : 'text-left',
                                                         (() => {
-                                                            if (!enableStickyColumns) {
+                                                            if (
+                                                                !enableStickyColumns
+                                                            ) {
                                                                 return 'static w-auto'
                                                             }
                                                             const sticky = (
@@ -539,7 +597,9 @@ const Table = <T,>({
                                                         ? 'text-center'
                                                         : '',
                                                     (() => {
-                                                        if (!enableStickyColumns) {
+                                                        if (
+                                                            !enableStickyColumns
+                                                        ) {
                                                             return 'static'
                                                         }
                                                         const sticky = (

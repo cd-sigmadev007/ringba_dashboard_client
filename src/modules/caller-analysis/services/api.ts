@@ -240,6 +240,36 @@ class CallerApiService {
     async getAdjustments(callId: string): Promise<Array<any>> {
         return this.makeRequest<Array<any>>(`/callers/${callId}/adjustments`)
     }
+
+    /**
+     * Delete multiple callers by their row IDs
+     * DELETE /api/callers/bulk
+     */
+    async deleteCallers(ids: Array<string>): Promise<{
+        success: boolean
+        data?: {
+            deletedCount: number
+            errors?: Array<string>
+        }
+        error?: string
+        message?: string
+    }> {
+        return this.makeRequest<{
+            success: boolean
+            data?: {
+                deletedCount: number
+                errors?: Array<string>
+            }
+            error?: string
+            message?: string
+        }>('/callers/bulk', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ids }),
+        })
+    }
 }
 
 export const callerApiService = new CallerApiService()

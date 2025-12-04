@@ -10,9 +10,13 @@ import { ColumnsDropdown } from '../components/ColumnsDropdown'
 import { FilterDropdown } from '../components/FilterDropdown'
 import { useColumnStore } from '../store/columnStore'
 import { useFilterStore } from '../store/filterStore'
+import { MultiSelectActionBar } from '../components/MultiSelectActionBar'
+import { callerApiService } from '../services/api'
+import { exportToCSV } from '../utils/csvExport'
 import type { ColumnOption } from '../components/ColumnsDropdown'
 import type { CallData } from '../types'
 import type { ColumnVisibility } from '../hooks/useTableColumns'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
 import { Modal, Table } from '@/components/ui'
@@ -51,6 +55,14 @@ export const CallerAnalysisContainer: React.FC = () => {
     >(undefined)
     const filterButtonRef = React.useRef<HTMLButtonElement | null>(null)
     const columnsButtonRef = React.useRef<HTMLButtonElement | null>(null)
+
+    // Row selection state
+    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>(
+        {}
+    )
+    const [selectedRowIds, setSelectedRowIds] = React.useState<Set<string>>(
+        new Set()
+    )
 
     // Column visibility state from Zustand store
     const { columnVisibility, toggleColumn } = useColumnStore()
@@ -192,13 +204,100 @@ export const CallerAnalysisContainer: React.FC = () => {
         setIsPlaying(playing)
     }
 
+    // Row selection handlers
+    const handleRowSelectionChange = React.useCallback(
+        (selectedIds: Set<string>) => {
+            setSelectedRowIds(selectedIds)
+        },
+        []
+    )
+
+    // Handle select all
+    const handleSelectAll = React.useCallback(
+        (checked: boolean) => {
+            setSelectAllChecked(checked)
+            if (checked) {
+                // Select all visible rows
+                const allRowIds: RowSelectionState = {}
+                filteredData.forEach((row) => {
+                    allRowIds[row.id] = true
+                })
+                setRowSelection(allRowIds)
+            } else {
+                // Deselect all
+                setRowSelection({})
+            }
+        },
+        [filteredData]
+    )
+
+    // Sync selectAllChecked with actual selection state
+    React.useEffect(() => {
+        const allSelected =
+            filteredData.length > 0 &&
+            filteredData.every((row) => selectedRowIds.has(row.id))
+        setSelectAllChecked(allSelected)
+    }, [selectedRowIds, filteredData])
+
+    // Delete handler
+    const handleDelete = React.useCallback(async () => {
+        if (selectedRowIds.size === 0) return
+
+        const confirmMessage = `Are you sure you want to delete ${selectedRowIds.size} item${selectedRowIds.size !== 1 ? 's' : ''}? This action cannot be undone.`
+        if (!window.confirm(confirmMessage)) {
+            return
+        }
+
+        try {
+            const idsArray = Array.from(selectedRowIds)
+            const response = await callerApiService.deleteCallers(idsArray)
+
+            if (response.success && response.data) {
+                // Refresh data
+                await refetch()
+                // Clear selection
+                setRowSelection({})
+                setSelectedRowIds(new Set())
+                setSelectAllChecked(false)
+            } else {
+                alert(`Failed to delete: ${response.error || 'Unknown error'}`)
+            }
+        } catch (error: any) {
+            console.error('Error deleting callers:', error)
+            alert(
+                `Failed to delete callers: ${error.message || 'Unknown error'}`
+            )
+        }
+    }, [selectedRowIds, refetch])
+
+    // CSV export handler
+    const handleDownloadCSV = React.useCallback(() => {
+        if (selectedRowIds.size === 0) return
+
+        const selectedData = filteredData.filter((row) =>
+            selectedRowIds.has(row.id)
+        )
+        exportToCSV(selectedData)
+    }, [selectedRowIds, filteredData])
+
+    // Raise dispute handler (UI only)
+    const handleRaiseDispute = React.useCallback(() => {
+        if (selectedRowIds.size === 0) return
+        console.log('Raise dispute for items:', Array.from(selectedRowIds))
+        // TODO: Implement raise dispute functionality when backend is ready
+        alert(
+            `Raise dispute functionality for ${selectedRowIds.size} item${selectedRowIds.size !== 1 ? 's' : ''} will be implemented soon.`
+        )
+    }, [selectedRowIds])
+
     const columns = useTableColumns(
         handleStatusClick,
         handleTranscriptClick,
         handlePlayAudio,
         currentPlayingRow,
         isPlaying,
-        columnVisibility
+        columnVisibility,
+        true // enableRowSelection
     )
 
     // Handle column toggle
@@ -239,7 +338,7 @@ export const CallerAnalysisContainer: React.FC = () => {
     )
 
     return (
-        <div className="min-h-screen content">
+        <div className="min-h-screen content relative">
             <div className="p-3 sm:p-4 lg:p-8">
                 {/* Header */}
                 <div className="mb-6 sm:mb-8">
@@ -295,6 +394,11 @@ export const CallerAnalysisContainer: React.FC = () => {
                         loading={isLoading || isLoadingBatch}
                         className="w-full"
                         onPaginationChange={handlePaginationChange}
+                        enableRowSelection={true}
+                        rowSelection={rowSelection}
+                        onRowSelectionChange={setRowSelection}
+                        onSelectionChange={handleRowSelectionChange}
+                        getRowId={(row) => row.id}
                         customHeader={
                             <div className="relative">
                                 <TableHeader
@@ -315,9 +419,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                                             !columnsDropdownOpen
                                         )
                                     }
-                                    onSelectAll={(checked) =>
-                                        setSelectAllChecked(checked)
-                                    }
+                                    onSelectAll={handleSelectAll}
                                     selectAllChecked={selectAllChecked}
                                 />
                                 {filterDropdownOpen && (
@@ -341,7 +443,11 @@ export const CallerAnalysisContainer: React.FC = () => {
                                             setColumnsDropdownOpen(false)
                                         }
                                         isOpen={columnsDropdownOpen}
-                                        triggerRef={isMobile ? undefined : columnsButtonRef}
+                                        triggerRef={
+                                            isMobile
+                                                ? undefined
+                                                : columnsButtonRef
+                                        }
                                         isMobile={isMobile}
                                     />
                                 )}
@@ -390,8 +496,8 @@ export const CallerAnalysisContainer: React.FC = () => {
                 )}
 
                 {/* Audio Player */}
-                {audioPlayerVisible && (
-                    <div className="fixed bottom-6 w-[40%] left-1/2 transform -translate-x-1/2 z-50">
+                {audioPlayerVisible && selectedRowIds.size === 0 && (
+                    <div className="fixed bottom-6 w-[70vw] md:w-[40vw] left-1/2 transform -translate-x-1/2 z-50">
                         <WaveformAudioPlayer
                             audioUrl={currentAudioUrl}
                             isVisible={audioPlayerVisible}
@@ -403,6 +509,14 @@ export const CallerAnalysisContainer: React.FC = () => {
                         />
                     </div>
                 )}
+
+                {/* Multi-select Action Bar */}
+                <MultiSelectActionBar
+                    selectedCount={selectedRowIds.size}
+                    onRaiseDispute={handleRaiseDispute}
+                    onDelete={handleDelete}
+                    onDownloadCSV={handleDownloadCSV}
+                />
             </div>
         </div>
     )

@@ -123,22 +123,22 @@
     .theme-dark .single-table .sticky-column {
         /* Sticky column background: subtle overlay rgba(217,217,217,0.01) */
         @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[14px_0_10px_rgba(0,0,0,0.20)];
-        border-right: 1px solid #002B57;
+        border-right: 1px solid #002b57;
     }
 
     .theme-light .single-table .sticky-column {
         @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[14px_0_10px_rgba(0,0,0,0.10)];
-        border-right: 1px solid #002B57;
+        border-right: 1px solid #002b57;
     }
 
     .theme-dark .single-table .sticky-column-th {
         @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[14px_0_10px_rgba(0,0,0,0.20)];
-        border-right: 1px solid #002B57;
+        border-right: 1px solid #002b57;
     }
 
     .theme-light .single-table .sticky-column-th {
         @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[14px_0_10px_rgba(0,0,0,0.10)];
-        border-right: 1px solid #002B57;
+        border-right: 1px solid #002b57;
     }
 
     /* Stronger shadow when scrollable */
@@ -153,22 +153,22 @@
     .theme-dark .single-table .sticky-column-right {
         /* Same subtle rgba background for right sticky column */
         @apply bg-[rgba(217,217,217,0.01)] border-[#002B57] drop-shadow-[-14px_0_10px_rgba(0,0,0,0.20)];
-        border-left: 1px solid #002B57;
+        border-left: 1px solid #002b57;
     }
 
     .theme-light .single-table .sticky-column-right {
         @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[-14px_0_10px_rgba(0,0,0,0.10)];
-        border-left: 1px solid #002B57;
+        border-left: 1px solid #002b57;
     }
 
     .theme-dark .single-table .sticky-column-right-th {
         @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[-14px_0_10px_rgba(0,0,0,0.20)];
-        border-left: 1px solid #002B57;
+        border-left: 1px solid #002b57;
     }
 
     .theme-light .single-table .sticky-column-right-th {
         @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[-14px_0_10px_rgba(0,0,0,0.10)];
-        border-left: 1px solid #002B57;
+        border-left: 1px solid #002b57;
     }
 
     /* Stronger shadow when scrollable—mirrored */
@@ -263,7 +263,7 @@
 
     /* Dark theme borders */
     .theme-dark .single-table td {
-        border-color: #002B57 !important;
+        border-color: #002b57 !important;
     }
 
     /* Light theme borders */
@@ -293,8 +293,8 @@
     /* Dark theme sticky column borders */
     .theme-dark .sticky-column,
     .theme-dark .sticky-column-th {
-        border-right-color: #002B57 !important;
-        border-bottom-color: #002B57 !important;
+        border-right-color: #002b57 !important;
+        border-bottom-color: #002b57 !important;
     }
 
     /* Light theme sticky column borders */
@@ -307,8 +307,8 @@
     /* Dark theme right sticky column borders */
     .theme-dark .sticky-column-right,
     .theme-dark .sticky-column-right-th {
-        border-left-color: #002B57 !important;
-        border-bottom-color: #002B57 !important;
+        border-left-color: #002b57 !important;
+        border-bottom-color: #002b57 !important;
     }
 
     /* Light theme right sticky column borders */

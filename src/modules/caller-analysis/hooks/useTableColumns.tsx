@@ -8,6 +8,7 @@ import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { Campaign } from '@/modules'
 import {
+    CheckboxIcon,
     CopyIcon,
     DocumentIcon,
     PauseIcon,
@@ -72,13 +73,67 @@ export const useTableColumns = (
     onPlayAudio: (audioUrl: string, rowId: string) => void,
     currentPlayingRow: string | null,
     isPlaying: boolean,
-    visibleColumns?: ColumnVisibility
+    visibleColumns?: ColumnVisibility,
+    enableRowSelection?: boolean
 ) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
     return useMemo<Array<ColumnDef<CallData>>>(() => {
-        const allColumns: Array<ColumnDef<CallData>> = [
+        const allColumns: Array<ColumnDef<CallData>> = []
+
+        // Add selection column as first column if row selection is enabled
+        if (enableRowSelection) {
+            allColumns.push({
+                id: 'select',
+                header: ({ table }) => (
+                    <div className="flex items-center justify-center">
+                        <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                table.toggleAllPageRowsSelected(
+                                    !table.getIsAllPageRowsSelected()
+                                )
+                            }}
+                            className="p-0 h-5 w-5 flex items-center justify-center border-none"
+                        >
+                            <CheckboxIcon
+                                checked={table.getIsAllPageRowsSelected()}
+                                isDark={isDark}
+                                className="w-5 h-5"
+                            />
+                        </Button>
+                    </div>
+                ),
+                cell: ({ row }) => (
+                    <div className="flex items-center justify-center">
+                        <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                row.toggleSelected(!row.getIsSelected())
+                            }}
+                            className="p-0 h-5 w-5 flex items-center justify-center border-none"
+                        >
+                            <CheckboxIcon
+                                checked={row.getIsSelected()}
+                                isDark={isDark}
+                                className="w-5 h-5"
+                            />
+                        </Button>
+                    </div>
+                ),
+                enableSorting: false,
+                enableHiding: false,
+                meta: {
+                    width: 50,
+                    align: 'center',
+                } as any,
+            })
+        }
+
+        allColumns.push(
             {
                 id: 'callerId',
                 header: 'CALLER ID',
@@ -313,8 +368,8 @@ export const useTableColumns = (
                         </div>
                     )
                 },
-            },
-        ]
+            }
+        )
 
         // Filter columns based on visibility
         if (visibleColumns) {
@@ -333,5 +388,6 @@ export const useTableColumns = (
         currentPlayingRow,
         isPlaying,
         visibleColumns,
+        enableRowSelection,
     ])
 }

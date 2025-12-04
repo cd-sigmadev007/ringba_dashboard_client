@@ -367,8 +367,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
                         isMobile && 'w-full'
                     )}
                 >
-                    Apply{' '}
-                    {activeFilterCount > 0 ? `${activeFilterCount} ` : ''}
+                    Apply {activeFilterCount > 0 ? `${activeFilterCount} ` : ''}
                     Filter{activeFilterCount !== 1 ? 's' : ''}
                 </Button>
             </div>
