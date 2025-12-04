@@ -61,7 +61,8 @@
     }
 
     .theme-dark .table-header {
-        @apply border-b !border-[color:var(--primary-1-b-456-fp-300,#1B456F)] bg-[color:var(--primary-001-e-3-cp-600,#001E3C)];
+        /* Keep all table borders consistent with #002B57 in dark mode */
+        @apply border-b !border-[#002B57] bg-[#001E3C];
     }
 
     .theme-light .table-header {
@@ -69,7 +70,7 @@
     }
 
     .theme-dark .single-table tr:not(:last-child) {
-        @apply border-b border-[#132F4C];
+        @apply border-b border-[#002B57];
     }
 
     .theme-light .single-table tr:not(:last-child) {
@@ -116,26 +117,57 @@
         @apply rounded-br-[10px];
     }
 
+    /* ------------------------------------------- */
+    /* LEFT STICKY COLUMN (original Figma spec)   */
+    /* ------------------------------------------- */
     .theme-dark .single-table .sticky-column {
-        @apply bg-[#001E3C] border-[#002B57] drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
+        /* Sticky column background: subtle overlay rgba(217,217,217,0.01) */
+        @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[14px_0_10px_rgba(0,0,0,0.20)];
+        border-right: 1px solid #002B57;
     }
 
     .theme-light .single-table .sticky-column {
-        @apply bg-white drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
+        @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[14px_0_10px_rgba(0,0,0,0.10)];
     }
 
     .theme-dark .single-table .sticky-column-th {
-        @apply bg-[#001E3C] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.09)];
+        @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[14px_0_10px_rgba(0,0,0,0.20)];
     }
 
     .theme-light .single-table .sticky-column-th {
-        @apply bg-[#F5F8FA] z-10 drop-shadow-[5px_2px_5px_rgba(0,0,0,0.02)];
+        @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[14px_0_10px_rgba(0,0,0,0.10)];
     }
 
-    /* Add box shadow only when table is scrollable */
+    /* Stronger shadow when scrollable */
     .table-scrollable .sticky-column,
     .table-scrollable .sticky-column-th {
-        box-shadow: 14px 0 10px 0 rgba(0, 0, 0, 0.2);
+        @apply shadow-[16px_0_14px_0_rgba(0,0,0,0.25)];
+    }
+
+    /* ------------------------------------------- */
+    /* RIGHT STICKY COLUMN (mirrored for right)   */
+    /* ------------------------------------------- */
+    .theme-dark .single-table .sticky-column-right {
+        /* Same subtle rgba background for right sticky column */
+        @apply bg-[rgba(217,217,217,0.01)] border-[#002B57] drop-shadow-[-14px_0_10px_rgba(0,0,0,0.20)];
+    }
+
+    .theme-light .single-table .sticky-column-right {
+        @apply bg-[rgba(217,217,217,0.01)] drop-shadow-[-14px_0_10px_rgba(0,0,0,0.10)];
+    }
+
+    .theme-dark .single-table .sticky-column-right-th {
+        @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[-14px_0_10px_rgba(0,0,0,0.20)];
+    }
+
+    .theme-light .single-table .sticky-column-right-th {
+        @apply bg-[rgba(217,217,217,0.01)] z-10 drop-shadow-[-14px_0_10px_rgba(0,0,0,0.10)];
+    }
+
+    /* Stronger shadow when scrollable—mirrored */
+    .table-scrollable .sticky-column-right,
+    .table-scrollable .sticky-column-right-th {
+        @apply shadow-[-16px_0_14px_0_rgba(0,0,0,0.25)];
     }
 
     /* Ensure sticky columns maintain position */
@@ -143,6 +175,22 @@
     .sticky-column-th {
         position: sticky !important;
         left: 0 !important;
+    }
+
+    /* Right sticky columns */
+    .sticky-column-right,
+    .sticky-column-right-th {
+        position: sticky !important;
+        right: 0 !important;
+    }
+
+    /* Disable right sticky on mobile */
+    @media (max-width: 767px) {
+        .sticky-column-right,
+        .sticky-column-right-th {
+            position: static !important;
+            right: auto !important;
+        }
     }
 
     /* Prevent table from collapsing sticky columns */
@@ -208,7 +256,7 @@
 
     /* Dark theme borders */
     .theme-dark .single-table td {
-        border-color: #1b456f !important;
+        border-color: #002B57 !important;
     }
 
     /* Light theme borders */
@@ -226,17 +274,40 @@
         left: 0 !important;
     }
 
+    /* Right sticky columns borders */
+    .sticky-column-right,
+    .sticky-column-right-th {
+        border-bottom: 1px solid !important;
+        z-index: 998 !important;
+        position: sticky !important;
+        right: 0 !important;
+    }
+
     /* Dark theme sticky column borders */
     .theme-dark .sticky-column,
     .theme-dark .sticky-column-th {
-        border-right-color: #1b456f !important;
-        border-bottom-color: #132f4c !important;
+        border-right-color: #002B57 !important;
+        border-bottom-color: #002B57 !important;
     }
 
     /* Light theme sticky column borders */
     .theme-light .sticky-column,
     .theme-light .sticky-column-th {
         border-right-color: #e0e0e0 !important;
+        border-bottom-color: #f0f5ff !important;
+    }
+
+    /* Dark theme right sticky column borders */
+    .theme-dark .sticky-column-right,
+    .theme-dark .sticky-column-right-th {
+        border-left-color: #002B57 !important;
+        border-bottom-color: #002B57 !important;
+    }
+
+    /* Light theme right sticky column borders */
+    .theme-light .sticky-column-right,
+    .theme-light .sticky-column-right-th {
+        border-left-color: #e0e0e0 !important;
         border-bottom-color: #f0f5ff !important;
     }
 

@@ -89,16 +89,16 @@ export const CallerAnalysisContainer: React.FC = () => {
                 visible: columnVisibility.campaign ?? true,
             },
             {
-                id: 'action',
-                label: 'Action',
-                category: 'applied',
-                visible: columnVisibility.action ?? true,
-            },
-            {
                 id: 'status',
                 label: 'Status',
                 category: 'applied',
                 visible: columnVisibility.status ?? true,
+            },
+            {
+                id: 'action',
+                label: 'Action',
+                category: 'applied',
+                visible: columnVisibility.action ?? true,
             },
         ],
         [columnVisibility]

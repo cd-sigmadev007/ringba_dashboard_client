@@ -185,11 +185,76 @@ export const useTableColumns = (
                 ),
             },
             {
+                id: 'status',
+                header: 'STATUS',
+                accessorKey: 'status',
+                meta: {
+                    width: 200,
+                    className: 'status-column',
+                    category: 'applied',
+                } as any,
+                cell: ({ getValue, row }) => {
+                    const status = getValue() as Array<string>
+                    const aiProcessed = row.original.ai_processed
+
+                    // Ensure status is an array and filter out empty/null values
+                    const statusArray = Array.isArray(status)
+                        ? status.filter((s) => s && s.trim() !== '')
+                        : []
+                    // Remove duplicates to ensure accurate count
+                    const uniqueStatus = Array.from(new Set(statusArray))
+                    const hasTags = uniqueStatus.length > 0
+                    const remainingCount = hasTags ? uniqueStatus.length - 1 : 0
+
+                    // If ai_processed is explicitly false, hide status
+                    // Otherwise, show tags if they exist
+                    if (aiProcessed === false) {
+                        return null
+                    }
+
+                    // If no tags, show nothing
+                    if (!hasTags) {
+                        return null
+                    }
+
+                    // Show tags (ai_processed is not false and tags exist)
+                    return (
+                        <div
+                            className="flex items-center justify-end gap-2 w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Status truncate={true} status={uniqueStatus[0]} />
+                            {remainingCount > 0 && (
+                                <Tooltip
+                                    tooltipText={`View all ${uniqueStatus.length} statuses`}
+                                >
+                                    <span
+                                        className={cn(
+                                            'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
+                                        )}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            onStatusClick(row.original)
+                                        }}
+                                    >
+                                        +{remainingCount}
+                                    </span>
+                                </Tooltip>
+                            )}
+                        </div>
+                    )
+                },
+            },
+            {
                 id: 'action',
                 header: 'ACTION',
                 accessorKey: 'action',
                 enableSorting: false,
-                meta: { width: 120, category: 'applied' },
+                meta: {
+                    width: 120,
+                    sticky: 'right',
+                    category: 'applied',
+                } as any,
                 cell: ({ row }) => {
                     return (
                         <div className="flex items-center gap-[5px]">
@@ -245,68 +310,6 @@ export const useTableColumns = (
                                     <WarningIcon />
                                 </Button>
                             </Tooltip>
-                        </div>
-                    )
-                },
-            },
-            {
-                id: 'status',
-                header: 'STATUS',
-                accessorKey: 'status',
-                meta: {
-                    width: 200,
-                    className: 'status-column',
-                    sticky: 'right',
-                    category: 'applied',
-                } as any,
-                cell: ({ getValue, row }) => {
-                    const status = getValue() as Array<string>
-                    const aiProcessed = row.original.ai_processed
-
-                    // Ensure status is an array and filter out empty/null values
-                    const statusArray = Array.isArray(status)
-                        ? status.filter((s) => s && s.trim() !== '')
-                        : []
-                    // Remove duplicates to ensure accurate count
-                    const uniqueStatus = Array.from(new Set(statusArray))
-                    const hasTags = uniqueStatus.length > 0
-                    const remainingCount = hasTags ? uniqueStatus.length - 1 : 0
-
-                    // If ai_processed is explicitly false, hide status
-                    // Otherwise, show tags if they exist
-                    if (aiProcessed === false) {
-                        return null
-                    }
-
-                    // If no tags, show nothing
-                    if (!hasTags) {
-                        return null
-                    }
-
-                    // Show tags (ai_processed is not false and tags exist)
-                    return (
-                        <div
-                            className="flex items-center justify-end gap-2 w-full"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <Status truncate={true} status={uniqueStatus[0]} />
-                            {remainingCount > 0 && (
-                                <Tooltip
-                                    tooltipText={`View all ${uniqueStatus.length} statuses`}
-                                >
-                                    <span
-                                        className={cn(
-                                            'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
-                                        )}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            onStatusClick(row.original)
-                                        }}
-                                    >
-                                        +{remainingCount}
-                                    </span>
-                                </Tooltip>
-                            )}
                         </div>
                     )
                 },

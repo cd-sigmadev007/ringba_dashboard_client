@@ -16,7 +16,7 @@ import TableLoader from './TableLoader'
 import Button from './Button'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { useThemeStore } from '@/store/themeStore.ts'
-import { cn } from '@/lib'
+import { cn, useIsMobile } from '@/lib'
 
 interface TableProps<T = any> {
     /**
@@ -83,6 +83,11 @@ interface TableProps<T = any> {
      * Custom header component to render above the table (inside the card)
      */
     customHeader?: React.ReactNode
+    /**
+     * Whether to enable sticky columns (left and right)
+     * Right sticky columns will only work on desktop/tablets, not mobile
+     */
+    enableStickyColumns?: boolean
 }
 
 const Table = <T,>({
@@ -101,9 +106,11 @@ const Table = <T,>({
     loading = false,
     emptyMessage = 'No data available',
     customHeader,
+    enableStickyColumns = true,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const isMobile = useIsMobile()
 
     const [sorting, setSorting] = useState<SortingState>([])
     const [collapsed, setCollapsed] = useState(initialCollapsed)
@@ -241,7 +248,7 @@ const Table = <T,>({
                         <div
                             className="border-b"
                             style={{
-                                borderColor: isDark ? '#1B456F' : '#ECECEC',
+                                borderColor: isDark ? '#002B57' : '#ECECEC',
                             }}
                         >
                             {customHeader}
@@ -280,7 +287,7 @@ const Table = <T,>({
                 {customHeader && (
                     <div
                         className="border-b"
-                        style={{ borderColor: isDark ? '#1B456F' : '#ECECEC' }}
+                        style={{ borderColor: isDark ? '#002B57' : '#ECECEC' }}
                     >
                         {customHeader}
                     </div>
@@ -292,7 +299,7 @@ const Table = <T,>({
                         className={clsx(
                             'px-5 py-3 border-b cursor-pointer flex items-center justify-between',
                             isDark
-                                ? 'bg-[#001E3C] border-[#1B456F] hover:bg-[#002B57]'
+                                ? 'bg-[#001E3C] border-[#002B57] hover:bg-[#002B57]'
                                 : 'bg-[#F5F8FA] border-[#ECECEC] hover:bg-[#EFF2F5]'
                         )}
                         onClick={() => setCollapsed(!collapsed)}
@@ -334,7 +341,7 @@ const Table = <T,>({
                                         className={clsx(
                                             'border-b thead-tr',
                                             isDark
-                                                ? 'bg-[#001E3C] border-[#1B456F]'
+                                                ? 'bg-[#001E3C] border-[#002B57]'
                                                 : 'bg-[#F5F8FA] border-[#ECECEC]'
                                         )}
                                     >
@@ -343,7 +350,7 @@ const Table = <T,>({
                                                 <th
                                                     key={header.id}
                                                     className={clsx(
-                                                        'px-5 py-[9px] uppercase text-[14px] font-semibold',
+                                                        'px-5 py-[9px] uppercase text-[14px] font-semibold border-b border-[#002B57]',
                                                         // Use alignment from meta, default to left
                                                         (
                                                             header.column
@@ -353,6 +360,9 @@ const Table = <T,>({
                                                             ? 'text-center'
                                                             : 'text-left',
                                                         (() => {
+                                                            if (!enableStickyColumns) {
+                                                                return 'static w-auto'
+                                                            }
                                                             const sticky = (
                                                                 header.column
                                                                     .columnDef
@@ -362,7 +372,8 @@ const Table = <T,>({
                                                                 sticky ===
                                                                 'left'
                                                             ) {
-                                                                return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column-th isolate ${
+                                                                // Left sticky header - rely on CSS drop-shadow from .sticky-column-th
+                                                                return `sticky left-0 z-[999] sticky-column-th isolate ${
                                                                     isDark
                                                                         ? 'bg-[#001E3C]'
                                                                         : 'bg-[#F5F8FA]'
@@ -372,7 +383,12 @@ const Table = <T,>({
                                                                 sticky ===
                                                                 'right'
                                                             ) {
-                                                                return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right-th isolate ${
+                                                                // Right sticky header only on tablet/desktop, not mobile
+                                                                if (isMobile) {
+                                                                    return 'static w-auto'
+                                                                }
+                                                                // Use CSS drop-shadow on .sticky-column-right-th for visual
+                                                                return `sticky right-0 z-[998] sticky-column-right-th isolate ${
                                                                     isDark
                                                                         ? 'bg-[#001E3C]'
                                                                         : 'bg-[#F5F8FA]'
@@ -523,13 +539,16 @@ const Table = <T,>({
                                                         ? 'text-center'
                                                         : '',
                                                     (() => {
+                                                        if (!enableStickyColumns) {
+                                                            return 'static'
+                                                        }
                                                         const sticky = (
                                                             cell.column
                                                                 .columnDef
                                                                 .meta as any
                                                         )?.sticky
                                                         if (sticky === 'left') {
-                                                            return `sticky left-0 z-[999] shadow-[2px_0_8px_rgba(0,0,0,0.1)] sticky-column isolate ${
+                                                            return `sticky left-0 z-[999] sticky-column isolate ${
                                                                 isDark
                                                                     ? 'bg-[#001E3C]'
                                                                     : 'bg-white'
@@ -538,7 +557,10 @@ const Table = <T,>({
                                                         if (
                                                             sticky === 'right'
                                                         ) {
-                                                            return `sticky right-0 z-[998] shadow-[-2px_0_8px_rgba(0,0,0,0.1)] sticky-column-right isolate ${
+                                                            if (isMobile) {
+                                                                return 'static'
+                                                            }
+                                                            return `sticky right-0 z-[998] sticky-column-right isolate ${
                                                                 isDark
                                                                     ? 'bg-[#001E3C]'
                                                                     : 'bg-white'
@@ -547,7 +569,7 @@ const Table = <T,>({
                                                         return 'static'
                                                     })(),
                                                     isDark
-                                                        ? 'text-[#F5F8FA] bg-[#071B2F] group-hover:bg-[#001E3C]'
+                                                        ? 'text-[#F5F8FA] bg-[#001E3C] group-hover:bg-[#001E3C]'
                                                         : 'text-[#3F4254] bg-white group-hover:bg-[#F5F8FA]/80'
                                                 )}
                                             >
