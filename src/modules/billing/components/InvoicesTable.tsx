@@ -5,7 +5,6 @@
 
 import React, { useMemo } from 'react'
 import clsx from 'clsx'
-import { InvoiceActionsMenu } from './InvoiceActionsMenu'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Invoice } from '../types'
 import { Table } from '@/components/ui'
@@ -16,9 +15,7 @@ import { useThemeStore } from '@/store/themeStore'
 interface InvoicesTableProps {
     data: Array<Invoice>
     onEdit: (invoice: Invoice) => void
-    onDelete: (invoice: Invoice) => void
     onDownload: (invoice: Invoice) => void
-    onSaveDraft: (invoice: Invoice) => void
     loading?: boolean
 }
 
@@ -69,9 +66,7 @@ const getStatusBadge = (status: Invoice['status']) => {
 export const InvoicesTable: React.FC<InvoicesTableProps> = ({
     data,
     onEdit,
-    onDelete,
     onDownload,
-    onSaveDraft,
     loading = false,
 }) => {
     const { theme } = useThemeStore()
@@ -216,18 +211,13 @@ export const InvoicesTable: React.FC<InvoicesTableProps> = ({
                             >
                                 <DownloadIcon className="w-[17px] h-[17px]" />
                             </Button>
-                            <InvoiceActionsMenu
-                                onSaveDraft={() => onSaveDraft(invoice)}
-                                onDownload={() => onDownload(invoice)}
-                                onDelete={() => onDelete(invoice)}
-                            />
                         </div>
                     )
                 },
                 size: 200,
             },
         ],
-        [isDark, onEdit, onDelete, onDownload, onSaveDraft]
+        [isDark, onEdit, onDownload]
     )
 
     return (

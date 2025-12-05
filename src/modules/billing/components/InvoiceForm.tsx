@@ -189,8 +189,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     disabled={disabled}
                     className={clsx(
                         isDark
-                            ? 'bg-[#002B57] text-[#F5F8FA]'
-                            : 'bg-[#002B57] text-[#F5F8FA]'
+                            ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                            : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                     )}
                     error={errors.invoice_number}
                 />
@@ -482,8 +482,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     className={clsx(
                         'h-[112px]',
                         isDark
-                            ? 'bg-[#002B57] text-[#F5F8FA]'
-                            : 'bg-[#002B57] text-[#F5F8FA]'
+                            ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                            : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                     )}
                 />
             </div>
@@ -507,8 +507,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
                     className={clsx(
                         'h-[112px]',
                         isDark
-                            ? 'bg-[#002B57] text-[#F5F8FA]'
-                            : 'bg-[#002B57] text-[#F5F8FA]'
+                            ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                            : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                     )}
                 />
             </div>

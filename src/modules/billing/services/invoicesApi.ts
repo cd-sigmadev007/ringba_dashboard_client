@@ -2,6 +2,7 @@
  * Billing Invoices API Service
  */
 
+import axios from 'axios'
 import type { ApiResponse } from '@/services/api'
 import type { CreateInvoiceRequest, Invoice, UpdateInvoiceRequest  } from '../types'
 import { apiClient } from '@/services/api'
@@ -81,12 +82,30 @@ export async function sendInvoice(id: string): Promise<void> {
 
 /**
  * Download invoice PDF
+ * Uses axios directly to ensure proper blob handling
  */
 export async function downloadInvoicePDF(id: string): Promise<Blob> {
-    const response = await apiClient.get(`/api/admin/invoices/${id}/pdf`, {
+    // Get base URL from environment or use relative URL
+    const baseURL = import.meta.env.VITE_API_BASE_URL || ''
+    const url = `${baseURL}/api/admin/invoices/${id}/pdf`
+    
+    // Use axios directly for blob responses to ensure proper handling
+    const response = await axios.get(url, {
         responseType: 'blob',
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/pdf',
+        },
     })
-    return response.data
+    
+    // Axios with responseType: 'blob' returns response.data as a Blob
+    if (response.data instanceof Blob) {
+        return response.data
+    }
+    
+    // Fallback: create Blob from response data
+    return new Blob([response.data], { type: 'application/pdf' })
 }
 
 /**

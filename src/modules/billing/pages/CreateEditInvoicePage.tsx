@@ -3,13 +3,14 @@
  * Two-column layout with form on left and live preview on right
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import clsx from 'clsx'
+import html2pdf from 'html2pdf.js'
+import { toast } from 'react-hot-toast'
 import {
     useCreateInvoice,
     useDeleteInvoice,
-    useDownloadInvoicePDF,
     useInvoice,
     useSaveDraft,
     useSendInvoice,
@@ -39,9 +40,11 @@ export default function CreateEditInvoicePage() {
     const createMutation = useCreateInvoice()
     const updateMutation = useUpdateInvoice()
     const sendMutation = useSendInvoice()
-    const downloadMutation = useDownloadInvoicePDF()
     const saveDraftMutation = useSaveDraft()
     const deleteMutation = useDeleteInvoice()
+    
+    // Ref for the preview component to generate PDF
+    const previewRef = useRef<HTMLDivElement>(null)
 
     const [formData, setFormData] = useState<CreateInvoiceRequest>({
         invoice_date: new Date().toISOString().split('T')[0],
@@ -216,18 +219,48 @@ export default function CreateEditInvoicePage() {
         }
     }, [formData, organizations, customers])
 
+    // Filter out empty items before sending
+    const getValidatedFormData = (): CreateInvoiceRequest => {
+        return {
+            ...formData,
+            items: formData.items.filter(
+                (item) => item.description.trim() !== '' && item.quantity > 0
+            ),
+        }
+    }
+
     const handleSend = async () => {
+        const validatedData = getValidatedFormData()
+        
+        // Validate required fields
+        if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
+            return // Error will be shown by form validation
+        }
+        
+        if (validatedData.items.length === 0) {
+            return // Error will be shown by form validation
+        }
+
         if (!isEditMode || !id) {
             // Save first, then send
             try {
-                const invoice = await createMutation.mutateAsync(formData)
+                const invoice = await createMutation.mutateAsync(validatedData)
+                // Wait a bit for the invoice to be fully saved
+                await new Promise((resolve) => setTimeout(resolve, 500))
                 await sendMutation.mutateAsync(invoice.id)
                 navigate({ to: '/billing/invoices' })
             } catch (error) {
                 // Error handling is done in the mutation hook
             }
         } else {
+            // For existing invoice, update first to ensure latest data, then send
             try {
+                await updateMutation.mutateAsync({
+                    id,
+                    data: validatedData,
+                })
+                // Wait a bit for the update to complete
+                await new Promise((resolve) => setTimeout(resolve, 500))
                 await sendMutation.mutateAsync(id)
                 navigate({ to: '/billing/invoices' })
             } catch (error) {
@@ -237,29 +270,100 @@ export default function CreateEditInvoicePage() {
     }
 
     const handleDownload = async () => {
+        const validatedData = getValidatedFormData()
+        
+        // Validate required fields
+        if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
+            return // Error will be shown by form validation
+        }
+        
+        if (validatedData.items.length === 0) {
+            return // Error will be shown by form validation
+        }
+
+        // Save/update invoice first if needed
+        let invoiceId = id
         if (!isEditMode || !id) {
-            // Save first, then download
             try {
-                const invoice = await createMutation.mutateAsync(formData)
-                await downloadMutation.mutateAsync(invoice.id)
+                const invoice = await createMutation.mutateAsync(validatedData)
+                invoiceId = invoice.id
+                // Wait a bit for the invoice to be fully saved
+                await new Promise((resolve) => setTimeout(resolve, 500))
             } catch (error) {
                 // Error handling is done in the mutation hook
+                return
             }
         } else {
             try {
-                await downloadMutation.mutateAsync(id)
+                await updateMutation.mutateAsync({
+                    id,
+                    data: validatedData,
+                })
+                // Wait a bit for the update to complete
+                await new Promise((resolve) => setTimeout(resolve, 500))
             } catch (error) {
                 // Error handling is done in the mutation hook
+                return
             }
+        }
+
+        // Generate PDF from preview component
+        if (!previewRef.current) {
+            toast.error('Preview not available')
+            return
+        }
+
+        try {
+            // Get the inner content div (the white invoice card)
+            const element = previewRef.current
+            
+            // Wait a bit for any pending renders
+            await new Promise((resolve) => setTimeout(resolve, 100))
+            
+            // Configure html2pdf options for pixel-perfect PDF
+            const opt = {
+                margin: [0, 0, 0, 0] as [number, number, number, number],
+                filename: `invoice-${validatedData.invoice_number || invoiceId}.pdf`,
+                image: { type: 'jpeg' as const, quality: 1.0 },
+                html2canvas: { 
+                    scale: 2, // Higher scale for better quality
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    width: element.offsetWidth,
+                    height: element.scrollHeight,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight,
+                },
+                jsPDF: { 
+                    unit: 'px' as const, 
+                    format: [element.offsetWidth, element.scrollHeight] as [number, number],
+                    orientation: element.scrollHeight > element.offsetWidth ? 'portrait' as const : 'landscape' as const,
+                },
+            }
+
+            // Generate and download PDF
+            await html2pdf().set(opt).from(element).save()
+            toast.success('Invoice PDF downloaded')
+        } catch (error) {
+            console.error('Error generating PDF:', error)
+            toast.error('Failed to generate PDF')
         }
     }
 
     const handleSaveDraft = async () => {
+        const validatedData = getValidatedFormData()
+        
+        // For draft, we can save even with empty items, but we need billed_by and billed_to
+        if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
+            return // Error will be shown by form validation
+        }
+
         if (!isEditMode || !id) {
-            // Save as draft
+            // Save as draft for new invoice
             try {
                 await createMutation.mutateAsync({
-                    ...formData,
+                    ...validatedData,
                     status: 'draft',
                 })
                 navigate({ to: '/billing/invoices' })
@@ -267,11 +371,17 @@ export default function CreateEditInvoicePage() {
                 // Error handling is done in the mutation hook
             }
         } else {
+            // Update existing invoice as draft
             try {
+                // First update the invoice with current form data
+                await updateMutation.mutateAsync({
+                    id,
+                    data: validatedData,
+                })
+                // Then save as draft (this ensures status is set to draft)
                 await saveDraftMutation.mutateAsync({
                     id,
                     data: {
-                        ...formData,
                         status: 'draft',
                     },
                 })
@@ -303,7 +413,6 @@ export default function CreateEditInvoicePage() {
         createMutation.isPending ||
         updateMutation.isPending ||
         sendMutation.isPending ||
-        downloadMutation.isPending ||
         saveDraftMutation.isPending ||
         deleteMutation.isPending
 
@@ -341,7 +450,7 @@ export default function CreateEditInvoicePage() {
                             onSaveDraft={handleSaveDraft}
                             onDownload={handleDownload}
                             onDelete={handleDelete}
-                            disabled={isLoading || !isEditMode}
+                            disabled={isLoading}
                         />
                     </div>
                 </div>
@@ -359,7 +468,7 @@ export default function CreateEditInvoicePage() {
 
                     {/* Right: Preview */}
                     <div className="flex-shrink-0">
-                        <InvoicePreview invoice={previewData} />
+                        <InvoicePreview invoice={previewData} pdfRef={previewRef} />
                     </div>
                 </div>
             </div>

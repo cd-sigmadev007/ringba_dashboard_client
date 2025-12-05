@@ -65,8 +65,8 @@ export const InvoiceItemRow: React.FC<InvoiceItemRowProps> = ({
                 className={clsx(
                     'min-w-[214px] flex-1',
                     isDark
-                        ? 'bg-[#002B57] text-[#F5F8FA]'
-                        : 'bg-[#002B57] text-[#F5F8FA]'
+                        ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                        : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                 )}
             />
             <Input
@@ -83,8 +83,8 @@ export const InvoiceItemRow: React.FC<InvoiceItemRowProps> = ({
                 className={clsx(
                     'flex-1',
                     isDark
-                        ? 'bg-[#002B57] text-[#F5F8FA]'
-                        : 'bg-[#002B57] text-[#F5F8FA]'
+                        ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                        : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                 )}
             />
             <Input
@@ -101,8 +101,8 @@ export const InvoiceItemRow: React.FC<InvoiceItemRowProps> = ({
                 className={clsx(
                     'flex-1',
                     isDark
-                        ? 'bg-[#002B57] text-[#F5F8FA]'
-                        : 'bg-[#002B57] text-[#F5F8FA]'
+                        ? 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
+                        : 'bg-[#002B57] focus:bg-[#002B57] text-[#F5F8FA]'
                 )}
             />
             <button

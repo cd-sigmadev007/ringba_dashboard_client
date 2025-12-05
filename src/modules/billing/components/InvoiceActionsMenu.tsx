@@ -5,9 +5,10 @@
 
 import React, { useState } from 'react'
 import clsx from 'clsx'
-import { DeleteIcon, DownloadIcon, DraftIcon } from '@/assets/svg'
+import { DeleteIcon, DownloadIcon, DraftIcon, ThreeDotIcon } from '@/assets/svg'
 import { useClickOutside } from '@/lib'
 import { useThemeStore } from '@/store/themeStore'
+import Button from '@/components/ui/Button'
 
 interface InvoiceActionsMenuProps {
     onSaveDraft: () => void
@@ -59,31 +60,24 @@ export const InvoiceActionsMenu: React.FC<InvoiceActionsMenuProps> = ({
 
     return (
         <div ref={menuRef} className="relative">
-            {/* Three-dot button */}
-            <button
-                type="button"
-                onClick={() => !disabled && setIsOpen(!isOpen)}
+            {/* Three-dot trigger button */}
+            <Button
+                variant="sec"
+                onClick={(e) => {
+                    e.stopPropagation()
+                    setIsOpen(!isOpen)
+                }}
                 disabled={disabled}
                 className={clsx(
-                    'w-[44px] h-[44px] flex items-center justify-center rounded-[10px]',
-                    isDark ? 'bg-[#132F4C]' : 'bg-[#132F4C]',
-                    !disabled && 'hover:bg-[#1B456F]',
-                    disabled && 'opacity-50 cursor-not-allowed'
+                    'p-1 min-w-0 flex items-center justify-center',
+                    isDark
+                        ? 'border border-[#0254A5] hover:bg-[#0254A5]/20'
+                        : 'border border-[#0254A5] hover:bg-[#0254A5]/10'
                 )}
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 22 22"
-                    fill="none"
-                >
-                    <circle cx="11" cy="5.5" r="1.5" fill="#F5F8FA" />
-                    <circle cx="11" cy="11" r="1.5" fill="#F5F8FA" />
-                    <circle cx="11" cy="16.5" r="1.5" fill="#F5F8FA" />
-                </svg>
-            </button>
-
+                <ThreeDotIcon className="w-[22px] h-[22px]" />
+            </Button>
+            
             {/* Dropdown menu */}
             {isOpen && (
                 <div
@@ -99,19 +93,15 @@ export const InvoiceActionsMenu: React.FC<InvoiceActionsMenuProps> = ({
                                 type="button"
                                 onClick={item.onClick}
                                 className={clsx(
-                                    'flex gap-[10px] items-center p-[10px] rounded-[7px] transition-colors',
+                                    'flex gap-[10px] items-center p-[10px] rounded-[7px] transition-colors w-full',
                                     index === 0
-                                        ? isDark
-                                            ? 'bg-[#1B456F]'
-                                            : 'bg-[#1B456F]'
-                                        : '',
-                                    isDark
-                                        ? 'text-[#F5F8FA] hover:bg-[#1B456F]'
-                                        : 'text-[#F5F8FA] hover:bg-[#1B456F]'
+                                        ? 'bg-[#1B456F]'
+                                        : 'bg-transparent hover:bg-[#1B456F]',
+                                    'text-[#F5F8FA]'
                                 )}
                             >
                                 {item.icon}
-                                <span className="text-[16px] font-medium">
+                                <span className="text-[16px] font-medium font-[\'Poppins\',sans-serif]">
                                     {item.label}
                                 </span>
                             </button>
