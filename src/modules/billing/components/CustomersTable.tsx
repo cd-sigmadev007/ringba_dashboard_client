@@ -1,25 +1,25 @@
 /**
- * Organizations Table Component
+ * Customers Table Component
  * Uses reusable Table component with columns matching Figma design
  */
 
 import React, { useMemo } from 'react'
 import { Table } from '@/components/ui'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { Organization } from '../types'
+import type { Customer } from '../services/customersApi'
 import { EditIcon, DeleteIcon } from '@/assets/svg'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import clsx from 'clsx'
 
-interface OrganizationsTableProps {
-    data: Organization[]
-    onEdit: (org: Organization) => void
-    onDelete: (org: Organization) => void
+interface CustomersTableProps {
+    data: Customer[]
+    onEdit: (customer: Customer) => void
+    onDelete: (customer: Customer) => void
     loading?: boolean
 }
 
-export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
+export const CustomersTable: React.FC<CustomersTableProps> = ({
     data,
     onEdit,
     onDelete,
@@ -28,7 +28,7 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
-    const columns = useMemo<Array<ColumnDef<Organization>>>(
+    const columns = useMemo<Array<ColumnDef<Customer>>>(
         () => [
             {
                 accessorKey: 'name',
@@ -57,12 +57,12 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                 size: 243,
             },
             {
-                accessorKey: 'contact',
+                id: 'contact',
                 header: 'contact',
                 cell: ({ row }) => {
-                    const org = row.original
-                    const countryCode = org.country_code || ''
-                    const phoneNumber = org.phone_number || ''
+                    const customer = row.original
+                    const countryCode = customer.country_code || ''
+                    const phoneNumber = customer.phone_number || ''
                     const contact = countryCode && phoneNumber
                         ? `${countryCode} ${phoneNumber}`
                         : countryCode || phoneNumber || '-'
@@ -96,14 +96,14 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                 id: 'actions',
                 header: 'Action',
                 cell: ({ row }) => {
-                    const org = row.original
+                    const customer = row.original
                     return (
                         <div className="flex items-center gap-[5px]">
                             <Button
                                 variant="ghost"
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    onEdit(org)
+                                    onEdit(customer)
                                 }}
                                 className={clsx(
                                     'p-1 min-w-0 w-[24px] h-[24px] flex items-center justify-center',
@@ -118,7 +118,7 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                                 variant="ghost"
                                 onClick={(e) => {
                                     e.stopPropagation()
-                                    onDelete(org)
+                                    onDelete(customer)
                                 }}
                                 className={clsx(
                                     'p-1 min-w-0 w-[24px] h-[24px] flex items-center justify-center',
@@ -145,7 +145,7 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
             loading={loading}
             pagination={true}
             pageSize={10}
-            emptyMessage="No organizations found"
+            emptyMessage="No customers found"
         />
     )
 }

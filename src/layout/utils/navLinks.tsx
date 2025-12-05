@@ -57,6 +57,18 @@ export const navLinks: Array<NavLinkItem> = [
         icon: <BillingIcon />,
         submenu: [
             {
+                id: 'billing-invoices',
+                title: 'Invoices',
+                path: '/billing/invoices',
+                disable: true, // Not implemented yet
+            },
+            {
+                id: 'billing-customers',
+                title: 'Customers',
+                path: '/billing/customers',
+                disable: false,
+            },
+            {
                 id: 'billing-organizations',
                 title: 'Organizations',
                 path: '/billing/organizations',
