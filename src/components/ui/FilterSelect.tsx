@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import clsx from 'clsx'
 import { get, isEqual } from 'lodash'
@@ -44,6 +44,10 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
     const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>(
         'bottom'
     )
+    const [searchText, setSearchText] = useState('')
+    const [filteredList, setFilteredList] =
+        useState<Array<SelectOption>>(filterList)
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const theme = useThemeStore((s) => s.theme) // 'dark' | 'light'
     const isMobile = useIsMobile()
     const isInitialMount = useRef(true)
@@ -52,8 +56,38 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         // Only close on click outside for desktop (when not using mobile modal)
         if (!isMobile) {
             setOpenSelect(false)
+            setSearchText('')
         }
     })
+
+    // Filter options based on search text
+    useEffect(() => {
+        if (!searchText.trim()) {
+            setFilteredList(filterList)
+            return
+        }
+
+        const searchLower = searchText.toLowerCase()
+        const filtered = filterList.filter((option) =>
+            option.title.toLowerCase().includes(searchLower)
+        )
+        setFilteredList(filtered)
+
+        // Auto-select first matching option for single select
+        if (!multiple && filtered.length > 0) {
+            const firstMatch = filtered[0]
+            if (!isEqual(selected.value, firstMatch.value)) {
+                setSelected(firstMatch)
+            }
+        }
+    }, [searchText, filterList, multiple, selected.value])
+
+    // Reset search when dropdown closes
+    useEffect(() => {
+        if (!openSelect) {
+            setSearchText('')
+        }
+    }, [openSelect])
 
     // Check available space and position dropdown accordingly
     useEffect(() => {
@@ -61,7 +95,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
             const rect = selectRef.current.getBoundingClientRect()
             const spaceBelow = window.innerHeight - rect.bottom
             const spaceAbove = rect.top
-            const dropdownHeight = Math.min(filterList.length * 40 + 20, 320) // Approximate height
+            const dropdownHeight = Math.min(filteredList.length * 40 + 20, 320) // Approximate height
 
             if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
                 setDropdownPosition('top')
@@ -69,7 +103,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                 setDropdownPosition('bottom')
             }
         }
-    }, [openSelect, isMobile, filterList.length])
+    }, [openSelect, isMobile, filteredList.length])
 
     // Sync selected state with defaultValue prop changes (without triggering callbacks)
     useEffect(() => {
@@ -164,6 +198,58 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
 
     const disabledText = isDark ? 'text-[#5E6278]' : 'text-[#A1A5B7]'
 
+    // Handle keyboard input for type-to-navigate
+    const handleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if (!openSelect) return
+
+            // Ignore special keys
+            if (
+                e.key === 'Enter' ||
+                e.key === 'Escape' ||
+                e.key === 'ArrowUp' ||
+                e.key === 'ArrowDown' ||
+                e.key === 'Tab' ||
+                e.ctrlKey ||
+                e.metaKey ||
+                e.altKey
+            ) {
+                return
+            }
+
+            // Clear timeout if exists
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current)
+            }
+
+            // Update search text
+            if (e.key.length === 1) {
+                setSearchText((prev) => prev + e.key)
+            } else if (e.key === 'Backspace') {
+                setSearchText((prev) => prev.slice(0, -1))
+            }
+
+            // Clear search after 1 second of no typing
+            searchTimeoutRef.current = setTimeout(() => {
+                setSearchText('')
+            }, 1000)
+        },
+        [openSelect]
+    )
+
+    // Add keyboard event listener when dropdown is open
+    useEffect(() => {
+        if (openSelect && !isMobile) {
+            window.addEventListener('keydown', handleKeyDown)
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown)
+                if (searchTimeoutRef.current) {
+                    clearTimeout(searchTimeoutRef.current)
+                }
+            }
+        }
+    }, [openSelect, isMobile, handleKeyDown])
+
     // Content that will be used in both desktop dropdown and mobile modal
     const optionsContent = (
         <ul
@@ -173,7 +259,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
                 !isMobile && 'overflow-y-auto custom-scroll'
             )}
         >
-            {filterList.map((item: SelectOption) => (
+            {filteredList.map((item: SelectOption) => (
                 <li
                     key={item.value}
                     className={clsx(

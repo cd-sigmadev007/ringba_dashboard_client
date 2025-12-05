@@ -3,12 +3,8 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-    
-    createOrganization,
-    getOrganizations
-} from '../services/adminApi'
-import type {CreateOrganizationRequest} from '../services/adminApi';
+import { createOrganization, getOrganizations } from '../services/adminApi'
+import type { CreateOrganizationRequest } from '../services/adminApi'
 
 export function useOrganizations() {
     return useQuery({
