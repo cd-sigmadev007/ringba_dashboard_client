@@ -6,10 +6,8 @@
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
 import {
-    useDeleteInvoice,
     useDownloadInvoicePDF,
     useInvoices,
-    useSaveDraft,
 } from '../hooks/useInvoices'
 import { InvoicesTable } from '../components/InvoicesTable'
 import type { Invoice } from '../types'
@@ -22,9 +20,7 @@ export default function InvoicesPage() {
     const isDark = theme === 'dark'
     const navigate = useNavigate()
     const { data: invoices = [], isLoading } = useInvoices()
-    const deleteMutation = useDeleteInvoice()
     const downloadMutation = useDownloadInvoicePDF()
-    const saveDraftMutation = useSaveDraft()
 
     const handleCreate = () => {
         navigate({ to: '/billing/invoices/new' })
@@ -34,36 +30,9 @@ export default function InvoicesPage() {
         navigate({ to: `/billing/invoices/${invoice.id}/edit` })
     }
 
-    const handleDelete = async (invoice: Invoice) => {
-        if (
-            window.confirm(
-                `Are you sure you want to delete invoice "${invoice.invoice_number}"? This action cannot be undone.`
-            )
-        ) {
-            try {
-                await deleteMutation.mutateAsync(invoice.id)
-            } catch (error) {
-                // Error handling is done in the mutation hook
-            }
-        }
-    }
-
     const handleDownload = async (invoice: Invoice) => {
         try {
             await downloadMutation.mutateAsync(invoice.id)
-        } catch (error) {
-            // Error handling is done in the mutation hook
-        }
-    }
-
-    const handleSaveDraft = async (invoice: Invoice) => {
-        try {
-            await saveDraftMutation.mutateAsync({
-                id: invoice.id,
-                data: {
-                    status: 'draft',
-                },
-            })
         } catch (error) {
             // Error handling is done in the mutation hook
         }
@@ -103,9 +72,7 @@ export default function InvoicesPage() {
                 <InvoicesTable
                     data={invoices}
                     onEdit={handleEdit}
-                    onDelete={handleDelete}
                     onDownload={handleDownload}
-                    onSaveDraft={handleSaveDraft}
                     loading={isLoading}
                 />
             </div>

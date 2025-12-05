@@ -31,9 +31,10 @@ interface InvoicePreviewProps {
         notes?: string | null
         items?: Array<InvoiceItem>
     }
+    pdfRef?: React.RefObject<HTMLDivElement | null>
 }
 
-export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoice }) => {
+export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoice, pdfRef }) => {
     const formatDate = (dateString: string) => {
         try {
             return new Date(dateString).toISOString().split('T')[0]
@@ -48,7 +49,11 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({ invoice }) => {
 
     return (
         <div className="bg-[#071b2f] border border-[#002b57] border-solid box-border flex items-start justify-center p-[24px] relative rounded-bl-[10px] rounded-br-[10px] w-fit">
-            <div className="bg-white relative shrink-0 w-[565px] min-h-[799px]">
+            <div 
+                ref={pdfRef}
+                className="bg-white relative shrink-0 w-[565px] min-h-[799px]"
+                id="invoice-preview-content"
+            >
                 {/* Header Section */}
                 <div className="relative px-[22.79px] pt-[45.58px] pb-[30px]">
                     {/* Logo - Top Left */}
