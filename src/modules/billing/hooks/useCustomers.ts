@@ -3,15 +3,17 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-    getCustomers,
-    createCustomer,
-    updateCustomer,
-    deleteCustomer,
-    type CreateCustomerRequest,
-    type UpdateCustomerRequest,
-} from '../services/customersApi'
 import toast from 'react-hot-toast'
+import {
+    createCustomer,
+    deleteCustomer,
+    getCustomers,
+    updateCustomer,
+} from '../services/customersApi'
+import type {
+    CreateCustomerRequest,
+    UpdateCustomerRequest,
+} from '../services/customersApi'
 
 export function useCustomers() {
     return useQuery({
@@ -30,7 +32,9 @@ export function useCreateCustomer() {
     return useMutation({
         mutationFn: (data: CreateCustomerRequest) => createCustomer(data),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['billing', 'customers'] })
+            await queryClient.invalidateQueries({
+                queryKey: ['billing', 'customers'],
+            })
             toast.success('Customer created successfully')
         },
         onError: (error: any) => {
@@ -51,7 +55,9 @@ export function useUpdateCustomer() {
             data: UpdateCustomerRequest
         }) => updateCustomer(id, data),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['billing', 'customers'] })
+            await queryClient.invalidateQueries({
+                queryKey: ['billing', 'customers'],
+            })
             toast.success('Customer updated successfully')
         },
         onError: (error: any) => {
@@ -66,7 +72,9 @@ export function useDeleteCustomer() {
     return useMutation({
         mutationFn: (id: string) => deleteCustomer(id),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['billing', 'customers'] })
+            await queryClient.invalidateQueries({
+                queryKey: ['billing', 'customers'],
+            })
             toast.success('Customer deleted successfully')
         },
         onError: (error: any) => {
@@ -74,4 +82,3 @@ export function useDeleteCustomer() {
         },
     })
 }
-

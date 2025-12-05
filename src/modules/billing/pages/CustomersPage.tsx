@@ -3,16 +3,16 @@
  * Main page for billing/customers matching Figma design (node-id: 4643-10577)
  */
 
-import React, { useState } from 'react'
+import { useState } from 'react'
+import clsx from 'clsx'
 import { useCustomers, useDeleteCustomer } from '../hooks/useCustomers'
 import { CustomersTable } from '../components/CustomersTable'
 import { CreateEditCustomerModal } from '../components/CreateEditCustomerModal'
+import type { Customer } from '../services/customersApi'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import { AddIcon } from '@/assets/svg'
-import type { Customer } from '../services/customersApi'
 import { Modal } from '@/components/ui/Modal'
-import clsx from 'clsx'
 
 export default function CustomersPage() {
     const { theme } = useThemeStore()
@@ -21,7 +21,9 @@ export default function CustomersPage() {
     const deleteMutation = useDeleteCustomer()
 
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
+    const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
+        null
+    )
     const [deleteCustomer, setDeleteCustomer] = useState<Customer | null>(null)
     const [isDeleting, setIsDeleting] = useState(false)
 
@@ -76,11 +78,15 @@ export default function CustomersPage() {
                         onClick={handleCreate}
                         className={clsx(
                             'flex items-center gap-[5px] px-[10px] py-[7px] rounded-[10px]',
-                            isDark ? 'bg-[#002B57] text-[#F5F8FA]' : 'bg-[#002B57] text-[#F5F8FA]'
+                            isDark
+                                ? 'bg-[#002B57] text-[#F5F8FA]'
+                                : 'bg-[#002B57] text-[#F5F8FA]'
                         )}
                     >
                         <AddIcon className="w-5 h-5" />
-                        <span className="text-[14px] font-regular">New Customer</span>
+                        <span className="text-[14px] font-regular">
+                            New Customer
+                        </span>
                     </Button>
                 </div>
 
@@ -110,8 +116,8 @@ export default function CustomersPage() {
                     <div className="space-y-4 p-2">
                         <p className="text-sm">
                             Are you sure you want to delete{' '}
-                            <strong>{deleteCustomer?.name}</strong>? This action cannot
-                            be undone.
+                            <strong>{deleteCustomer?.name}</strong>? This action
+                            cannot be undone.
                         </p>
                         <div className="flex justify-end gap-2">
                             <Button
@@ -136,4 +142,3 @@ export default function CustomersPage() {
         </div>
     )
 }
-

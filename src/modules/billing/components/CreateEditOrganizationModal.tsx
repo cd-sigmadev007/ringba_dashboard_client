@@ -3,17 +3,32 @@
  * Matches Figma design (node-id: 4643-11272)
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import clsx from 'clsx'
+import {
+    useCreateOrganization,
+    useUpdateOrganization,
+} from '../hooks/useOrganizations'
+import type {
+    CreateOrganizationRequest,
+    Organization,
+    UpdateOrganizationRequest,
+} from '../types'
 import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { TextArea } from '@/components/ui/TextArea'
 import Button from '@/components/ui/Button'
 import FormSelect from '@/components/ui/FormSelect'
 import { useThemeStore } from '@/store/themeStore'
-import { useCreateOrganization, useUpdateOrganization } from '../hooks/useOrganizations'
-import type { Organization, CreateOrganizationRequest, UpdateOrganizationRequest } from '../types'
 import { useIsMobile } from '@/lib'
-import clsx from 'clsx'
+import {
+    fetchCountries,
+    lookupPostalZippopotam,
+} from '@/modules/org/services/locationApi'
+
+const Spinner: React.FC = () => (
+    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+)
 
 interface CreateEditOrganizationModalProps {
     isOpen: boolean
@@ -35,11 +50,9 @@ const COUNTRY_CODES = [
     { title: '+7', value: '+7' },
 ]
 
-export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalProps> = ({
-    isOpen,
-    onClose,
-    organization,
-}) => {
+export const CreateEditOrganizationModal: React.FC<
+    CreateEditOrganizationModalProps
+> = ({ isOpen, onClose, organization }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
@@ -51,6 +64,7 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
         country_code: '',
         phone_number: '',
         billing_address: '',
+        country: '',
         state: '',
         city: '',
         postal_code: '',
@@ -58,9 +72,30 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const [countries, setCountries] = useState<
+        Array<{ title: string; value: string }>
+    >([])
+    const [loadingPostal, setLoadingPostal] = useState(false)
+    const [lastLookedUpPostal, setLastLookedUpPostal] = useState<string>('')
 
     const createMutation = useCreateOrganization()
     const updateMutation = useUpdateOrganization()
+
+    // Fetch countries on mount
+    useEffect(() => {
+        let mounted = true
+        fetchCountries().then((list) => {
+            if (!mounted) return
+            setCountries(
+                [{ title: 'Select Country', value: '' }].concat(
+                    list.map((c) => ({ title: c.name, value: c.code }))
+                )
+            )
+        })
+        return () => {
+            mounted = false
+        }
+    }, [])
 
     // Populate form when editing
     useEffect(() => {
@@ -71,6 +106,7 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                 country_code: organization.country_code || '',
                 phone_number: organization.phone_number || '',
                 billing_address: organization.billing_address || '',
+                country: organization.country || '',
                 state: organization.state || '',
                 city: organization.city || '',
                 postal_code: organization.postal_code || '',
@@ -84,11 +120,13 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                 country_code: '',
                 phone_number: '',
                 billing_address: '',
+                country: '',
                 state: '',
                 city: '',
                 postal_code: '',
                 gst_vat_tax_id: '',
             })
+            setLastLookedUpPostal('')
         }
         setErrors({})
     }, [organization, isOpen])
@@ -100,7 +138,10 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
             newErrors.name = 'Company name is required'
         }
 
-        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        if (
+            formData.email &&
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+        ) {
             newErrors.email = 'Invalid email format'
         }
 
@@ -123,6 +164,7 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                     country_code: formData.country_code || undefined,
                     phone_number: formData.phone_number || undefined,
                     billing_address: formData.billing_address || undefined,
+                    country: formData.country || undefined,
                     state: formData.state || undefined,
                     city: formData.city || undefined,
                     postal_code: formData.postal_code || undefined,
@@ -148,12 +190,14 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
             country_code: '',
             phone_number: '',
             billing_address: '',
+            country: '',
             state: '',
             city: '',
             postal_code: '',
             gst_vat_tax_id: '',
         })
         setErrors({})
+        setLastLookedUpPostal('')
         onClose()
     }
 
@@ -169,7 +213,9 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
             animation={isMobile ? 'slide' : 'fade'}
             className={clsx(
                 isDark ? 'bg-[#071B2F]' : 'bg-white',
-                isMobile ? 'w-full h-[70vh] rounded-t-[10px]' : 'w-[70vw] max-h-[70vh] overflow-y-auto'
+                isMobile
+                    ? 'w-full h-[70vh] rounded-t-[10px]'
+                    : 'w-[70vw] max-h-[70vh] overflow-y-auto'
             )}
         >
             <form onSubmit={handleSubmit} className="flex flex-col gap-[24px]">
@@ -211,7 +257,8 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                         value={formData.email}
                         onChange={(e) => {
                             setFormData({ ...formData, email: e.target.value })
-                            if (errors.email) setErrors({ ...errors, email: '' })
+                            if (errors.email)
+                                setErrors({ ...errors, email: '' })
                         }}
                         placeholder="Enter company email"
                         error={errors.email}
@@ -240,14 +287,20 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                             value={formData.country_code}
                             placeholder="+91"
                             onChange={(value) => {
-                                setFormData({ ...formData, country_code: value })
+                                setFormData({
+                                    ...formData,
+                                    country_code: value,
+                                })
                             }}
                             widthClassName="w-auto min-w-[80px]"
                         />
                         <Input
                             value={formData.phone_number}
                             onChange={(e) => {
-                                setFormData({ ...formData, phone_number: e.target.value })
+                                setFormData({
+                                    ...formData,
+                                    phone_number: e.target.value,
+                                })
                             }}
                             placeholder="9876511223"
                             disabled={isLoading}
@@ -269,14 +322,19 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                     <TextArea
                         value={formData.billing_address}
                         onChange={(e) => {
-                            setFormData({ ...formData, billing_address: e.target.value })
+                            setFormData({
+                                ...formData,
+                                billing_address: e.target.value,
+                            })
                         }}
                         placeholder="Enter billing address"
                         rows={4}
                         disabled={isLoading}
                         className={clsx(
                             'h-[112px]',
-                            isDark ? 'bg-[#002B57] text-[#F5F8FA]' : 'bg-[#002B57] text-[#F5F8FA]'
+                            isDark
+                                ? 'bg-[#002B57] text-[#F5F8FA]'
+                                : 'bg-[#002B57] text-[#F5F8FA]'
                         )}
                     />
                     <div className="flex gap-[14px] flex-wrap">
@@ -286,9 +344,31 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                                     ? 'bg-[#002B57] text-[#F5F8FA] border-transparent'
                                     : 'bg-[#002B57] text-[#F5F8FA] border-transparent'
                             )}
-                            options={[]} // TODO: Add state options
-                            value={formData.state}
+                            options={countries}
+                            value={formData.country}
+                            placeholder="Select Country"
+                            onChange={(value) => {
+                                setFormData({ ...formData, country: value })
+                                // Reset postal lookup cache when country changes
+                                setLastLookedUpPostal('')
+                            }}
+                            widthClassName="min-w-[160px] flex-1"
+                        />
+                        <FormSelect
+                            className={clsx(
+                                isDark
+                                    ? 'bg-[#002B57] text-[#F5F8FA] border-transparent'
+                                    : 'bg-[#002B57] text-[#F5F8FA] border-transparent'
+                            )}
+                            options={[
+                                {
+                                    title: formData.state || 'State / Province',
+                                    value: formData.state || '',
+                                },
+                            ]}
+                            value={formData.state || ''}
                             placeholder="State"
+                            loading={loadingPostal}
                             onChange={(value) => {
                                 setFormData({ ...formData, state: value })
                             }}
@@ -300,9 +380,15 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                                     ? 'bg-[#002B57] text-[#F5F8FA] border-transparent'
                                     : 'bg-[#002B57] text-[#F5F8FA] border-transparent'
                             )}
-                            options={[]} // TODO: Add city options
-                            value={formData.city}
+                            options={[
+                                {
+                                    title: formData.city || 'City',
+                                    value: formData.city || '',
+                                },
+                            ]}
+                            value={formData.city || ''}
                             placeholder="City"
+                            loading={loadingPostal}
                             onChange={(value) => {
                                 setFormData({ ...formData, city: value })
                             }}
@@ -311,11 +397,51 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                         <Input
                             value={formData.postal_code}
                             onChange={(e) => {
-                                setFormData({ ...formData, postal_code: e.target.value })
+                                setFormData({
+                                    ...formData,
+                                    postal_code: e.target.value,
+                                })
+                                // Reset postal lookup cache when postal code changes
+                                setLastLookedUpPostal('')
+                            }}
+                            onBlur={async () => {
+                                const postalKey = `${formData.country}-${formData.postal_code}`
+                                // Only lookup if country/postal changed and both are present
+                                if (
+                                    formData.country &&
+                                    formData.postal_code &&
+                                    postalKey !== lastLookedUpPostal
+                                ) {
+                                    setLoadingPostal(true)
+                                    try {
+                                        const res =
+                                            await lookupPostalZippopotam(
+                                                formData.country.toLowerCase(),
+                                                formData.postal_code
+                                            )
+                                        if (res) {
+                                            setFormData((v) => ({
+                                                ...v,
+                                                city: res.city || v.city || '',
+                                                state:
+                                                    res.state || v.state || '',
+                                            }))
+                                            setLastLookedUpPostal(postalKey)
+                                        }
+                                    } catch (err) {
+                                        console.error(
+                                            'Postal lookup failed:',
+                                            err
+                                        )
+                                    } finally {
+                                        setLoadingPostal(false)
+                                    }
+                                }
                             }}
                             placeholder="Postal Code"
                             disabled={isLoading}
                             className="min-w-[160px] flex-1"
+                            rightIcon={loadingPostal ? <Spinner /> : undefined}
                         />
                     </div>
                 </div>
@@ -333,7 +459,10 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
                     <Input
                         value={formData.gst_vat_tax_id}
                         onChange={(e) => {
-                            setFormData({ ...formData, gst_vat_tax_id: e.target.value })
+                            setFormData({
+                                ...formData,
+                                gst_vat_tax_id: e.target.value,
+                            })
                         }}
                         placeholder="Enter tax ID"
                         disabled={isLoading}
@@ -342,7 +471,6 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
 
                 {/* Submit Button */}
                 <Button
-                    type="submit"
                     variant="primary"
                     disabled={isLoading}
                     className={clsx(
@@ -356,4 +484,3 @@ export const CreateEditOrganizationModal: React.FC<CreateEditOrganizationModalPr
         </Modal>
     )
 }
-

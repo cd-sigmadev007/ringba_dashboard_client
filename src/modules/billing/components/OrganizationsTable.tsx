@@ -4,16 +4,16 @@
  */
 
 import React, { useMemo } from 'react'
-import { Table } from '@/components/ui'
+import clsx from 'clsx'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Organization } from '../types'
-import { EditIcon, DeleteIcon } from '@/assets/svg'
+import { Table } from '@/components/ui'
+import { DeleteIcon, EditIcon } from '@/assets/svg'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
-import clsx from 'clsx'
 
 interface OrganizationsTableProps {
-    data: Organization[]
+    data: Array<Organization>
     onEdit: (org: Organization) => void
     onDelete: (org: Organization) => void
     loading?: boolean
@@ -63,9 +63,10 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
                     const org = row.original
                     const countryCode = org.country_code || ''
                     const phoneNumber = org.phone_number || ''
-                    const contact = countryCode && phoneNumber
-                        ? `${countryCode} ${phoneNumber}`
-                        : countryCode || phoneNumber || '-'
+                    const contact =
+                        countryCode && phoneNumber
+                            ? `${countryCode} ${phoneNumber}`
+                            : countryCode || phoneNumber || '-'
                     return (
                         <span className="text-[14px] font-medium text-[#F5F8FA]">
                             {contact}
@@ -149,4 +150,3 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
         />
     )
 }
-

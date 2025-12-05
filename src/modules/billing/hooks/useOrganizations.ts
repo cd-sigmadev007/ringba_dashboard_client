@@ -3,14 +3,17 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-    fetchOrganizations,
-    createOrg,
-    updateOrg,
-    type CreateOrganizationRequest,
-    type UpdateOrganizationRequest,
-} from '../services/organizationsApi'
 import toast from 'react-hot-toast'
+import {
+    createOrg,
+    deleteOrg,
+    fetchOrganizations,
+    updateOrg,
+} from '../services/organizationsApi'
+import type {
+    CreateOrganizationRequest,
+    UpdateOrganizationRequest,
+} from '../services/organizationsApi'
 
 export function useOrganizations() {
     return useQuery({
@@ -26,7 +29,9 @@ export function useCreateOrganization() {
     return useMutation({
         mutationFn: (data: CreateOrganizationRequest) => createOrg(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['billing', 'organizations'] })
+            queryClient.invalidateQueries({
+                queryKey: ['billing', 'organizations'],
+            })
             queryClient.invalidateQueries({ queryKey: ['organizations'] })
             toast.success('Organization created successfully')
         },
@@ -48,7 +53,9 @@ export function useUpdateOrganization() {
             data: UpdateOrganizationRequest
         }) => updateOrg(id, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['billing', 'organizations'] })
+            queryClient.invalidateQueries({
+                queryKey: ['billing', 'organizations'],
+            })
             queryClient.invalidateQueries({ queryKey: ['organizations'] })
             toast.success('Organization updated successfully')
         },
@@ -58,3 +65,20 @@ export function useUpdateOrganization() {
     })
 }
 
+export function useDeleteOrganization() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (id: string) => deleteOrg(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['billing', 'organizations'],
+            })
+            queryClient.invalidateQueries({ queryKey: ['organizations'] })
+            toast.success('Organization deleted successfully')
+        },
+        onError: (error: any) => {
+            toast.error(error?.message || 'Failed to delete organization')
+        },
+    })
+}

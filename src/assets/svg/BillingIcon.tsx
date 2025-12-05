@@ -6,12 +6,9 @@ interface SVGRProps {
     className?: string
 }
 
-export const BillingIcon: React.FC<React.SVGProps<SVGSVGElement> & SVGRProps> = ({
-    title,
-    titleId,
-    className,
-    ...props
-}) => (
+export const BillingIcon: React.FC<
+    React.SVGProps<SVGSVGElement> & SVGRProps
+> = ({ title, titleId, className, ...props }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="22"
@@ -31,4 +28,3 @@ export const BillingIcon: React.FC<React.SVGProps<SVGSVGElement> & SVGRProps> = 
 )
 
 export default BillingIcon
-

@@ -2,8 +2,8 @@
  * Billing Customers API Service
  */
 
-import { apiClient } from '@/services/api'
 import type { ApiResponse } from '@/services/api'
+import { apiClient } from '@/services/api'
 
 export interface Customer {
     id: string
@@ -47,8 +47,8 @@ export interface UpdateCustomerRequest {
     gst_vat_tax_id?: string
 }
 
-export interface CustomersResponse extends ApiResponse<Customer[]> {
-    data: Customer[]
+export interface CustomersResponse extends ApiResponse<Array<Customer>> {
+    data: Array<Customer>
 }
 
 export interface CustomerResponse extends ApiResponse<Customer> {
@@ -91,7 +91,10 @@ export async function updateCustomer(
 /**
  * Delete a customer
  */
-export async function deleteCustomer(id: string): Promise<ApiResponse<{ id: string }>> {
-    return apiClient.delete<ApiResponse<{ id: string }>>(`/api/admin/customers/${id}`)
+export async function deleteCustomer(
+    id: string
+): Promise<ApiResponse<{ id: string }>> {
+    return apiClient.delete<ApiResponse<{ id: string }>>(
+        `/api/admin/customers/${id}`
+    )
 }
-

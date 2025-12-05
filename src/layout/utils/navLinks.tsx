@@ -1,4 +1,4 @@
-import { BuildingIcon, PhoneIcon, BillingIcon } from '../../assets/svg'
+import { BillingIcon, BuildingIcon, PhoneIcon } from '../../assets/svg'
 
 export interface NavLinkItem {
     id: string | number

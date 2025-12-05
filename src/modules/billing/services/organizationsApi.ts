@@ -2,25 +2,29 @@
  * Billing Organizations API Service
  */
 
-import {
-    getOrganizations,
-    createOrganization,
-    updateOrganization,
-    type Organization as AdminOrganization,
-    type CreateOrganizationRequest,
-    type UpdateOrganizationRequest,
-    type OrganizationsResponse,
-    type CreateOrganizationResponse,
-} from '@/modules/dashboard/services/adminApi'
 import type { Organization } from '../types'
+import type {
+    CreateOrganizationRequest,
+    UpdateOrganizationRequest,
+} from '@/modules/dashboard/services/adminApi'
+import {
+    createOrganization,
+    deleteOrganization,
+    getOrganizations,
+    updateOrganization,
+} from '@/modules/dashboard/services/adminApi'
 
 // Re-export types for convenience
-export type { Organization, CreateOrganizationRequest, UpdateOrganizationRequest }
+export type {
+    Organization,
+    CreateOrganizationRequest,
+    UpdateOrganizationRequest,
+}
 
 /**
  * Get all organizations
  */
-export async function fetchOrganizations(): Promise<Organization[]> {
+export async function fetchOrganizations(): Promise<Array<Organization>> {
     const response = await getOrganizations()
     return response.data
 }
@@ -46,3 +50,9 @@ export async function updateOrg(
     return response.data
 }
 
+/**
+ * Delete an organization
+ */
+export async function deleteOrg(id: string): Promise<void> {
+    await deleteOrganization(id)
+}

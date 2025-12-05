@@ -8,4 +8,3 @@ export default (parentRoute: RootRoute) =>
         component: OrganizationsPage,
         getParentRoute: () => parentRoute,
     })
-

@@ -11,6 +11,7 @@ export interface Organization {
     country_code?: string | null
     phone_number?: string | null
     billing_address?: string | null
+    country?: string | null
     state?: string | null
     city?: string | null
     postal_code?: string | null
@@ -23,6 +24,7 @@ export interface CreateOrganizationRequest {
     country_code?: string
     phone_number?: string
     billing_address?: string
+    country?: string
     state?: string
     city?: string
     postal_code?: string
@@ -35,9 +37,9 @@ export interface UpdateOrganizationRequest {
     country_code?: string
     phone_number?: string
     billing_address?: string
+    country?: string
     state?: string
     city?: string
     postal_code?: string
     gst_vat_tax_id?: string
 }
-

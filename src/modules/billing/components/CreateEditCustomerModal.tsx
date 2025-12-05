@@ -3,18 +3,25 @@
  * Matches Figma design (node-id: 4643-10738)
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import clsx from 'clsx'
+import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
+import type {
+    CreateCustomerRequest,
+    Customer,
+    UpdateCustomerRequest,
+} from '../services/customersApi'
 import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { TextArea } from '@/components/ui/TextArea'
 import Button from '@/components/ui/Button'
 import FormSelect from '@/components/ui/FormSelect'
 import { useThemeStore } from '@/store/themeStore'
-import { useCreateCustomer, useUpdateCustomer } from '../hooks/useCustomers'
-import type { Customer, CreateCustomerRequest, UpdateCustomerRequest } from '../services/customersApi'
-import { fetchCountries, lookupPostalZippopotam } from '@/modules/org/services/locationApi'
+import {
+    fetchCountries,
+    lookupPostalZippopotam,
+} from '@/modules/org/services/locationApi'
 import { useIsMobile } from '@/lib'
-import clsx from 'clsx'
 
 const Spinner: React.FC = () => (
     <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
@@ -40,11 +47,9 @@ const COUNTRY_CODES = [
     { title: '+7', value: '+7' },
 ]
 
-export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = ({
-    isOpen,
-    onClose,
-    customer,
-}) => {
+export const CreateEditCustomerModal: React.FC<
+    CreateEditCustomerModalProps
+> = ({ isOpen, onClose, customer }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
@@ -64,7 +69,9 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
     })
 
     const [errors, setErrors] = useState<Record<string, string>>({})
-    const [countries, setCountries] = useState<Array<{ title: string; value: string }>>([])
+    const [countries, setCountries] = useState<
+        Array<{ title: string; value: string }>
+    >([])
     const [loadingPostal, setLoadingPostal] = useState(false)
     const [lastLookedUpPostal, setLastLookedUpPostal] = useState<string>('')
 
@@ -128,7 +135,10 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
             newErrors.name = 'Customer name is required'
         }
 
-        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        if (
+            formData.email &&
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+        ) {
             newErrors.email = 'Invalid email format'
         }
 
@@ -200,7 +210,9 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
             animation={isMobile ? 'slide' : 'fade'}
             className={clsx(
                 isDark ? 'bg-[#071B2F]' : 'bg-white',
-                isMobile ? 'w-full h-[70vh] rounded-t-[10px]' : 'w-[70vw] max-h-[70vh] overflow-y-auto'
+                isMobile
+                    ? 'w-full h-[70vh] rounded-t-[10px]'
+                    : 'w-[70vw] max-h-[70vh] overflow-y-auto'
             )}
         >
             <form onSubmit={handleSubmit} className="flex flex-col gap-[24px]">
@@ -242,7 +254,8 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                         value={formData.email}
                         onChange={(e) => {
                             setFormData({ ...formData, email: e.target.value })
-                            if (errors.email) setErrors({ ...errors, email: '' })
+                            if (errors.email)
+                                setErrors({ ...errors, email: '' })
                         }}
                         placeholder="Enter customer email"
                         error={errors.email}
@@ -271,14 +284,20 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                             value={formData.country_code}
                             placeholder="+91"
                             onChange={(value) => {
-                                setFormData({ ...formData, country_code: value })
+                                setFormData({
+                                    ...formData,
+                                    country_code: value,
+                                })
                             }}
                             widthClassName="w-auto min-w-[80px]"
                         />
                         <Input
                             value={formData.phone_number}
                             onChange={(e) => {
-                                setFormData({ ...formData, phone_number: e.target.value })
+                                setFormData({
+                                    ...formData,
+                                    phone_number: e.target.value,
+                                })
                             }}
                             placeholder="9876511223"
                             disabled={isLoading}
@@ -300,14 +319,19 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                     <TextArea
                         value={formData.billing_address}
                         onChange={(e) => {
-                            setFormData({ ...formData, billing_address: e.target.value })
+                            setFormData({
+                                ...formData,
+                                billing_address: e.target.value,
+                            })
                         }}
                         placeholder="Enter billing address"
                         rows={4}
                         disabled={isLoading}
                         className={clsx(
                             'h-[112px]',
-                            isDark ? 'bg-[#002B57] text-[#F5F8FA]' : 'bg-[#002B57] text-[#F5F8FA]'
+                            isDark
+                                ? 'bg-[#002B57] text-[#F5F8FA]'
+                                : 'bg-[#002B57] text-[#F5F8FA]'
                         )}
                     />
                     <div className="flex gap-[14px] flex-wrap">
@@ -322,7 +346,8 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                             placeholder="Select Country"
                             onChange={(value) => {
                                 setFormData({ ...formData, country: value })
-                                if (errors.country) setErrors({ ...errors, country: '' })
+                                if (errors.country)
+                                    setErrors({ ...errors, country: '' })
                                 // Reset postal lookup cache when country changes
                                 setLastLookedUpPostal('')
                             }}
@@ -338,15 +363,16 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                             options={[
                                 {
                                     title: formData.state || 'State / Province',
-                                    value: formData.state,
+                                    value: formData.state || '',
                                 },
                             ]}
-                            value={formData.state}
+                            value={formData.state || ''}
                             placeholder="State"
                             loading={loadingPostal}
                             onChange={(value) => {
                                 setFormData({ ...formData, state: value })
-                                if (errors.state) setErrors({ ...errors, state: '' })
+                                if (errors.state)
+                                    setErrors({ ...errors, state: '' })
                             }}
                             widthClassName="min-w-[160px] flex-1"
                             error={errors.state}
@@ -360,15 +386,16 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                             options={[
                                 {
                                     title: formData.city || 'City',
-                                    value: formData.city,
+                                    value: formData.city || '',
                                 },
                             ]}
-                            value={formData.city}
+                            value={formData.city || ''}
                             placeholder="City"
                             loading={loadingPostal}
                             onChange={(value) => {
                                 setFormData({ ...formData, city: value })
-                                if (errors.city) setErrors({ ...errors, city: '' })
+                                if (errors.city)
+                                    setErrors({ ...errors, city: '' })
                             }}
                             widthClassName="min-w-[160px] flex-1"
                             error={errors.city}
@@ -376,8 +403,12 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                         <Input
                             value={formData.postal_code}
                             onChange={(e) => {
-                                setFormData({ ...formData, postal_code: e.target.value })
-                                if (errors.postal_code) setErrors({ ...errors, postal_code: '' })
+                                setFormData({
+                                    ...formData,
+                                    postal_code: e.target.value,
+                                })
+                                if (errors.postal_code)
+                                    setErrors({ ...errors, postal_code: '' })
                                 // Reset postal lookup cache when postal code changes
                                 setLastLookedUpPostal('')
                             }}
@@ -391,20 +422,25 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                                 ) {
                                     setLoadingPostal(true)
                                     try {
-                                        const res = await lookupPostalZippopotam(
-                                            formData.country.toLowerCase(),
-                                            formData.postal_code
-                                        )
+                                        const res =
+                                            await lookupPostalZippopotam(
+                                                formData.country.toLowerCase(),
+                                                formData.postal_code
+                                            )
                                         if (res) {
                                             setFormData((v) => ({
                                                 ...v,
                                                 city: res.city || v.city || '',
-                                                state: res.state || v.state || '',
+                                                state:
+                                                    res.state || v.state || '',
                                             }))
                                             setLastLookedUpPostal(postalKey)
                                         }
                                     } catch (err) {
-                                        console.error('Postal lookup failed:', err)
+                                        console.error(
+                                            'Postal lookup failed:',
+                                            err
+                                        )
                                     } finally {
                                         setLoadingPostal(false)
                                     }
@@ -432,7 +468,10 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
                     <Input
                         value={formData.gst_vat_tax_id}
                         onChange={(e) => {
-                            setFormData({ ...formData, gst_vat_tax_id: e.target.value })
+                            setFormData({
+                                ...formData,
+                                gst_vat_tax_id: e.target.value,
+                            })
                         }}
                         placeholder="Enter tax ID"
                         disabled={isLoading}
@@ -455,4 +494,3 @@ export const CreateEditCustomerModal: React.FC<CreateEditCustomerModalProps> = (
         </Modal>
     )
 }
-

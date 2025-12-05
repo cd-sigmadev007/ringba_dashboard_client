@@ -4,16 +4,16 @@
  */
 
 import React, { useMemo } from 'react'
-import { Table } from '@/components/ui'
+import clsx from 'clsx'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Customer } from '../services/customersApi'
-import { EditIcon, DeleteIcon } from '@/assets/svg'
+import { Table } from '@/components/ui'
+import { DeleteIcon, EditIcon } from '@/assets/svg'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
-import clsx from 'clsx'
 
 interface CustomersTableProps {
-    data: Customer[]
+    data: Array<Customer>
     onEdit: (customer: Customer) => void
     onDelete: (customer: Customer) => void
     loading?: boolean
@@ -63,9 +63,10 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({
                     const customer = row.original
                     const countryCode = customer.country_code || ''
                     const phoneNumber = customer.phone_number || ''
-                    const contact = countryCode && phoneNumber
-                        ? `${countryCode} ${phoneNumber}`
-                        : countryCode || phoneNumber || '-'
+                    const contact =
+                        countryCode && phoneNumber
+                            ? `${countryCode} ${phoneNumber}`
+                            : countryCode || phoneNumber || '-'
                     return (
                         <span className="text-[14px] font-medium text-[#F5F8FA]">
                             {contact}
@@ -149,4 +150,3 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({
         />
     )
 }
-
