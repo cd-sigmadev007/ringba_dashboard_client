@@ -62,7 +62,7 @@ export const InvoiceActionsMenu: React.FC<InvoiceActionsMenuProps> = ({
         <div ref={menuRef} className="relative">
             {/* Three-dot trigger button */}
             <Button
-                variant="sec"
+                variant="secondary"
                 onClick={(e) => {
                     e.stopPropagation()
                     setIsOpen(!isOpen)
