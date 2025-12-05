@@ -60,7 +60,7 @@ export const navLinks: Array<NavLinkItem> = [
                 id: 'billing-invoices',
                 title: 'Invoices',
                 path: '/billing/invoices',
-                disable: true, // Not implemented yet
+                disable: false,
             },
             {
                 id: 'billing-customers',
