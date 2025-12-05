@@ -227,14 +227,14 @@ export const Modal: FC<ModalProps> = ({
 
                 <div
                     className={cn(
-                        'overflow-y-auto custom-scroll rounded-[7px] flex-1 min-h-0',
+                        'overflow-y-auto mb-6 custom-scroll rounded-[7px] flex-1 min-h-0',
                         size === 'full' ? 'h-[90%]' : '',
                         border &&
                             cn(
                                 'border',
                                 isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
                             ),
-                        contentClassName || 'mx-6'
+                        contentClassName || 'mx-6 mb-6'
                     )}
                     onClick={(e) => {
                         // Stop propagation to prevent the content area from closing when clicked

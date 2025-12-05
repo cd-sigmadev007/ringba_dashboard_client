@@ -89,32 +89,6 @@ export default function OrganizationsPage() {
                     loading={isLoading}
                 />
 
-                {/* Pagination Footer */}
-                {totalItems > 0 && (
-                    <div className="flex items-center justify-between mt-6">
-                        <p
-                            className={clsx(
-                                'text-[16px] font-medium',
-                                isDark ? 'text-[#A1A5B7]' : 'text-[#7E8299]'
-                            )}
-                        >
-                            Showing {startItem}-{endItem} of {totalItems} items
-                        </p>
-                        <div className="flex gap-[10px] items-center">
-                            <div
-                                className={clsx(
-                                    'h-[35px] w-[40px] flex items-center justify-center rounded-[10px]',
-                                    isDark
-                                        ? 'bg-[#1A64FF] text-[#F0F5FF]'
-                                        : 'bg-[#1A64FF] text-[#F0F5FF]'
-                                )}
-                            >
-                                <span className="text-[16px] font-medium">{currentPage}</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* Create/Edit Modal */}
                 <CreateEditOrganizationModal
                     isOpen={isModalOpen}

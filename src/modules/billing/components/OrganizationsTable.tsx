@@ -146,7 +146,6 @@ export const OrganizationsTable: React.FC<OrganizationsTableProps> = ({
             pagination={true}
             pageSize={10}
             emptyMessage="No organizations found"
-            className="single-table"
         />
     )
 }
