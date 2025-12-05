@@ -6,8 +6,7 @@ import { useThemeStore } from '@/store/themeStore'
 
 type ButtonVariant = 'primary' | 'ghost' | 'secondary' | 'default'
 
-interface ButtonProps
-    extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant
     className?: string
     children: ReactNode

@@ -650,7 +650,7 @@ const Table = <T,>({
             {pagination && (
                 <div
                     className={clsx(
-                        'px-2 py-5 flex items-center justify-between'
+                        'px-2 py-5 flex items-center justify-between bg-none'
                     )}
                 >
                     <div
