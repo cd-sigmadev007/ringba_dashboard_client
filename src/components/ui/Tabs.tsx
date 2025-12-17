@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
-import { useThemeStore } from '@/store/themeStore'
 
 export interface TabItem {
     id: string
@@ -25,8 +24,6 @@ export const Tabs: React.FC<TabsProps> = ({
     contentClassName,
     onChange,
 }) => {
-    const { theme } = useThemeStore()
-    const isDark = theme === 'dark'
 
     const [activeTab, setActiveTab] = useState(
         defaultActiveTab || tabs[0]?.id || ''
@@ -51,19 +48,15 @@ export const Tabs: React.FC<TabsProps> = ({
                             key={tab.id}
                             onClick={() => handleTabChange(tab.id)}
                             className={clsx(
-                                'px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center justify-center relative',
+                                'px-[10px] py-[15px] text-[16px] font-medium transition-colors duration-200 flex items-center justify-center relative',
                                 isActive && [
                                     // Active tab styles - blue bottom border
-                                    isDark
-                                        ? 'text-[#F5F8FA]'
-                                        : 'text-[#F5F8FA]',
+                                    'text-[#F5F8FA]',
                                     'border-b-2 border-[#007FFF]',
                                 ],
                                 !isActive && [
                                     // Inactive tab styles
-                                    isDark
-                                        ? 'text-[#7E8299]'
-                                        : 'text-[#7E8299]',
+                                    'text-[#7E8299]',
                                 ]
                             )}
                         >

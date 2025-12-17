@@ -183,7 +183,7 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                     onClick={() => toggleEntry(entryKey)}
                                 >
                                     {/* Status Icon */}
-                                    <div className="shrink-0 size-[24px] flex items-center justify-center">
+                                    <div className="shrink-0 size-[24px] mt-[4px] flex items-center justify-center">
                                         {entry.converted ? (
                                             <ConvertedIcon className="size-[24px]" />
                                         ) : (
