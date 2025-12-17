@@ -15,7 +15,7 @@ const OrgHeader: React.FC = () => {
                         isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
                     )}
                 >
-                    Organization Profile
+                    Organization Settings
                 </h1>
             </div>
         </div>

@@ -31,7 +31,7 @@ export const navLinks: Array<NavLinkItem> = [
         submenu: [
             {
                 id: 'org-profile',
-                title: 'Profile',
+                title: 'Settings',
                 path: '/organization/profile',
                 disable: false,
             },
