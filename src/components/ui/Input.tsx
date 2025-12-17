@@ -12,7 +12,7 @@ import type { InputHTMLAttributes } from 'react'
 // Input variants using class-variance-authority
 const inputVariants = cva(
     // Base styles
-    'rounded-[7px] w-full px-[15px] py-[10px] placeholder:text-[#A1A5B7] focus:outline-0 border border-transparent focus:border-[#007FFF] transition-all duration-100 ease-in bg-[#FFF] focus:bg-[#FFFFFF] text-[#3F4254] disabled:opacity-40 disabled:cursor-not-allowed',
+    'rounded-[7px] w-full px-[15px] py-[10px] placeholder:text-[#A1A5B7] focus:outline-0 border border-transparent focus:border-[#007FFF] transition-all duration-100 ease-in bg-[#FFF] text-[#3F4254] disabled:opacity-40 disabled:cursor-not-allowed',
     {
         variants: {
             variant: {

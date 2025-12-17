@@ -16,6 +16,11 @@ import OrganizationCampaignsRoute from './routes/organizationCampaigns.tsx'
 import OrganizationUsersRoute from './routes/organizationUsers.tsx'
 import CreateCampaignRoute from './routes/createCampaign.tsx'
 import EditCampaignRoute from './routes/editCampaign.tsx'
+import BillingOrganizationsRoute from './routes/billingOrganizations.tsx'
+import BillingCustomersRoute from './routes/billingCustomers.tsx'
+import BillingInvoicesRoute from './routes/billingInvoices.tsx'
+import BillingInvoiceCreateRoute from './routes/billingInvoiceCreate.tsx'
+import BillingInvoiceEditRoute from './routes/billingInvoiceEdit.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -46,6 +51,11 @@ const routeTree = rootRoute.addChildren([
     OrganizationUsersRoute(rootRoute),
     CreateCampaignRoute(rootRoute),
     EditCampaignRoute(rootRoute),
+    BillingOrganizationsRoute(rootRoute),
+    BillingCustomersRoute(rootRoute),
+    BillingInvoicesRoute(rootRoute),
+    BillingInvoiceCreateRoute(rootRoute),
+    BillingInvoiceEditRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()

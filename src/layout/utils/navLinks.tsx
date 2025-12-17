@@ -1,4 +1,4 @@
-import { BuildingIcon, PhoneIcon } from '../../assets/svg'
+import { BillingIcon, BuildingIcon, PhoneIcon } from '../../assets/svg'
 
 export interface NavLinkItem {
     id: string | number
@@ -46,6 +46,32 @@ export const navLinks: Array<NavLinkItem> = [
                 id: 'org-campaigns',
                 title: 'Campaigns',
                 path: '/organization/campaigns',
+                disable: false,
+            },
+        ],
+    },
+    {
+        id: 99887767,
+        title: 'Billing',
+        disable: false,
+        icon: <BillingIcon />,
+        submenu: [
+            {
+                id: 'billing-invoices',
+                title: 'Invoices',
+                path: '/billing/invoices',
+                disable: false,
+            },
+            {
+                id: 'billing-customers',
+                title: 'Customers',
+                path: '/billing/customers',
+                disable: false,
+            },
+            {
+                id: 'billing-organizations',
+                title: 'Organizations',
+                path: '/billing/organizations',
                 disable: false,
             },
         ],

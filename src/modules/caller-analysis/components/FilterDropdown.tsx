@@ -340,7 +340,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
                 className={cn(
                     'border-t border-[#1b456f] border-solid flex items-center justify-between shrink-0 pt-[15px]',
                     isMobile &&
-                        'flex-col gap-[10px] sticky bottom-0 bg-[#071b2f] pb-[20px] -mx-[20px] px-[20px] z-10',
+                        'flex-col gap-[10px] sticky bottom-0 bg-[#071b2f] -mx-[20px] px-[20px] z-10',
                     !isMobile && 'mt-[15px]'
                 )}
             >

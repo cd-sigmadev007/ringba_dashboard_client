@@ -90,6 +90,9 @@ export default function OrganizationList() {
                     data={organizations}
                     columns={columns}
                     showHeader={true}
+                    pagination={true}
+                    pageSize={10}
+                    emptyMessage="No organizations found"
                     size="medium"
                 />
             )}
