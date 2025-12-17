@@ -7,13 +7,13 @@ import toast from 'react-hot-toast'
 import {
     createInvoice,
     deleteInvoice,
-    downloadInvoicePDF,
     fetchInvoices,
     getInvoiceById,
     saveDraft,
     sendInvoice,
     updateInvoice,
 } from '../services/invoicesApi'
+import { generateInvoicePDF } from '../utils/pdfGenerator'
 import type { CreateInvoiceRequest, UpdateInvoiceRequest } from '../types'
 
 export function useInvoices() {
@@ -114,33 +114,29 @@ export function useSendInvoice() {
 }
 
 export function useDownloadInvoicePDF() {
+    const queryClient = useQueryClient()
+
     return useMutation({
         mutationFn: async (id: string) => {
-            const blob = await downloadInvoicePDF(id)
+            // Fetch the full invoice data (or get from cache if available)
+            const invoice = await queryClient.fetchQuery({
+                queryKey: ['billing', 'invoices', id],
+                queryFn: () => getInvoiceById(id),
+                staleTime: 5000, // Use cached data if available and less than 5 seconds old
+            })
 
-            // Ensure we have a valid Blob
-            if (!(blob instanceof Blob)) {
-                throw new Error('Invalid response: expected Blob')
+            if (!invoice) {
+                throw new Error('Invoice not found')
             }
 
-            const url = URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = `invoice-${id}.pdf`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-
-            // Revoke the URL after a short delay to ensure download starts
-            setTimeout(() => {
-                URL.revokeObjectURL(url)
-            }, 100)
+            // Generate PDF client-side using html2pdf (matches UI exactly)
+            await generateInvoicePDF(invoice)
         },
         onSuccess: () => {
             toast.success('Invoice PDF downloaded')
         },
         onError: (error: any) => {
-            toast.error(error?.message || 'Failed to download invoice PDF')
+            toast.error(error?.message || 'Failed to generate invoice PDF')
         },
     })
 }
