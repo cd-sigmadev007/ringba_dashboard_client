@@ -5,10 +5,7 @@
 
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
-import {
-    useDownloadInvoicePDF,
-    useInvoices,
-} from '../hooks/useInvoices'
+import { useDownloadInvoicePDF, useInvoices } from '../hooks/useInvoices'
 import { InvoicesTable } from '../components/InvoicesTable'
 import type { Invoice } from '../types'
 import Button from '@/components/ui/Button'

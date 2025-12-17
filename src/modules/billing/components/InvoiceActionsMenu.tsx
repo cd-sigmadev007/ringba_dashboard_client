@@ -69,15 +69,15 @@ export const InvoiceActionsMenu: React.FC<InvoiceActionsMenuProps> = ({
                 }}
                 disabled={disabled}
                 className={clsx(
-                    'p-1 min-w-0 flex items-center justify-center',
+                    'flex items-center justify-center gap-[5px] h-[44px] px-[11px] py-[7px] rounded-[10px]',
                     isDark
-                        ? 'border border-[#0254A5] hover:bg-[#0254A5]/20'
-                        : 'border border-[#0254A5] hover:bg-[#0254A5]/10'
+                        ? 'bg-[#132f4c] text-[#F5F8FA]'
+                        : 'bg-[#132f4c] text-[#F5F8FA]'
                 )}
             >
                 <ThreeDotIcon className="w-[22px] h-[22px]" />
             </Button>
-            
+
             {/* Dropdown menu */}
             {isOpen && (
                 <div
@@ -101,7 +101,7 @@ export const InvoiceActionsMenu: React.FC<InvoiceActionsMenuProps> = ({
                                 )}
                             >
                                 {item.icon}
-                                <span className="text-[16px] font-medium font-[\'Poppins\',sans-serif]">
+                                <span className="text-[16px] font-medium">
                                     {item.label}
                                 </span>
                             </button>

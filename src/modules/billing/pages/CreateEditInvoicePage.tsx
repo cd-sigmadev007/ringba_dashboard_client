@@ -42,7 +42,7 @@ export default function CreateEditInvoicePage() {
     const sendMutation = useSendInvoice()
     const saveDraftMutation = useSaveDraft()
     const deleteMutation = useDeleteInvoice()
-    
+
     // Ref for the preview component to generate PDF
     const previewRef = useRef<HTMLDivElement>(null)
 
@@ -231,12 +231,12 @@ export default function CreateEditInvoicePage() {
 
     const handleSend = async () => {
         const validatedData = getValidatedFormData()
-        
+
         // Validate required fields
         if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
             return // Error will be shown by form validation
         }
-        
+
         if (validatedData.items.length === 0) {
             return // Error will be shown by form validation
         }
@@ -271,12 +271,12 @@ export default function CreateEditInvoicePage() {
 
     const handleDownload = async () => {
         const validatedData = getValidatedFormData()
-        
+
         // Validate required fields
         if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
             return // Error will be shown by form validation
         }
-        
+
         if (validatedData.items.length === 0) {
             return // Error will be shown by form validation
         }
@@ -316,16 +316,16 @@ export default function CreateEditInvoicePage() {
         try {
             // Get the inner content div (the white invoice card)
             const element = previewRef.current
-            
+
             // Wait a bit for any pending renders
             await new Promise((resolve) => setTimeout(resolve, 100))
-            
+
             // Configure html2pdf options for pixel-perfect PDF
             const opt = {
                 margin: [0, 0, 0, 0] as [number, number, number, number],
                 filename: `invoice-${validatedData.invoice_number || invoiceId}.pdf`,
                 image: { type: 'jpeg' as const, quality: 1.0 },
-                html2canvas: { 
+                html2canvas: {
                     scale: 2, // Higher scale for better quality
                     useCORS: true,
                     logging: false,
@@ -335,10 +335,16 @@ export default function CreateEditInvoicePage() {
                     windowWidth: element.scrollWidth,
                     windowHeight: element.scrollHeight,
                 },
-                jsPDF: { 
-                    unit: 'px' as const, 
-                    format: [element.offsetWidth, element.scrollHeight] as [number, number],
-                    orientation: element.scrollHeight > element.offsetWidth ? 'portrait' as const : 'landscape' as const,
+                jsPDF: {
+                    unit: 'px' as const,
+                    format: [element.offsetWidth, element.scrollHeight] as [
+                        number,
+                        number,
+                    ],
+                    orientation:
+                        element.scrollHeight > element.offsetWidth
+                            ? ('portrait' as const)
+                            : ('landscape' as const),
                 },
             }
 
@@ -353,7 +359,7 @@ export default function CreateEditInvoicePage() {
 
     const handleSaveDraft = async () => {
         const validatedData = getValidatedFormData()
-        
+
         // For draft, we can save even with empty items, but we need billed_by and billed_to
         if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
             return // Error will be shown by form validation
@@ -435,16 +441,16 @@ export default function CreateEditInvoicePage() {
                             onClick={handleSend}
                             disabled={isLoading}
                             className={clsx(
-                                'flex items-center gap-[5px] px-[10px] py-[7px] rounded-[10px]',
+                                'flex items-center gap-[4px] h-[44px] px-[14px] py-[7px] rounded-[10px]',
                                 isDark
-                                    ? 'bg-[#002B57] text-[#F5F8FA]'
-                                    : 'bg-[#002B57] text-[#F5F8FA]'
+                                    ? 'bg-[#132f4c] text-[#F5F8FA]'
+                                    : 'bg-[#132f4c] text-[#F5F8FA]'
                             )}
                         >
-                            <SendIcon className="w-[22px] h-[22px]" />
-                            <span className="text-[14px] font-regular">
+                            <span className="font-medium text-[16px]">
                                 Send Invoice
                             </span>
+                            <SendIcon className="w-[22px] h-[22px]" />
                         </Button>
                         <InvoiceActionsMenu
                             onSaveDraft={handleSaveDraft}
@@ -468,7 +474,10 @@ export default function CreateEditInvoicePage() {
 
                     {/* Right: Preview */}
                     <div className="flex-shrink-0">
-                        <InvoicePreview invoice={previewData} pdfRef={previewRef} />
+                        <InvoicePreview
+                            invoice={previewData}
+                            pdfRef={previewRef}
+                        />
                     </div>
                 </div>
             </div>

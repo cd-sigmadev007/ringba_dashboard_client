@@ -4,7 +4,11 @@
 
 import axios from 'axios'
 import type { ApiResponse } from '@/services/api'
-import type { CreateInvoiceRequest, Invoice, UpdateInvoiceRequest  } from '../types'
+import type {
+    CreateInvoiceRequest,
+    Invoice,
+    UpdateInvoiceRequest,
+} from '../types'
 import { apiClient } from '@/services/api'
 
 export interface InvoicesResponse extends ApiResponse<Array<Invoice>> {
@@ -88,7 +92,7 @@ export async function downloadInvoicePDF(id: string): Promise<Blob> {
     // Get base URL from environment or use relative URL
     const baseURL = import.meta.env.VITE_API_BASE_URL || ''
     const url = `${baseURL}/api/admin/invoices/${id}/pdf`
-    
+
     // Use axios directly for blob responses to ensure proper handling
     const response = await axios.get(url, {
         responseType: 'blob',
@@ -98,12 +102,12 @@ export async function downloadInvoicePDF(id: string): Promise<Blob> {
             Accept: 'application/pdf',
         },
     })
-    
+
     // Axios with responseType: 'blob' returns response.data as a Blob
     if (response.data instanceof Blob) {
         return response.data
     }
-    
+
     // Fallback: create Blob from response data
     return new Blob([response.data], { type: 'application/pdf' })
 }

@@ -117,12 +117,12 @@ export function useDownloadInvoicePDF() {
     return useMutation({
         mutationFn: async (id: string) => {
             const blob = await downloadInvoicePDF(id)
-            
+
             // Ensure we have a valid Blob
             if (!(blob instanceof Blob)) {
                 throw new Error('Invalid response: expected Blob')
             }
-            
+
             const url = URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.href = url
@@ -130,7 +130,7 @@ export function useDownloadInvoicePDF() {
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
-            
+
             // Revoke the URL after a short delay to ensure download starts
             setTimeout(() => {
                 URL.revokeObjectURL(url)

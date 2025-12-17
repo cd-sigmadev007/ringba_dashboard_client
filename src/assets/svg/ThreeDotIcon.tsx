@@ -11,9 +11,12 @@ interface SVGRProps {
     className?: string
 }
 
-const ThreeDotIcon: React.FC<
-    React.SVGProps<SVGSVGElement> & SVGRProps
-> = ({ title, titleId, className, ...props }) => (
+const ThreeDotIcon: React.FC<React.SVGProps<SVGSVGElement> & SVGRProps> = ({
+    title,
+    titleId,
+    className,
+    ...props
+}) => (
     <svg
         width="22"
         height="22"
@@ -33,4 +36,3 @@ const ThreeDotIcon: React.FC<
 
 export default ThreeDotIcon
 export { ThreeDotIcon }
-

@@ -27,8 +27,8 @@ export const PriorityStatusSection: React.FC<PriorityStatusSectionProps> = ({
         isMobile ? 'max-w-none w-full' : ''
     )
 
-    if (statuses.length === 0) return null
-
+    // Always show the category section, even if empty
+    // This ensures all categories are visible when they have statuses
     return (
         <div
             className={clsx(
@@ -45,10 +45,21 @@ export const PriorityStatusSection: React.FC<PriorityStatusSectionProps> = ({
             >
                 <p className={labelClass}>{title}</p>
                 <div className="flex-1 overflow-x-fixed">
-                    <Status
-                        enablePillOverflow={enablePillOverflow}
-                        status={statuses}
-                    />
+                    {statuses.length > 0 ? (
+                        <Status
+                            enablePillOverflow={enablePillOverflow}
+                            status={statuses}
+                        />
+                    ) : (
+                        <span
+                            className={clsx(
+                                'text-sm italic',
+                                isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                            )}
+                        >
+                            No statuses in this category
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

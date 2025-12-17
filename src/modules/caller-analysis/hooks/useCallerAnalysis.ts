@@ -164,89 +164,6 @@ export const useCallerAnalysis = () => {
         fetchData()
     }, [filters])
 
-    // Helper function to parse lastCall date string to Date object
-    // Handles formats: "Nov 07, 2025, 4:19:00 PM ET" or "Nov 07, 4:19:00 PM ET"
-    const parseLastCallDate = (lastCall: string): Date | null => {
-        try {
-            // Try parsing with year first: "Nov 07, 2025, 4:19:00 PM ET"
-            let dateMatch = lastCall.match(
-                /(\w+)\s+(\d+),\s+(\d{4}),\s+(\d{1,2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
-            )
-
-            let year: number
-            let month: string
-            let day: string
-            let hour: string
-            let minute: string
-            let second: string
-            let ampm: string
-
-            if (dateMatch) {
-                // Format with year
-                const [
-                    ,
-                    monthStr,
-                    dayStr,
-                    yearStr,
-                    hourStr,
-                    minuteStr,
-                    secondStr,
-                    ampmStr,
-                ] = dateMatch
-                month = monthStr
-                day = dayStr
-                year = parseInt(yearStr)
-                hour = hourStr
-                minute = minuteStr
-                second = secondStr
-                ampm = ampmStr
-            } else {
-                // Try parsing without year: "Aug 05, 06:00:00 AM ET"
-                dateMatch = lastCall.match(
-                    /(\w+)\s+(\d+),\s+(\d{2}):(\d{2}):(\d{2})\s+(AM|PM)\s+ET/
-                )
-                if (!dateMatch) return null
-
-                const [
-                    ,
-                    monthStr,
-                    dayStr,
-                    hourStr,
-                    minuteStr,
-                    secondStr,
-                    ampmStr,
-                ] = dateMatch
-                month = monthStr
-                day = dayStr
-                hour = hourStr
-                minute = minuteStr
-                second = secondStr
-                ampm = ampmStr
-                year = new Date().getFullYear() // Use current year as fallback
-            }
-
-            const monthIndex = new Date(
-                Date.parse(month + ' 1, 2000')
-            ).getMonth()
-
-            let hour24 = parseInt(hour)
-            if (ampm === 'PM' && hour24 !== 12) hour24 += 12
-            if (ampm === 'AM' && hour24 === 12) hour24 = 0
-
-            return new Date(
-                year,
-                monthIndex,
-                parseInt(day),
-                hour24,
-                parseInt(minute),
-                parseInt(second)
-            )
-        } catch (error) {
-            console.error('Error parsing date:', lastCall, error)
-            return null
-        }
-    }
-
     // Filter data based on current filters
     const filteredData = useMemo(() => {
         console.log('🔍 Filtering data:', {
@@ -278,24 +195,9 @@ export const useCallerAnalysis = () => {
                 return false
             }
 
-            // Date range filter
-            if (filters.dateRange.from || filters.dateRange.to) {
-                const callDate = parseLastCallDate(d.lastCall)
-                if (callDate) {
-                    if (
-                        filters.dateRange.from &&
-                        callDate < filters.dateRange.from
-                    ) {
-                        return false
-                    }
-                    if (
-                        filters.dateRange.to &&
-                        callDate > filters.dateRange.to
-                    ) {
-                        return false
-                    }
-                }
-            }
+            // Date range filter - REMOVED: Backend handles date filtering correctly
+            // Client-side date filtering was causing timezone mismatches and incorrect filtering
+            // The backend already filters by date in EST timezone, so we trust the API results
 
             // Duration filter (legacy)
             if (!matchesDurationFilter(d.duration, filters.durationFilter)) {
