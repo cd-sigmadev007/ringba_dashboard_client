@@ -298,44 +298,63 @@ export default function CreateEditInvoicePage() {
     }
 
     const handleSend = async () => {
+        console.log('handleSend called')
         const validatedData = getValidatedFormData()
+        console.log('Validated data:', validatedData)
+        console.log('isEditMode:', isEditMode, 'id:', id)
 
         // Validate required fields
         if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
-            return // Error will be shown by form validation
+            console.log(
+                'Validation failed: missing billed_by_id or billed_to_id'
+            )
+            toast.error('Please select both "Billed By" and "Billed To"')
+            return
         }
 
         if (validatedData.items.length === 0) {
-            return // Error will be shown by form validation
+            console.log('Validation failed: no items')
+            toast.error('Please add at least one invoice item')
+            return
         }
+
+        console.log('Validation passed, proceeding with send')
 
         if (!isEditMode || !id) {
             // Save first, then send
+            console.log('Creating new invoice first')
             try {
                 const invoice = await createMutation.mutateAsync({
                     data: validatedData,
                     logoFile,
                 })
+                console.log('Invoice created:', invoice.id)
                 // Wait a bit for the invoice to be fully saved
                 await new Promise((resolve) => setTimeout(resolve, 500))
+                console.log('Sending invoice:', invoice.id)
                 await sendMutation.mutateAsync(invoice.id)
                 navigate({ to: '/billing/invoices' })
             } catch (error) {
+                console.error('Error in handleSend (create):', error)
                 // Error handling is done in the mutation hook
             }
         } else {
             // For existing invoice, update first to ensure latest data, then send
+            console.log('Updating existing invoice first:', id)
             try {
                 await updateMutation.mutateAsync({
                     id,
                     data: validatedData,
                     logoFile,
                 })
+                console.log('Invoice updated, now sending')
                 // Wait a bit for the update to complete
                 await new Promise((resolve) => setTimeout(resolve, 500))
+                console.log('Sending invoice:', id)
                 await sendMutation.mutateAsync(id)
                 navigate({ to: '/billing/invoices' })
             } catch (error) {
+                console.error('Error in handleSend (update):', error)
                 // Error handling is done in the mutation hook
             }
         }
@@ -517,8 +536,14 @@ export default function CreateEditInvoicePage() {
                     </h1>
                     <div className="flex items-center gap-[10px]">
                         <Button
+                            type="button"
                             variant="secondary"
-                            onClick={handleSend}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                console.log('Send Invoice button clicked')
+                                handleSend()
+                            }}
                             disabled={isLoading}
                             className={clsx(
                                 'flex items-center gap-[4px] h-[44px] px-[14px] py-[7px] rounded-[10px]',
