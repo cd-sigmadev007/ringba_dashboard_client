@@ -86,6 +86,7 @@ export interface Invoice {
     total_amount: number
     payment_instructions: string | null
     notes: string | null
+    logo_url: string | null
     created_at: string
     created_by: string | null
     updated_at: string
@@ -111,6 +112,7 @@ export interface CreateInvoiceRequest {
     discount_rate?: number
     payment_instructions?: string
     notes?: string
+    logo_url?: string
     items: Array<{
         description: string
         quantity: number
@@ -133,6 +135,7 @@ export interface UpdateInvoiceRequest {
     discount_rate?: number
     payment_instructions?: string
     notes?: string
+    logo_url?: string
     items?: Array<{
         id?: string
         description: string

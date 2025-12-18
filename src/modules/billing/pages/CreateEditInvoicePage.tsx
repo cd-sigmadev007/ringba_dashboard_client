@@ -3,7 +3,7 @@
  * Two-column layout with form on left and live preview on right
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import clsx from 'clsx'
 import html2pdf from 'html2pdf.js'
@@ -45,6 +45,31 @@ export default function CreateEditInvoicePage() {
 
     // Ref for the preview component to generate PDF
     const previewRef = useRef<HTMLDivElement>(null)
+
+    // Logo upload state
+    const [logoFile, setLogoFile] = useState<File | undefined>(undefined)
+    const [logoPreview, setLogoPreview] = useState<string | undefined>(
+        undefined
+    )
+
+    const getApiBaseUrl = useMemo(() => {
+        const baseUrl =
+            (import.meta as any).env?.VITE_API_BASE_URL ||
+            'http://localhost:3001'
+        return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
+    }, [])
+
+    const toAbsoluteLogoUrl = useCallback(
+        (logoUrl?: string | null) => {
+            if (!logoUrl) return ''
+            if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://'))
+                return logoUrl
+            const base = getApiBaseUrl
+            const path = logoUrl.startsWith('/') ? logoUrl : `/${logoUrl}`
+            return `${base}${path}`
+        },
+        [getApiBaseUrl]
+    )
 
     const [formData, setFormData] = useState<CreateInvoiceRequest>({
         invoice_date: new Date().toISOString().split('T')[0],
@@ -92,6 +117,7 @@ export default function CreateEditInvoicePage() {
                 payment_instructions:
                     existingInvoice.payment_instructions || undefined,
                 notes: existingInvoice.notes || undefined,
+                logo_url: existingInvoice.logo_url || undefined,
                 items: existingInvoice.items?.map((item) => ({
                     description: item.description,
                     quantity: item.quantity,
@@ -106,8 +132,19 @@ export default function CreateEditInvoicePage() {
                     },
                 ],
             })
+            // Set logo preview from existing invoice
+            setLogoPreview(
+                existingInvoice.logo_url
+                    ? toAbsoluteLogoUrl(existingInvoice.logo_url)
+                    : undefined
+            )
+            setLogoFile(undefined)
+        } else if (!isEditMode) {
+            // Reset logo state for new invoice
+            setLogoPreview(undefined)
+            setLogoFile(undefined)
         }
-    }, [existingInvoice])
+    }, [existingInvoice, isEditMode])
 
     // Calculate totals for preview
     const previewData = useMemo(() => {
@@ -205,6 +242,11 @@ export default function CreateEditInvoicePage() {
             total_amount: Math.round(totalAmount * 100) / 100,
             payment_instructions: formData.payment_instructions,
             notes: formData.notes,
+            logo_url: logoPreview
+                ? logoPreview
+                : formData.logo_url
+                  ? toAbsoluteLogoUrl(formData.logo_url)
+                  : undefined,
             items: formData.items.map((item, index) => ({
                 id: `temp-${index}`,
                 invoice_id: '',
@@ -217,7 +259,33 @@ export default function CreateEditInvoicePage() {
                 created_at: new Date().toISOString(),
             })),
         }
-    }, [formData, organizations, customers])
+    }, [formData, organizations, customers, logoPreview, toAbsoluteLogoUrl])
+
+    // Logo file handlers
+    const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        setLogoFile(file)
+        if (file) {
+            const reader = new FileReader()
+            reader.onload = () => setLogoPreview(reader.result as string)
+            reader.readAsDataURL(file)
+        } else {
+            setLogoPreview(
+                existingInvoice?.logo_url
+                    ? toAbsoluteLogoUrl(existingInvoice.logo_url)
+                    : undefined
+            )
+        }
+    }
+
+    const handleRemoveLogo = () => {
+        setLogoFile(undefined)
+        setLogoPreview(undefined)
+        setFormData({
+            ...formData,
+            logo_url: undefined,
+        })
+    }
 
     // Filter out empty items before sending
     const getValidatedFormData = (): CreateInvoiceRequest => {
@@ -244,7 +312,10 @@ export default function CreateEditInvoicePage() {
         if (!isEditMode || !id) {
             // Save first, then send
             try {
-                const invoice = await createMutation.mutateAsync(validatedData)
+                const invoice = await createMutation.mutateAsync({
+                    data: validatedData,
+                    logoFile,
+                })
                 // Wait a bit for the invoice to be fully saved
                 await new Promise((resolve) => setTimeout(resolve, 500))
                 await sendMutation.mutateAsync(invoice.id)
@@ -258,6 +329,7 @@ export default function CreateEditInvoicePage() {
                 await updateMutation.mutateAsync({
                     id,
                     data: validatedData,
+                    logoFile,
                 })
                 // Wait a bit for the update to complete
                 await new Promise((resolve) => setTimeout(resolve, 500))
@@ -285,7 +357,10 @@ export default function CreateEditInvoicePage() {
         let invoiceId = id
         if (!isEditMode || !id) {
             try {
-                const invoice = await createMutation.mutateAsync(validatedData)
+                const invoice = await createMutation.mutateAsync({
+                    data: validatedData,
+                    logoFile,
+                })
                 invoiceId = invoice.id
                 // Wait a bit for the invoice to be fully saved
                 await new Promise((resolve) => setTimeout(resolve, 500))
@@ -298,6 +373,7 @@ export default function CreateEditInvoicePage() {
                 await updateMutation.mutateAsync({
                     id,
                     data: validatedData,
+                    logoFile,
                 })
                 // Wait a bit for the update to complete
                 await new Promise((resolve) => setTimeout(resolve, 500))
@@ -369,8 +445,11 @@ export default function CreateEditInvoicePage() {
             // Save as draft for new invoice
             try {
                 await createMutation.mutateAsync({
-                    ...validatedData,
-                    status: 'draft',
+                    data: {
+                        ...validatedData,
+                        status: 'draft',
+                    },
+                    logoFile,
                 })
                 navigate({ to: '/billing/invoices' })
             } catch (error) {
@@ -383,6 +462,7 @@ export default function CreateEditInvoicePage() {
                 await updateMutation.mutateAsync({
                     id,
                     data: validatedData,
+                    logoFile,
                 })
                 // Then save as draft (this ensures status is set to draft)
                 await saveDraftMutation.mutateAsync({
@@ -469,6 +549,9 @@ export default function CreateEditInvoicePage() {
                             formData={formData}
                             onChange={setFormData}
                             disabled={isLoading}
+                            logoPreview={logoPreview}
+                            onLogoFileChange={handleLogoFileChange}
+                            onRemoveLogo={handleRemoveLogo}
                         />
                     </div>
 
