@@ -24,7 +24,6 @@ export const Tabs: React.FC<TabsProps> = ({
     contentClassName,
     onChange,
 }) => {
-
     const [activeTab, setActiveTab] = useState(
         defaultActiveTab || tabs[0]?.id || ''
     )

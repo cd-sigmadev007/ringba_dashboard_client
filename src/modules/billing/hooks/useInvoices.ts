@@ -37,7 +37,13 @@ export function useCreateInvoice() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: (data: CreateInvoiceRequest) => createInvoice(data),
+        mutationFn: ({
+            data,
+            logoFile,
+        }: {
+            data: CreateInvoiceRequest
+            logoFile?: File
+        }) => createInvoice(data, logoFile),
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['billing', 'invoices'],
@@ -57,10 +63,12 @@ export function useUpdateInvoice() {
         mutationFn: ({
             id,
             data,
+            logoFile,
         }: {
             id: string
             data: UpdateInvoiceRequest
-        }) => updateInvoice(id, data),
+            logoFile?: File
+        }) => updateInvoice(id, data, logoFile),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({
                 queryKey: ['billing', 'invoices'],

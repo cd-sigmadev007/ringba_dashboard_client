@@ -9,6 +9,7 @@ import { useOrganizations } from '../hooks/useOrganizations'
 import { useCustomers } from '../hooks/useCustomers'
 import { fetchCurrencies } from '../services/currencyApi'
 import { InvoiceItemRow } from './InvoiceItemRow'
+import { InvoiceLogoUpload } from './InvoiceLogoUpload'
 import type { InvoiceItemData } from './InvoiceItemRow'
 import type { CreateInvoiceRequest } from '../types'
 import { Input } from '@/components/ui/Input'
@@ -22,6 +23,9 @@ interface InvoiceFormProps {
     onChange: (data: CreateInvoiceRequest) => void
     errors?: Record<string, string>
     disabled?: boolean
+    logoPreview?: string
+    onLogoFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onRemoveLogo?: () => void
 }
 
 export const InvoiceForm: React.FC<InvoiceFormProps> = ({
@@ -29,6 +33,9 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     onChange,
     errors = {},
     disabled = false,
+    logoPreview,
+    onLogoFileChange,
+    onRemoveLogo,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -170,6 +177,25 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
     return (
         <div className="flex flex-col gap-[24px] w-[440px]">
+            {/* Invoice Logo */}
+            {onLogoFileChange && (
+                <div className="flex flex-col gap-[10px]">
+                    <label
+                        className={clsx(
+                            'text-[14px] font-regular',
+                            isDark ? 'text-white' : 'text-[#3F4254]'
+                        )}
+                    >
+                        Invoice Logo
+                    </label>
+                    <InvoiceLogoUpload
+                        preview={logoPreview}
+                        onFileChange={onLogoFileChange}
+                        onRemove={logoPreview ? onRemoveLogo : undefined}
+                    />
+                </div>
+            )}
+
             {/* Invoice Number */}
             <div className="flex flex-col gap-[10px]">
                 <label

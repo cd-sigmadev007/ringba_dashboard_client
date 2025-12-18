@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import toast from 'react-hot-toast'
-import {  apiKeysApi } from '../services/apiKeysApi'
-import type {ApiKeyType} from '../services/apiKeysApi';
+import { apiKeysApi } from '../services/apiKeysApi'
+import type { ApiKeyType } from '../services/apiKeysApi'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobileOrTablet } from '@/lib/hooks/useMediaQuery'
 import { usePermissions } from '@/hooks/usePermissions'

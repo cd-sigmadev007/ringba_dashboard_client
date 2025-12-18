@@ -43,11 +43,40 @@ export async function getInvoiceById(id: string): Promise<Invoice> {
  * Create a new invoice
  */
 export async function createInvoice(
-    data: CreateInvoiceRequest
+    data: CreateInvoiceRequest,
+    logoFile?: File
 ): Promise<Invoice> {
+    const formData = new FormData()
+
+    // Add all fields to FormData
+    Object.keys(data).forEach((key) => {
+        const value = (data as any)[key]
+        if (value !== undefined && value !== null && key !== 'logo_url') {
+            if (key === 'items') {
+                // Stringify items array
+                formData.append(key, JSON.stringify(value))
+            } else {
+                formData.append(key, value.toString())
+            }
+        }
+    })
+
+    // Add logo file if provided (takes precedence over logo_url)
+    if (logoFile) {
+        formData.append('logo', logoFile)
+    } else if (data.logo_url) {
+        // If no file but logo_url is provided, include it
+        formData.append('logo_url', data.logo_url)
+    }
+
     const response = await apiClient.post<InvoiceResponse>(
         '/api/admin/invoices',
-        data
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
     )
     return response.data
 }
@@ -57,11 +86,40 @@ export async function createInvoice(
  */
 export async function updateInvoice(
     id: string,
-    data: UpdateInvoiceRequest
+    data: UpdateInvoiceRequest,
+    logoFile?: File
 ): Promise<Invoice> {
+    const formData = new FormData()
+
+    // Add all fields to FormData
+    Object.keys(data).forEach((key) => {
+        const value = (data as any)[key]
+        if (value !== undefined && value !== null && key !== 'logo_url') {
+            if (key === 'items') {
+                // Stringify items array
+                formData.append(key, JSON.stringify(value))
+            } else {
+                formData.append(key, value.toString())
+            }
+        }
+    })
+
+    // Add logo file if provided (takes precedence over logo_url)
+    if (logoFile) {
+        formData.append('logo', logoFile)
+    } else if (data.logo_url !== undefined) {
+        // If no file but logo_url is provided (can be null to remove), include it
+        formData.append('logo_url', data.logo_url || '')
+    }
+
     const response = await apiClient.put<InvoiceResponse>(
         `/api/admin/invoices/${id}`,
-        data
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
     )
     return response.data
 }

@@ -29,6 +29,7 @@ interface InvoicePreviewProps {
         total_amount: number
         payment_instructions?: string | null
         notes?: string | null
+        logo_url?: string | null
         items?: Array<InvoiceItem>
     }
     pdfRef?: React.RefObject<HTMLDivElement | null>
@@ -75,7 +76,15 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                     <div className="relative px-[22.79px] pt-[45.58px] pb-[30px]">
                         {/* Logo - Top Left */}
                         <div className="absolute h-[26.588px] left-[23.73px] top-[45.58px] w-[134.84px]">
-                            <LightLogo />
+                            {invoice.logo_url ? (
+                                <img
+                                    src={invoice.logo_url}
+                                    alt="Invoice logo"
+                                    className="h-full w-auto object-contain"
+                                />
+                            ) : (
+                                <LightLogo />
+                            )}
                         </div>
 
                         {/* INVOICE Title - Top Right */}
