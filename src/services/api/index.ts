@@ -71,37 +71,46 @@ export interface PaginatedApiResponse<T = any> {
     }
 }
 
-// Request Interceptor Factory
-// Creates an interceptor that accepts getAccessToken function from Auth0
-export const createAuthInterceptor = (
-    getAccessToken: () => Promise<string | undefined>
-) => {
-    return async (config: any) => {
-        // Get Auth0 access token
-        try {
-            const token = await getAccessToken()
+const AUTH_SKIP_BEARER = [
+    '/api/auth/login',
+    '/api/auth/forgot-password',
+    '/api/auth/request-invite-otp',
+    '/api/auth/set-password',
+    '/api/auth/reset-password',
+    '/api/auth/validate-reset-token',
+]
+
+const AUTH_SKIP_WAIT = [
+    '/api/auth/me',
+    '/api/auth/login',
+    '/api/auth/forgot-password',
+    '/api/auth/request-invite-otp',
+    '/api/auth/set-password',
+    '/api/auth/reset-password',
+    '/api/auth/validate-reset-token',
+    '/api/invitations/validate',
+]
+
+function isAuthRoute(url: string, list: Array<string>): boolean {
+    return list.some((p) => url.includes(p))
+}
+
+// Request Interceptor: add Bearer when getAccessToken() is truthy; skip for auth routes. Always add timestamp.
+export const createAuthInterceptor = (getAccessToken: () => string | null) => {
+    return (config: any) => {
+        if (!isAuthRoute(config.url || '', AUTH_SKIP_BEARER)) {
+            const token = getAccessToken()
             if (token) {
                 config.headers = {
                     ...config.headers,
                     Authorization: `Bearer ${token}`,
                 }
-            } else {
-                console.warn(
-                    'No access token available for request:',
-                    config.url
-                )
             }
-        } catch (error) {
-            console.error('Failed to get access token:', error)
-            // Don't block the request, but log the error
         }
-
-        // Add request timestamp
         config.headers = {
             ...config.headers,
             'X-Request-Timestamp': new Date().toISOString(),
         }
-
         return config
     }
 }
@@ -121,51 +130,85 @@ const responseInterceptor = (response: AxiosResponse) => {
     return response
 }
 
-// Error Interceptor
-const errorInterceptor = async (error: any) => {
-    const originalRequest = error.config
+// Module-level refs for 401 retry (set by initializeAuth)
+let _authRefresh: (() => Promise<string | null>) | null = null
+let _authOnTokenRefreshed: ((t: string) => void) | null = null
+// Serialize refresh: only one in-flight so concurrent 401s (e.g. /me + other on reload) don't
+// each call refresh and cause "token already consumed" 401s for the 2nd+ request
+let _authRefreshInFlight: Promise<string | null> | null = null
 
-    // Handle 401 Unauthorized
-    if (
-        error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
-        !originalRequest._retry
-    ) {
-        originalRequest._retry = true
+function createErrorInterceptor(
+    instance: AxiosInstance
+): (error: any) => Promise<never> {
+    return async (error: any) => {
+        const config = error.config
 
-        console.error('🔒 Authentication failed:', {
-            url: originalRequest.url,
-            status: error.response?.status,
-            message: error.response?.data?.message || 'Unauthorized',
-        })
+        // Never retry when the failed request was /api/auth/refresh itself (avoids infinite loop:
+        // refresh 401 -> interceptor calls refresh again -> 401 -> ...)
+        const url = config?.url ?? ''
+        const isRefreshRequest =
+            typeof url === 'string' && url.includes('/api/auth/refresh')
+        if (
+            error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+            isRefreshRequest
+        ) {
+            return Promise.reject(error)
+        }
 
-        // Auth0 will handle redirect via useAuth0 hook
-        // Just reject the error
+        // 401: try refresh and retry once (only for non-refresh requests).
+        // Use a single in-flight refresh so concurrent 401s (e.g. on reload) wait and reuse the
+        // same new token instead of each calling refresh (backend consumes the refresh token once).
+        if (
+            error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+            config &&
+            !config._retry &&
+            _authRefresh
+        ) {
+            config._retry = true
+            try {
+                if (!_authRefreshInFlight) {
+                    _authRefreshInFlight = _authRefresh().finally(() => {
+                        _authRefreshInFlight = null
+                    })
+                }
+                const token = await _authRefreshInFlight
+                if (token) {
+                    _authOnTokenRefreshed?.(token)
+                    config.headers = {
+                        ...config.headers,
+                        Authorization: `Bearer ${token}`,
+                    }
+                    return instance.request(config)
+                }
+            } catch (_) {}
+        }
+
+        if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
+            console.error('🔒 Authentication failed:', {
+                url: config?.url,
+                status: error.response?.status,
+                message: error.response?.data?.message || 'Unauthorized',
+            })
+        } else if (error.response?.status === HTTP_STATUS.FORBIDDEN) {
+            console.error('🚫 Access forbidden:', {
+                url: config?.url,
+                message: error.response?.data?.message || 'Forbidden',
+            })
+        } else if (error.response) {
+            console.error('❌ API Error:', {
+                url: config?.url,
+                status: error.response.status,
+                message: error.response.data?.message || 'Request failed',
+            })
+        } else if (error.request) {
+            console.error('🌐 Network Error:', {
+                url: config?.url,
+                message: 'No response received from server',
+            })
+        }
+
         return Promise.reject(error)
     }
-
-    // Handle 403 Forbidden
-    if (error.response?.status === HTTP_STATUS.FORBIDDEN) {
-        console.error('🚫 Access forbidden:', {
-            url: originalRequest.url,
-            message: error.response?.data?.message || 'Forbidden',
-        })
-    }
-
-    // Handle other errors
-    if (error.response) {
-        console.error('❌ API Error:', {
-            url: originalRequest.url,
-            status: error.response.status,
-            message: error.response.data?.message || 'Request failed',
-        })
-    } else if (error.request) {
-        console.error('🌐 Network Error:', {
-            url: originalRequest.url,
-            message: 'No response received from server',
-        })
-    }
-
-    return Promise.reject(error)
 }
 
 // Create axios instance
@@ -173,17 +216,17 @@ const createApiInstance = (): AxiosInstance => {
     const instance = axios.create({
         baseURL: API_CONFIG.BASE_URL,
         timeout: API_CONFIG.TIMEOUT,
-        withCredentials: true, // Required for cookies to be sent cross-origin
+        withCredentials: true,
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
         },
     })
-
-    // Add interceptors
     instance.interceptors.request.use(requestInterceptor)
-    instance.interceptors.response.use(responseInterceptor, errorInterceptor)
-
+    instance.interceptors.response.use(
+        responseInterceptor,
+        createErrorInterceptor(instance)
+    )
     return instance
 }
 
@@ -244,47 +287,37 @@ export class ApiClient {
     }
 
     /**
-     * Initialize authentication interceptor
-     * Must be called after Auth0Provider is mounted
-     * @param getAccessToken Function to get Auth0 access token
+     * Initialize auth: getAccessToken (sync), optional refresh and onTokenRefreshed for 401 retry.
      */
-    initializeAuth(getAccessToken: () => Promise<string | undefined>): void {
+    initializeAuth(opts: {
+        getAccessToken: () => string | null
+        refresh?: () => Promise<string | null>
+        onTokenRefreshed?: (t: string) => void
+    }): void {
         if (this.authInitialized) {
             console.warn('ApiClient auth already initialized')
             return
         }
+        _authRefresh = opts.refresh ?? null
+        _authOnTokenRefreshed = opts.onTokenRefreshed ?? null
 
-        // Remove default request interceptor
         this.instance.interceptors.request.clear()
-
-        // Add auth interceptor
-        const authInterceptor = createAuthInterceptor(getAccessToken)
-        this.instance.interceptors.request.use(authInterceptor)
-
-        // Add response interceptor
-        this.instance.interceptors.response.use(
-            responseInterceptor,
-            errorInterceptor
+        this.instance.interceptors.request.use(
+            createAuthInterceptor(opts.getAccessToken)
         )
 
         this.authInitialized = true
-        // Clear the timeout since auth is now initialized
         if (this.authCheckTimeout) {
             clearTimeout(this.authCheckTimeout)
             this.authCheckTimeout = null
         }
-        // Resolve the promise to unblock waiting requests
-        if (this.resolveAuthReady) {
-            this.resolveAuthReady()
-        }
-        console.log('✅ ApiClient authentication initialized')
+        if (this.resolveAuthReady) this.resolveAuthReady()
     }
 
     // Generic GET request
     async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
         try {
-            // Wait for auth initialization before making request
-            await this.waitForAuth()
+            if (!isAuthRoute(url, AUTH_SKIP_WAIT)) await this.waitForAuth()
             const response = await this.instance.get<T>(url, config)
             return response.data
         } catch (error) {
@@ -306,11 +339,7 @@ export class ApiClient {
         config?: AxiosRequestConfig
     ): Promise<T> {
         try {
-            // Don't wait for auth if this is the login endpoint (creates the session)
-            if (!url.includes('/api/auth/login')) {
-                // Wait for auth initialization before making request
-                await this.waitForAuth()
-            }
+            if (!isAuthRoute(url, AUTH_SKIP_WAIT)) await this.waitForAuth()
             const response = await this.instance.post<T>(url, data, config)
             return response.data
         } catch (error) {

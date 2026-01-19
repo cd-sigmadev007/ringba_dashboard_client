@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import {
     DurationRangeFilter,
     FilterSelect,
@@ -9,6 +8,7 @@ import { Search } from '../../../components/common'
 import { useCampaignOptions } from '../constants/filterOptions'
 import type { FilterState } from '../types'
 import type { SelectOption } from '@/components/ui/FilterSelect'
+import { useAuth } from '@/contexts/AuthContext'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import { apiClient } from '@/services/api'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
@@ -32,7 +32,8 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
     const [isLoadingTags, setIsLoadingTags] = useState(true)
     const campaignOptions = useCampaignOptions()
     const campaignsLoading = useCampaignStore((s) => s.loading)
-    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user
 
     // Fetch tags from database when auth is ready
     useEffect(() => {

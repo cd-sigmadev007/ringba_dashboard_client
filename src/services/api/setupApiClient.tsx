@@ -1,21 +1,20 @@
 /**
- * Setup ApiClient with Auth0 Authentication
- * This component initializes the apiClient with Auth0 access tokens
+ * Setup ApiClient with self-hosted auth (getAccessToken, refresh for 401 retry)
  */
 
 import { useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import { apiClient } from './index'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function ApiClientSetup({ children }: { children: React.ReactNode }) {
-    const { getAccessTokenSilently, isAuthenticated } = useAuth0()
+    const { getAccessToken, refresh } = useAuth()
 
     useEffect(() => {
-        if (isAuthenticated) {
-            // Initialize apiClient with Auth0 token getter
-            apiClient.initializeAuth(getAccessTokenSilently)
-        }
-    }, [isAuthenticated, getAccessTokenSilently])
+        apiClient.initializeAuth({
+            getAccessToken,
+            refresh,
+        })
+    }, [getAccessToken, refresh])
 
     return <>{children}</>
 }

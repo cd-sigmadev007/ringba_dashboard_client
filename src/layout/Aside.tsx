@@ -188,11 +188,6 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
         })
     }
 
-    // ✅ Define navigatesignup
-    const navigatesignup = () => {
-        window.location.href = '/signup'
-    }
-
     return (
         <aside
             className={clsx(
@@ -218,9 +213,6 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
 
             <div className="flex flex-col gap-y-5 lg:hidden overflow-scroll">
                 <ThemeSwitcher />
-                <Button className="h-11" onClick={navigatesignup}>
-                    Join Beta
-                </Button>
             </div>
         </aside>
     )

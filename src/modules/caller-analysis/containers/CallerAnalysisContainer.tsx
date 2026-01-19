@@ -1,6 +1,5 @@
 import React from 'react'
 import clsx from 'clsx'
-import { useAuth0 } from '@auth0/auth0-react'
 import { useCallerAnalysis, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
@@ -17,6 +16,7 @@ import type { ColumnOption } from '../components/ColumnsDropdown'
 import type { CallData } from '../types'
 import type { ColumnVisibility } from '../hooks/useTableColumns'
 import type { RowSelectionState } from '@tanstack/react-table'
+import { useAuth } from '@/contexts/AuthContext'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
 import { Modal, Table } from '@/components/ui'
@@ -29,7 +29,8 @@ export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
-    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user
     const { fetchCampaigns, campaigns } = useCampaignStore()
     const [openModal, setOpenModal] = React.useState(false)
     const [openStatusModal, setOpenStatusModal] = React.useState(false)

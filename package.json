@@ -14,7 +14,6 @@
         "update-icons": "ts-node scripts/update-icons.ts"
     },
     "dependencies": {
-        "@auth0/auth0-react": "^2.8.0",
         "@faker-js/faker": "^9.6.0",
         "@tailwindcss/vite": "^4.1.12",
         "@tanstack/match-sorter-utils": "^8.19.4",

@@ -2,54 +2,72 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router'
-import { useAuth0 } from '@auth0/auth0-react'
 
-// import LoadingBar from 'react-top-loading-bar';
 import Header from './Header'
 import Footer from './Footer'
 import Aside from './Aside'
+import { AuthLayout } from './AuthLayout'
+import { useAuth } from '@/contexts/AuthContext'
 import Styles from '@/styles/index'
+
+const AUTH_ROUTES = [
+    '/login',
+    '/login-otp',
+    '/device-registration-success',
+    '/forgot-password',
+    '/check-email',
+    '/reset-password',
+    '/password-changed',
+]
+const protectedRoutes = [
+    '/dashboard',
+    '/organization',
+    '/caller-analysis',
+    '/billing',
+]
 
 const RootLayout: React.FC = () => {
     const [openMenu, setOpenMenu] = useState(false)
-    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+    const { user, loading } = useAuth()
+    const isAuthenticated = !!user
     const navigate = useNavigate()
     const location = useLocation()
-
-    // Protected routes that require authentication
-    const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
+    const isAuthRoute =
+        AUTH_ROUTES.includes(location.pathname) ||
+        location.pathname.startsWith('/invite/')
 
     useEffect(() => {
-        // Don't redirect if still loading or already on callback page
-        if (isLoading) return
-        if (location.pathname === '/callback') return
+        if (loading) return
+        if (isAuthRoute) return
 
-        const isProtectedRoute = protectedRoutes.some((route) =>
-            location.pathname.startsWith(route)
-        )
-
-        // If user is authenticated and on root path, redirect to caller analysis
         if (isAuthenticated && location.pathname === '/') {
             navigate({ to: '/caller-analysis' })
             return
         }
 
-        // If user is not authenticated and trying to access protected route, redirect to login
-        if (isProtectedRoute && !isAuthenticated) {
-            loginWithRedirect({
-                appState: {
-                    returnTo: location.pathname,
-                },
-            })
+        if (
+            !isAuthenticated &&
+            protectedRoutes.some((r) => location.pathname.startsWith(r))
+        ) {
+            navigate({ to: '/login' })
             return
         }
-    }, [
-        isAuthenticated,
-        isLoading,
-        location.pathname,
-        navigate,
-        loginWithRedirect,
-    ])
+
+        if (!isAuthenticated && location.pathname === '/') {
+            navigate({ to: '/login' })
+            return
+        }
+    }, [isAuthenticated, loading, location.pathname, navigate, isAuthRoute])
+
+    if (isAuthRoute) {
+        return (
+            <Styles>
+                <AuthLayout>
+                    <Outlet />
+                </AuthLayout>
+            </Styles>
+        )
+    }
 
     return (
         <Styles>

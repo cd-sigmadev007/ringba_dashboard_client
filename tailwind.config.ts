@@ -181,6 +181,7 @@ export default {
                 },
             },
             textColor: {
+                destructive: '#F64E60',
                 sidebar: {
                     base: '#475569', // slate-600
                     active: '#1e293b', // slate-800

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import type { SelectOption } from '@/components/ui/FilterSelect'
+import { useAuth } from '@/contexts/AuthContext'
 import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 import { apiClient } from '@/services/api'
 
 export function useFilterTags(isOpen: boolean) {
     const [statusOptions, setStatusOptions] = useState<Array<SelectOption>>([])
     const [isLoadingTags, setIsLoadingTags] = useState(true)
-    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user
 
     useEffect(() => {
         const fetchTagsInternal = async () => {
