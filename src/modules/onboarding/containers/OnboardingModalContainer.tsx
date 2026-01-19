@@ -17,7 +17,7 @@ export interface OnboardingModalContainerProps {
 
 /**
  * Non-skippable onboarding modal (3 steps). Shown when user.onboardingCompletedAt is null.
- * On "Let's Go!" on step 3: POST /api/auth/complete-onboarding, refetchMe, onComplete.
+ * Step 2: First name (required), Last name (optional). On "Let's Go!" step 3: complete-onboarding with names, refetchMe, onComplete.
  */
 export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> = ({
     open,
@@ -25,14 +25,16 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
 }) => {
     const { user, refetchMe } = useAuth()
     const [step, setStep] = useState(1)
-
-    const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || '—'
+    const [step2Names, setStep2Names] = useState<{ firstName: string; lastName: string } | null>(null)
 
     const handleStep1LetsGo = () => setStep(2)
-    const handleStep2Continue = () => setStep(3)
+    const handleStep2Continue = (firstName: string, lastName: string) => {
+        setStep2Names({ firstName, lastName })
+        setStep(3)
+    }
     const handleStep3LetsGo = async () => {
         try {
-            await authApi.completeOnboarding()
+            await authApi.completeOnboarding(step2Names?.firstName, step2Names?.lastName)
             await refetchMe()
             onComplete()
         } catch (_) {}
@@ -48,6 +50,7 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
             closeOnBackdropClick={false}
             title={undefined}
             size="lg"
+            className="!max-w-[750px] w-full"
             contentClassName="!mx-0 !mb-0 !p-0"
         >
             {step === 1 && (
@@ -55,7 +58,8 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
             )}
             {step === 2 && (
                 <OnboardingStep2Profile
-                    fullName={fullName}
+                    initialFirstName={user?.firstName ?? ''}
+                    initialLastName={user?.lastName ?? ''}
                     onContinue={handleStep2Continue}
                     dots={dots}
                 />

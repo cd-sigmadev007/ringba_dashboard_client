@@ -2,8 +2,9 @@ import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { AuthCard } from './AuthCard'
 import { useThemeStore } from '@/store/themeStore'
-import { SuccessCheckIcon } from '@/assets/svg'
 import Button from '@/components/ui/Button'
+
+import tickPng from '@/assets/png/tick.png'
 
 export interface CheckEmailViewProps {
     email?: string
@@ -21,9 +22,7 @@ export const CheckEmailView: React.FC<CheckEmailViewProps> = ({
     return (
         <AuthCard>
             <div className="p-6 sm:p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#132f4c] flex items-center justify-center mx-auto mb-6">
-                    <SuccessCheckIcon className="w-10 h-10 text-[#138a00]" />
-                </div>
+                <img src={tickPng} alt="" className="w-16 h-16 mx-auto mb-6 object-contain" />
                 <h1 className={`text-xl font-semibold ${textClr}`}>
                     Check Your Email
                 </h1>

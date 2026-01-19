@@ -2,7 +2,8 @@ import React from 'react'
 import { AuthCard } from './AuthCard'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
-import { SuccessCheckIcon } from '@/assets/svg'
+
+import donePng from '@/assets/png/done.png'
 
 export interface EmailVerifiedViewProps {
     onGreat: () => void
@@ -22,12 +23,7 @@ export const EmailVerifiedView: React.FC<EmailVerifiedViewProps> = ({ onGreat })
     return (
         <AuthCard>
             <div className="p-6 sm:p-8 flex flex-col items-center text-center">
-                <div
-                    className="w-16 h-16 rounded-full bg-[#007FFF] flex items-center justify-center mb-6 flex-shrink-0"
-                    aria-hidden
-                >
-                    <SuccessCheckIcon className="w-8 h-8 text-white" />
-                </div>
+                <img src={donePng} alt="" className="mx-auto mb-6 object-contain flex-shrink-0" aria-hidden />
                 <h1 className={`text-xl font-semibold ${textClr}`}>Email Verified!</h1>
                 <p className={`text-sm ${textMuted} mt-1 mb-6`}>
                     Your email has been successfully verified.

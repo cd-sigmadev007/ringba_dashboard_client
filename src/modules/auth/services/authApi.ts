@@ -28,7 +28,9 @@ export const authApi = {
         return apiClient.post('/api/auth/request-otp', { email, purpose })
     },
 
-    completeOnboarding(): Promise<void> {
-        return apiClient.post('/api/auth/complete-onboarding').then(() => {})
+    completeOnboarding(firstName?: string, lastName?: string): Promise<void> {
+        return apiClient
+            .post('/api/auth/complete-onboarding', { first_name: firstName, last_name: lastName })
+            .then(() => {})
     },
 }
