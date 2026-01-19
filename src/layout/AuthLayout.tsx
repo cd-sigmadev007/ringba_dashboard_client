@@ -4,11 +4,10 @@
  */
 
 import React from 'react'
-import { Link } from '@tanstack/react-router'
 import Footer from './Footer'
 import { useThemeStore } from '@/store/themeStore'
-import Logo from '@/components/logo'
 import { cn } from '@/lib/utils'
+import Header from './Header'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
     const { theme } = useThemeStore()
@@ -21,12 +20,19 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
                 isDark ? 'bg-[#0a1828]' : 'bg-[#f4f9fb]'
             )}
         >
-            <header className="px-4 lg:px-10 py-4">
-                <Link to="/login">
-                    <Logo />
-                </Link>
-            </header>
-            <main className="flex-1 flex items-center justify-center px-4 py-8">
+            <Header setOpenMenu={undefined} openMenu={undefined} />
+            {/* Spacer for fixed header so main content starts below it */}
+            <div
+                className="h-[56px] flex-shrink-0 lg:h-[65px]"
+                aria-hidden
+            />
+            <main
+                className="flex-1 flex items-center justify-center px-4 py-8 min-h-0"
+                style={{
+                    background:
+                        'linear-gradient(257deg, #253758 -26.08%, #040D16 14.04%, #050F1A 85.51%, #253C50 128.21%)',
+                }}
+            >
                 {children}
             </main>
             <Footer />

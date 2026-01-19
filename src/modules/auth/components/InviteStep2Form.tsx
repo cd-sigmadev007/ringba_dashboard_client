@@ -4,6 +4,7 @@ import { AuthCard } from './AuthCard'
 import { Input } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
+import Logo from '@/components/logo'
 
 export interface InviteStep2FormProps {
     email: string
@@ -56,11 +57,14 @@ export const InviteStep2Form: React.FC<InviteStep2FormProps> = ({
     return (
         <AuthCard>
             <div className="p-6 sm:p-8">
-                <h1 className={`text-xl font-semibold ${textClr}`}>Welcome</h1>
-                <p className={`text-sm ${textMuted} mt-1 mb-2`}>
+                <div className="flex justify-center mb-6">
+                    <Logo />
+                </div>
+                <h1 className={`text-xl font-semibold ${textClr} text-center`}>Welcome</h1>
+                <p className={`text-sm ${textMuted} mt-1 mb-2 text-center`}>
                     Create a new account.
                 </p>
-                <p className={`text-sm ${textClr} mb-6`}>
+                <p className={`text-sm ${textClr} mb-6 text-center`}>
                     You are signing up with <strong>{email}</strong>
                 </p>
 

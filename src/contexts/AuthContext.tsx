@@ -21,6 +21,8 @@ export interface AuthUser {
     campaignIds: Array<string>
     firstName?: string | null
     lastName?: string | null
+    /** When set, onboarding modal is not shown. Null = show onboarding. */
+    onboardingCompletedAt?: string | null
 }
 
 interface AuthState {
@@ -52,6 +54,8 @@ interface AuthContextValue extends AuthState {
     logout: () => Promise<void>
     getAccessToken: () => string | null
     refresh: () => Promise<string | null>
+    /** Refetch /me and update user (e.g. onboardingCompletedAt). */
+    refetchMe: () => Promise<void>
     clearError: () => void
 }
 
@@ -115,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 : [],
                             firstName: u.firstName ?? null,
                             lastName: u.lastName ?? null,
+                            onboardingCompletedAt: u.onboardingCompletedAt ?? null,
                         },
                         accessToken: state.accessToken,
                         loading: false,
@@ -131,6 +136,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => {
             cancelled = true
         }
+    }, [])
+
+    const refetchMe = useCallback(async () => {
+        try {
+            const res = await apiClient.get<{ data?: { user?: AuthUser } }>(
+                '/api/auth/me'
+            )
+            const u = (res as any)?.data?.user
+            if (u) {
+                setState((s) => ({
+                    ...s,
+                    user: {
+                        id: u.id,
+                        email: u.email,
+                        role: u.role,
+                        orgId: u.orgId ?? null,
+                        campaignIds: Array.isArray(u.campaignIds)
+                            ? u.campaignIds
+                            : [],
+                        firstName: u.firstName ?? null,
+                        lastName: u.lastName ?? null,
+                        onboardingCompletedAt: u.onboardingCompletedAt ?? null,
+                    },
+                }))
+            }
+        } catch (_) {}
     }, [])
 
     const login = useCallback(
@@ -190,12 +221,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     pendingLogin: null,
                     error: null,
                 }))
+                // Refetch /me to get onboardingCompletedAt (verify-login-otp response is minimal)
+                await refetchMe()
             } else {
                 setState((s) => ({ ...s, error: 'Login failed' }))
                 throw new Error('Login failed')
             }
         },
-        []
+        [refetchMe]
     )
 
     const requestInviteOtp = useCallback(async (invitationToken: string) => {
@@ -267,6 +300,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         getAccessToken,
         refresh,
+        refetchMe,
         clearError,
     }
 

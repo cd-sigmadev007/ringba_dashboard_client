@@ -4,16 +4,18 @@ import { useInviteValidate } from '../hooks'
 import {
     InviteInvalidView,
     InviteStep1Form,
+    InviteOtpForm,
     InviteStep2Form,
     ValidatingInviteView,
+    EmailVerifiedView,
 } from '../components'
 import { useAuth } from '@/contexts/AuthContext'
 
 export const InviteContainer: React.FC = () => {
     const navigate = useNavigate()
-    const { setPassword, error, clearError } = useAuth()
+    const { setPassword, refetchMe, error, clearError } = useAuth()
     const { token, validating, invalid, email } = useInviteValidate()
-    const [step, setStep] = useState<1 | 2>(1)
+    const [step, setStep] = useState<1 | 2 | 3 | 4>(1) // 4 = Email Verified (show once after signup)
     const [step1Data, setStep1Data] = useState<{
         password: string
         otp: string
@@ -23,8 +25,23 @@ export const InviteContainer: React.FC = () => {
 
     const handleRequestCode = () => requestInviteOtp(token)
 
-    const handleStep2Submit = async (firstName: string, lastName: string) => {
-        if (!step1Data) return
+    const handleStep1Continue = (data: { password: string }) => {
+        setStep1Data({ password: data.password, otp: '' })
+        setStep(2)
+    }
+
+    const handleOtpBack = () => {
+        setStep(1)
+        setStep1Data(null)
+    }
+
+    const handleOtpVerify = (otp: string) => {
+        setStep1Data((s) => (s ? { ...s, otp } : null))
+        setStep(3)
+    }
+
+    const handleStep3Submit = async (firstName: string, lastName: string) => {
+        if (!step1Data?.password || !step1Data?.otp) return
         await setPassword({
             invitationToken: token,
             password: step1Data.password,
@@ -32,6 +49,11 @@ export const InviteContainer: React.FC = () => {
             first_name: firstName,
             last_name: lastName,
         })
+        setStep(4) // Email Verified screen (only 1st time; next login goes straight to main)
+    }
+
+    const handleEmailVerifiedGreat = async () => {
+        await refetchMe()
         navigate({ to: '/caller-analysis' })
     }
 
@@ -43,10 +65,7 @@ export const InviteContainer: React.FC = () => {
         return (
             <InviteStep1Form
                 email={email}
-                onNext={(data) => {
-                    setStep1Data(data)
-                    setStep(2)
-                }}
+                onContinue={handleStep1Continue}
                 onRequestCode={handleRequestCode}
                 error={error}
                 clearError={clearError}
@@ -54,12 +73,29 @@ export const InviteContainer: React.FC = () => {
         )
     }
 
-    if (!step1Data) return <InviteInvalidView />
+    if (step === 2) {
+        return (
+            <InviteOtpForm
+                email={email}
+                onBack={handleOtpBack}
+                onRequestCode={handleRequestCode}
+                onVerify={handleOtpVerify}
+                error={error}
+                clearError={clearError}
+            />
+        )
+    }
+
+    if (step === 4) {
+        return <EmailVerifiedView onGreat={handleEmailVerifiedGreat} />
+    }
+
+    if (!step1Data?.password || !step1Data?.otp) return <InviteInvalidView />
 
     return (
         <InviteStep2Form
             email={email}
-            onSubmit={handleStep2Submit}
+            onSubmit={handleStep3Submit}
             error={error}
             clearError={clearError}
         />

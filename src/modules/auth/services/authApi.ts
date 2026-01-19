@@ -27,4 +27,8 @@ export const authApi = {
     requestOtp(email: string, purpose: 'login' | 'signup'): Promise<void> {
         return apiClient.post('/api/auth/request-otp', { email, purpose })
     },
+
+    completeOnboarding(): Promise<void> {
+        return apiClient.post('/api/auth/complete-onboarding').then(() => {})
+    },
 }

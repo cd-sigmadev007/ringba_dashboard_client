@@ -8,6 +8,7 @@ import Footer from './Footer'
 import Aside from './Aside'
 import { AuthLayout } from './AuthLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { OnboardingModalContainer } from '@/modules/onboarding/containers/OnboardingModalContainer'
 import Styles from '@/styles/index'
 
 const AUTH_ROUTES = [
@@ -69,8 +70,14 @@ const RootLayout: React.FC = () => {
         )
     }
 
+    const showOnboarding = !!(user && !user.onboardingCompletedAt)
+
     return (
         <Styles>
+            <OnboardingModalContainer
+                open={showOnboarding}
+                onComplete={() => {}}
+            />
             <div
                 className={clsx(
                     'min-h-screen overflow-y-auto',

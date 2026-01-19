@@ -94,6 +94,8 @@ export interface ModalProps
     children: ReactNode
     title?: string | ReactNode
     showCloseButton?: boolean
+    /** When false, clicking the backdrop does not close the modal (e.g. non-skippable onboarding). Default true. */
+    closeOnBackdropClick?: boolean
     showSeparator?: boolean
     className?: string
     overlayClassName?: string
@@ -109,6 +111,7 @@ export const Modal: FC<ModalProps> = ({
     children,
     title,
     showCloseButton = true,
+    closeOnBackdropClick = true,
     showSeparator = false,
     overlay,
     position,
@@ -127,9 +130,9 @@ export const Modal: FC<ModalProps> = ({
     // Body scroll lock
     const isMobile = useIsMobile()
 
-    // Click outside handler
+    // Click outside handler (no-op when closeOnBackdropClick is false for non-skippable modals)
     const modalRef = useClickOutside<HTMLDivElement>(() => {
-        onClose()
+        if (closeOnBackdropClick) onClose()
     })
 
     useEffect(() => {
