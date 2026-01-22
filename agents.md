@@ -10,11 +10,12 @@ This document provides a comprehensive analysis of the Ringba frontend client ar
 4. [API & Service Layer](#api--service-layer)
 5. [State Management](#state-management)
 6. [Routing](#routing)
-7. [Component Organization](#component-organization)
-8. [Hooks Patterns](#hooks-patterns)
-9. [TypeScript Patterns](#typescript-patterns)
-10. [Styling & Theming](#styling--theming)
-11. [Development Workflow](#development-workflow)
+7. [Access Control & Permissions](#access-control--permissions)
+8. [Component Organization](#component-organization)
+9. [Hooks Patterns](#hooks-patterns)
+10. [TypeScript Patterns](#typescript-patterns)
+11. [Styling & Theming](#styling--theming)
+12. [Development Workflow](#development-workflow)
 
 ---
 
@@ -516,6 +517,230 @@ routes/
 
 ---
 
+## Access Control & Permissions
+
+### User Roles
+
+The application uses a role-based access control (RBAC) system with the following roles:
+
+```typescript
+// types/auth.ts
+export enum UserRole {
+    SUPER_ADMIN = 'super_admin',
+    ORG_ADMIN = 'org_admin',
+    MEDIA_BUYER = 'media_buyer',
+}
+```
+
+**Role Definitions:**
+- **`super_admin`**: Full system access, can manage all organizations and users
+- **`org_admin`**: Organization-level admin, can manage their organization and users
+- **`media_buyer`**: Limited access, can view assigned campaigns and caller analysis
+
+### Permission Hook
+
+Use the `usePermissions` hook to access user role and permissions:
+
+```typescript
+// hooks/usePermissions.ts
+import { usePermissions } from '@/hooks/usePermissions'
+
+export function MyComponent() {
+    const { role, org_id, campaign_ids, isAuthenticated, isLoading } = usePermissions()
+    
+    // Check if user has access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+    
+    if (isLoading) return <div>Loading...</div>
+    if (!canAccess) return <div>Access Denied</div>
+    
+    return <div>Protected Content</div>
+}
+```
+
+**Hook Returns:**
+- `role`: UserRole | null - Current user's role
+- `org_id`: string | null - User's organization ID
+- `campaign_ids`: Array<string> - User's assigned campaign IDs
+- `isAuthenticated`: boolean - Authentication status
+- `isLoading`: boolean - Loading state
+
+### Access Control Patterns
+
+#### 1. Page-Level Access Control
+
+Protect entire pages by checking role at the component level:
+
+```typescript
+// modules/org/pages/UsersPage.tsx
+export default function UsersPage() {
+    const { role, isLoading } = usePermissions()
+    
+    // Access control: Only super_admin and org_admin can access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+    
+    if (isLoading) return <div>Loading...</div>
+    
+    if (!canAccess) {
+        return (
+            <div>
+                <h1>Access Denied</h1>
+                <p>You must be a Super Admin or Org Admin to access this page.</p>
+            </div>
+        )
+    }
+    
+    return <UsersTable />
+}
+```
+
+#### 2. Navigation Menu Access Control
+
+Hide navigation items based on user role:
+
+```typescript
+// layout/utils/navLinks.tsx
+export interface NavLinkItem {
+    submenu?: Array<{
+        id: string | number
+        title: string
+        path: string
+        hideForRoles?: Array<string> // Roles that should not see this menu item
+    }>
+}
+
+export const navLinks: Array<NavLinkItem> = [
+    {
+        id: 'org-users',
+        title: 'Manage Users',
+        path: '/organization/users',
+        hideForRoles: ['media_buyer'], // Hide for media buyers
+    },
+]
+```
+
+**Important:** The navigation component should filter items based on `hideForRoles` when rendering.
+
+#### 3. Feature-Level Access Control
+
+Conditionally render features based on role:
+
+```typescript
+// modules/org/pages/CampaignsPage.tsx
+export default function CampaignsPage() {
+    const { role } = usePermissions()
+    const canManageCampaigns = role === 'super_admin' || role === 'org_admin'
+    
+    return (
+        <div>
+            <CampaignsTable />
+            {canManageCampaigns && (
+                <Button onClick={handleCreate}>Create Campaign</Button>
+            )}
+        </div>
+    )
+}
+```
+
+#### 4. Billing Module Access Control
+
+**⚠️ IMPORTANT:** The billing section is restricted to **super admins and org admins only**.
+
+```typescript
+// Billing pages should check access
+export default function InvoicesPage() {
+    const { role, isLoading } = usePermissions()
+    
+    // Billing access: Only super_admin and org_admin
+    const canAccessBilling = role === 'super_admin' || role === 'org_admin'
+    
+    if (isLoading) return <div>Loading...</div>
+    
+    if (!canAccessBilling) {
+        return (
+            <div>
+                <h1>Access Denied</h1>
+                <p>You must be a Super Admin or Org Admin to access billing features.</p>
+            </div>
+        )
+    }
+    
+    return <InvoicesTable />
+}
+```
+
+**Billing Navigation:**
+- The billing menu item in navigation should be hidden for `media_buyer` role
+- All billing routes (`/billing/*`) should check access before rendering
+
+**Billing Routes:**
+- `/billing/invoices` - Invoices management
+- `/billing/customers` - Customers management  
+- `/billing/organizations` - Organizations management
+
+All these routes should implement the access control check shown above.
+
+### Access Control Best Practices
+
+1. **Check Early**: Verify permissions at the page/route level before rendering
+2. **Consistent Patterns**: Use the same pattern (`role === 'super_admin' || role === 'org_admin'`) across the app
+3. **Loading States**: Always handle loading state when checking permissions
+4. **User Feedback**: Show clear "Access Denied" messages when access is restricted
+5. **Navigation**: Hide inaccessible menu items rather than showing them disabled
+6. **Route Protection**: Consider adding route-level guards in TanStack Router for additional security
+
+### Common Access Patterns
+
+```typescript
+// Pattern 1: Super Admin only
+const isSuperAdmin = role === 'super_admin'
+
+// Pattern 2: Super Admin or Org Admin
+const isAdmin = role === 'super_admin' || role === 'org_admin'
+
+// Pattern 3: Org Admin or Media Buyer (exclude super admin)
+const isOrgUser = role === 'org_admin' || role === 'media_buyer'
+
+// Pattern 4: Check specific role
+const isMediaBuyer = role === 'media_buyer'
+```
+
+### Example: Protected Component
+
+```typescript
+// components/ProtectedComponent.tsx
+import { usePermissions } from '@/hooks/usePermissions'
+
+interface ProtectedComponentProps {
+    allowedRoles: Array<'super_admin' | 'org_admin' | 'media_buyer'>
+    children: React.ReactNode
+    fallback?: React.ReactNode
+}
+
+export function ProtectedComponent({ 
+    allowedRoles, 
+    children, 
+    fallback 
+}: ProtectedComponentProps) {
+    const { role, isLoading } = usePermissions()
+    
+    if (isLoading) return <div>Loading...</div>
+    
+    if (!role || !allowedRoles.includes(role)) {
+        return fallback || <div>Access Denied</div>
+    }
+    
+    return <>{children}</>
+}
+
+// Usage
+<ProtectedComponent allowedRoles={['super_admin', 'org_admin']}>
+    <BillingSection />
+</ProtectedComponent>
+```
+
+---
+
 ## Component Organization
 
 ### Component Hierarchy
@@ -992,6 +1217,15 @@ import { Button } from '../../../components/ui/Button'
 3. ✅ **Query Caching**: Leverage TanStack Query caching
 4. ✅ **Lazy Loading**: Use dynamic imports for heavy components
 
+### Access Control
+
+1. ✅ **Check Early**: Verify permissions at page/route level
+2. ✅ **Consistent Patterns**: Use standard role check patterns
+3. ✅ **Loading States**: Handle loading when checking permissions
+4. ✅ **User Feedback**: Show clear access denied messages
+5. ✅ **Navigation**: Hide inaccessible menu items
+6. ✅ **Billing Restriction**: Billing section only for super_admin and org_admin
+
 ---
 
 ## Common Patterns & Examples
@@ -1018,6 +1252,24 @@ import { Button } from '../../../components/ui/Button'
 3. Create store with `create()`
 4. Add persistence if needed with `persist()` middleware
 5. Export from module `index.ts`
+
+### Implementing Access Control
+
+1. Import `usePermissions` hook in your component
+2. Check role using pattern: `role === 'super_admin' || role === 'org_admin'`
+3. Handle loading state
+4. Show access denied message if user doesn't have permission
+5. Update navigation to hide items for restricted roles
+
+**Example for Billing:**
+```typescript
+// In billing pages
+const { role, isLoading } = usePermissions()
+const canAccessBilling = role === 'super_admin' || role === 'org_admin'
+
+// In navigation
+hideForRoles: ['media_buyer'] // Hide billing menu for media buyers
+```
 
 ---
 
