@@ -1,14 +1,14 @@
 import React from 'react'
-import {  render } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
     RouterProvider,
     createMemoryHistory,
     createRouter,
 } from '@tanstack/react-router'
-import type {RenderOptions} from '@testing-library/react';
-import type {AuthUser} from '@/contexts/AuthContext';
-import { AuthProvider  } from '@/contexts/AuthContext'
+import type { RenderOptions } from '@testing-library/react'
+import type { AuthUser } from '@/contexts/AuthContext'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
     user?: AuthUser | null

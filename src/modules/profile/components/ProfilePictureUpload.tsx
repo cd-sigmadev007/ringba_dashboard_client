@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { DefaultAvatar, DeleteIcon  } from '@/assets/svg'
+import { DefaultAvatar, DeleteIcon } from '@/assets/svg'
 import Button from '@/components/ui/Button'
 
 interface ProfilePictureUploadProps {

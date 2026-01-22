@@ -34,7 +34,9 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
-    const [digits, setDigits] = useState<Array<string>>(Array(OTP_LENGTH).fill(''))
+    const [digits, setDigits] = useState<Array<string>>(
+        Array(OTP_LENGTH).fill('')
+    )
     const [loading, setLoading] = useState(false)
     const [cooldown, setCooldown] = useState(0)
     const inputRefs = useRef<Array<HTMLInputElement | null>>([])

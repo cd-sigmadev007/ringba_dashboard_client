@@ -63,7 +63,10 @@ export const OnboardingStep2Profile: React.FC<OnboardingStep2ProfileProps> = ({
                         value={firstName}
                         onChange={(e) => {
                             setFirstName(e.target.value)
-                            setError((prev) => ({ ...prev, firstName: undefined }))
+                            setError((prev) => ({
+                                ...prev,
+                                firstName: undefined,
+                            }))
                         }}
                         placeholder="First name"
                         error={error.firstName}

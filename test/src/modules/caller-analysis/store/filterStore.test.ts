@@ -23,7 +23,10 @@ describe('filterStore', () => {
 
     it('should set filters', () => {
         const newFilters: FilterState = {
-            dateRange: { from: new Date('2025-01-01'), to: new Date('2025-01-31') },
+            dateRange: {
+                from: new Date('2025-01-01'),
+                to: new Date('2025-01-31'),
+            },
             campaignFilter: ['campaign-1'],
             statusFilter: ['converted'],
             durationFilter: 'medium',
