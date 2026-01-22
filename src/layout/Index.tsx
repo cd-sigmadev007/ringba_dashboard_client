@@ -54,11 +54,23 @@ const RootLayout: React.FC = () => {
             return
         }
 
+        // Billing routes: only super_admin and org_admin can access
+        if (
+            isAuthenticated &&
+            user &&
+            location.pathname.startsWith('/billing') &&
+            user.role !== 'super_admin' &&
+            user.role !== 'org_admin'
+        ) {
+            navigate({ to: '/caller-analysis' })
+            return
+        }
+
         if (!isAuthenticated && location.pathname === '/') {
             navigate({ to: '/login' })
             return
         }
-    }, [isAuthenticated, loading, location.pathname, navigate, isAuthRoute])
+    }, [isAuthenticated, loading, location.pathname, navigate, isAuthRoute, user])
 
     if (isAuthRoute) {
         return (

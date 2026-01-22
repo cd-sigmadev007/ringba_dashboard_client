@@ -6,6 +6,7 @@ export interface NavLinkItem {
     path?: string
     disable?: boolean
     icon?: React.ReactNode
+    hideForRoles?: Array<string> // Roles that should not see this menu item
     submenu?: Array<{
         id: string | number
         title: string
@@ -55,6 +56,7 @@ export const navLinks: Array<NavLinkItem> = [
         title: 'Billing',
         disable: false,
         icon: <BillingIcon />,
+        hideForRoles: ['media_buyer'], // Only super_admin and org_admin can see billing
         submenu: [
             {
                 id: 'billing-invoices',

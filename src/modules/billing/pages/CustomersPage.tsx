@@ -3,8 +3,9 @@
  * Main page for billing/customers matching Figma design (node-id: 4643-10577)
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import clsx from 'clsx'
+import { useNavigate } from '@tanstack/react-router'
 import { useCustomers, useDeleteCustomer } from '../hooks/useCustomers'
 import { CustomersTable } from '../components/CustomersTable'
 import { CreateEditCustomerModal } from '../components/CreateEditCustomerModal'
@@ -13,12 +14,24 @@ import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import { AddIcon } from '@/assets/svg'
 import { Modal } from '@/components/ui/Modal'
+import { usePermissions } from '@/hooks/usePermissions'
 
 export default function CustomersPage() {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const navigate = useNavigate()
     const { data: customers = [], isLoading } = useCustomers()
     const deleteMutation = useDeleteCustomer()
+    const { role } = usePermissions()
+
+    // Access control: Only super_admin and org_admin can access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+
+    useEffect(() => {
+        if (role && !canAccess) {
+            navigate({ to: '/caller-analysis' })
+        }
+    }, [role, canAccess, navigate])
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(
@@ -39,6 +52,10 @@ export default function CustomersPage() {
 
     const handleDeleteClick = (customer: Customer) => {
         setDeleteCustomer(customer)
+    }
+
+    if (!canAccess) {
+        return null
     }
 
     const handleDeleteConfirm = async () => {

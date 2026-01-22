@@ -47,7 +47,7 @@ export const OnboardingStep2Profile: React.FC<OnboardingStep2ProfileProps> = ({
                 <p className={`text-sm ${textMuted} mt-2`}>
                     Provide your name and set-up your passwords.
                 </p>
-                <OnboardingDots total={dots.total} current={dots.current} className="mt-auto pt-6 md:pt-0" />
+                <OnboardingDots total={dots.total} current={dots.current} className="mt-auto pt-6 md:pt-0 self-start" />
             </div>
             {/* Right: form */}
             <div className="flex flex-col gap-[40px] flex-1 w-full min-w-0 md:max-w-[300px]">

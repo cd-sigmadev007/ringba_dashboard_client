@@ -3,8 +3,9 @@
  * Main page for billing/organizations matching Figma design (node-id: 4643-10916)
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import clsx from 'clsx'
+import { useNavigate } from '@tanstack/react-router'
 import {
     useDeleteOrganization,
     useOrganizations,
@@ -15,12 +16,24 @@ import type { Organization } from '../types'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import { AddIcon } from '@/assets/svg'
+import { usePermissions } from '@/hooks/usePermissions'
 
 export default function OrganizationsPage() {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const navigate = useNavigate()
     const { data: organizations = [], isLoading } = useOrganizations()
     const deleteMutation = useDeleteOrganization()
+    const { role } = usePermissions()
+
+    // Access control: Only super_admin and org_admin can access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+
+    useEffect(() => {
+        if (role && !canAccess) {
+            navigate({ to: '/caller-analysis' })
+        }
+    }, [role, canAccess, navigate])
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingOrg, setEditingOrg] = useState<Organization | null>(null)
@@ -33,6 +46,10 @@ export default function OrganizationsPage() {
     const handleEdit = (org: Organization) => {
         setEditingOrg(org)
         setIsModalOpen(true)
+    }
+
+    if (!canAccess) {
+        return null
     }
 
     const handleDelete = async (org: Organization) => {
