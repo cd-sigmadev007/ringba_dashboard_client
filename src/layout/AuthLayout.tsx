@@ -26,8 +26,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             <main
                 className="flex-1 flex items-center justify-center px-4 py-8 min-h-0"
                 style={{
-                    background:
-                        'linear-gradient(257deg, #253758 -26.08%, #040D16 14.04%, #050F1A 85.51%, #253C50 128.21%)',
+                    background: '#001E3C', // Deep navy blue from design system
                 }}
             >
                 {children}
