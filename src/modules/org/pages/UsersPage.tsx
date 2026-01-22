@@ -22,6 +22,8 @@ interface UserRow {
     role: 'super_admin' | 'org_admin' | 'media_buyer'
     invitation_status?: 'send' | 'accepted' | 'expired' | null
     logo_url?: string | null
+    first_name?: string | null
+    last_name?: string | null
 }
 
 const UsersPage: React.FC = () => {
@@ -114,20 +116,25 @@ const UsersPage: React.FC = () => {
                 accessorKey: 'email',
                 cell: ({ getValue, row }: any) => {
                     const email = getValue()
-                    const name = email.split('@')[0] || email
+                    const firstName = row?.original?.first_name
+                    const lastName = row?.original?.last_name
+                    const displayName =
+                        firstName && lastName
+                            ? `${firstName} ${lastName}`.trim()
+                            : firstName || lastName || email.split('@')[0] || email
                     const url = toAbsoluteLogoUrl(row?.original?.logo_url)
                     return (
                         <div className="flex items-center gap-2">
                             {url ? (
                                 <img
                                     src={url}
-                                    alt={name}
+                                    alt={displayName}
                                     className="w-6 h-6 rounded-full object-cover"
                                 />
                             ) : (
                                 <DefaultAvatar className="w-6 h-6" />
                             )}
-                            <span className="text-sm font-medium">{name}</span>
+                            <span className="text-sm font-medium">{displayName}</span>
                         </div>
                     )
                 },
@@ -230,6 +237,8 @@ const UsersPage: React.FC = () => {
         role: u.role,
         invitation_status: u.invitation_status ?? null,
         logo_url: u.logo_url ?? null,
+        first_name: u.first_name ?? null,
+        last_name: u.last_name ?? null,
     }))
 
     // Show access denied if user doesn't have required role

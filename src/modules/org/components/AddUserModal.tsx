@@ -14,7 +14,8 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
     isOpen,
     onClose,
 }) => {
-    const [name, setName] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [error, setError] = useState<string | null>(null)
     const { createUser } = useUsersStore()
@@ -23,8 +24,8 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
         e.preventDefault()
         setError(null)
 
-        if (!name.trim()) {
-            setError('Name is required')
+        if (!firstName.trim()) {
+            setError('First name is required')
             return
         }
 
@@ -43,7 +44,8 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
         try {
             const result = await createUser({
                 email: email.trim(),
-                name: name.trim(),
+                first_name: firstName.trim(),
+                last_name: lastName.trim(),
                 invitation_status: 'send',
             })
 
@@ -51,7 +53,8 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
                 toast.success(
                     'User created successfully! Email added to allowlist. User can now register with Auth0.'
                 )
-                setName('')
+                setFirstName('')
+                setLastName('')
                 setEmail('')
                 onClose()
             } else {
@@ -66,7 +69,8 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
     }
 
     const handleClose = () => {
-        setName('')
+        setFirstName('')
+        setLastName('')
         setEmail('')
         setError(null)
         onClose()
@@ -83,18 +87,34 @@ export const AddUserModal: React.FC<AddUserModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-4 p-2" noValidate>
                 <div>
                     <label
-                        htmlFor="name"
+                        htmlFor="firstName"
                         className="block text-sm font-medium mb-1"
                     >
-                        Name
+                        First Name
                     </label>
                     <Input
-                        id="name"
+                        id="firstName"
                         type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter user name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Enter first name"
                         required
+                    />
+                </div>
+
+                <div>
+                    <label
+                        htmlFor="lastName"
+                        className="block text-sm font-medium mb-1"
+                    >
+                        Last Name (optional)
+                    </label>
+                    <Input
+                        id="lastName"
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Enter last name"
                     />
                 </div>
 

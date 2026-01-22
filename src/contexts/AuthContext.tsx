@@ -12,6 +12,7 @@ import React, {
     useState,
 } from 'react'
 import { apiClient } from '@/services/api'
+import { authApi } from '@/modules/auth/services/authApi'
 
 export interface AuthUser {
     id: string
@@ -21,6 +22,7 @@ export interface AuthUser {
     campaignIds: Array<string>
     firstName?: string | null
     lastName?: string | null
+    profilePictureUrl?: string | null
     /** When set, onboarding modal is not shown. Null = show onboarding. */
     onboardingCompletedAt?: string | null
 }
@@ -48,14 +50,18 @@ interface AuthContextValue extends AuthState {
         invitationToken: string
         password: string
         otp: string
-        first_name: string
-        last_name: string
     }) => Promise<void>
     logout: () => Promise<void>
     getAccessToken: () => string | null
     refresh: () => Promise<string | null>
     /** Refetch /me and update user (e.g. onboardingCompletedAt). */
     refetchMe: () => Promise<void>
+    /** Update user profile (name and/or picture). */
+    updateProfile: (data: {
+        first_name?: string
+        last_name?: string
+        profile_picture?: File
+    }) => Promise<void>
     clearError: () => void
 }
 
@@ -119,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 : [],
                             firstName: u.firstName ?? null,
                             lastName: u.lastName ?? null,
+                            profilePictureUrl: u.profilePictureUrl ?? null,
                             onboardingCompletedAt: u.onboardingCompletedAt ?? null,
                         },
                         accessToken: state.accessToken,
@@ -157,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             : [],
                         firstName: u.firstName ?? null,
                         lastName: u.lastName ?? null,
+                        profilePictureUrl: u.profilePictureUrl ?? null,
                         onboardingCompletedAt: u.onboardingCompletedAt ?? null,
                     },
                 }))
@@ -243,8 +251,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             invitationToken: string
             password: string
             otp: string
-            first_name: string
-            last_name: string
         }) => {
             setState((s) => ({ ...s, error: null }))
             const res = await apiClient.post<{
@@ -286,6 +292,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
     }, [])
 
+    const updateProfile = useCallback(
+        async (data: {
+            first_name?: string
+            last_name?: string
+            profile_picture?: File
+        }) => {
+            try {
+                await authApi.updateProfile(data)
+                // Refetch /me to get updated user data
+                await refetchMe()
+            } catch (error) {
+                setState((s) => ({
+                    ...s,
+                    error: error instanceof Error ? error.message : 'Failed to update profile',
+                }))
+                throw error
+            }
+        },
+        [refetchMe]
+    )
+
     const clearError = useCallback(
         () => setState((s) => ({ ...s, error: null })),
         []
@@ -301,6 +328,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         getAccessToken,
         refresh,
         refetchMe,
+        updateProfile,
         clearError,
     }
 

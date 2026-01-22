@@ -10,11 +10,16 @@ export interface UserDto {
     created_by: string | null
     invitation_status?: 'send' | 'accepted' | 'expired' | null
     logo_url?: string | null
+    first_name?: string | null
+    last_name?: string | null
+    profile_picture_url?: string | null
 }
 
 export interface CreateUserRequest {
     email: string
     name?: string
+    first_name?: string
+    last_name?: string
     org_id?: string | null
     invitation_status?: 'send' | 'accepted' | 'expired'
 }
@@ -36,6 +41,8 @@ export const usersApi = {
             email: input.email,
             invitation_status: input.invitation_status || 'send',
             org_id: input.org_id,
+            first_name: input.first_name,
+            last_name: input.last_name,
         })
         return res.data
     },

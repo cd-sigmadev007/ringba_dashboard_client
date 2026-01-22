@@ -33,4 +33,28 @@ export const authApi = {
             .post('/api/auth/complete-onboarding', { first_name: firstName, last_name: lastName })
             .then(() => {})
     },
+
+    async updateProfile(data: {
+        first_name?: string
+        last_name?: string
+        profile_picture?: File
+    }): Promise<any> {
+        const formData = new FormData()
+        if (data.first_name !== undefined) {
+            formData.append('first_name', data.first_name)
+        }
+        if (data.last_name !== undefined) {
+            formData.append('last_name', data.last_name)
+        }
+        if (data.profile_picture) {
+            formData.append('profile_picture', data.profile_picture)
+        }
+
+        const res = await apiClient.patch('/api/auth/profile', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        return res.data
+    },
 }

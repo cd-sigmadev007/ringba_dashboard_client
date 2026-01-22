@@ -10,7 +10,7 @@ export interface InviteOtpFormProps {
     email: string
     onBack: () => void
     onRequestCode: () => Promise<void>
-    onVerify: (otp: string) => void
+    onVerify: (otp: string) => Promise<void>
     error?: string | null
     clearError: () => void
 }
@@ -99,13 +99,13 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
         inputRefs.current[focus]?.focus()
     }
 
-    const handleVerify = (e: React.FormEvent) => {
+    const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault()
         clearError()
         if (!canVerify) return
         setLoading(true)
         try {
-            onVerify(otp)
+            await onVerify(otp)
         } finally {
             setLoading(false)
         }

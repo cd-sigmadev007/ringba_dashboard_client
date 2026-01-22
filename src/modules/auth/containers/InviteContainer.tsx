@@ -5,7 +5,6 @@ import {
     InviteInvalidView,
     InviteStep1Form,
     InviteOtpForm,
-    InviteStep2Form,
     ValidatingInviteView,
     EmailVerifiedView,
 } from '../components'
@@ -15,7 +14,7 @@ export const InviteContainer: React.FC = () => {
     const navigate = useNavigate()
     const { setPassword, refetchMe, error, clearError } = useAuth()
     const { token, validating, invalid, email } = useInviteValidate()
-    const [step, setStep] = useState<1 | 2 | 3 | 4>(1) // 4 = Email Verified (show once after signup)
+    const [step, setStep] = useState<1 | 2 | 4>(1) // 4 = Email Verified (show once after signup)
     const [step1Data, setStep1Data] = useState<{
         password: string
         otp: string
@@ -35,19 +34,14 @@ export const InviteContainer: React.FC = () => {
         setStep1Data(null)
     }
 
-    const handleOtpVerify = (otp: string) => {
+    const handleOtpVerify = async (otp: string) => {
+        if (!step1Data?.password) return
         setStep1Data((s) => (s ? { ...s, otp } : null))
-        setStep(3)
-    }
-
-    const handleStep3Submit = async (firstName: string, lastName: string) => {
-        if (!step1Data?.password || !step1Data?.otp) return
+        // Names are already in DB from invite creation, no need to collect them here
         await setPassword({
             invitationToken: token,
             password: step1Data.password,
-            otp: step1Data.otp,
-            first_name: firstName,
-            last_name: lastName,
+            otp: otp,
         })
         setStep(4) // Email Verified screen (only 1st time; next login goes straight to main)
     }
@@ -90,14 +84,6 @@ export const InviteContainer: React.FC = () => {
         return <EmailVerifiedView onGreat={handleEmailVerifiedGreat} />
     }
 
-    if (!step1Data?.password || !step1Data?.otp) return <InviteInvalidView />
-
-    return (
-        <InviteStep2Form
-            email={email}
-            onSubmit={handleStep3Submit}
-            error={error}
-            clearError={clearError}
-        />
-    )
+    // Step 2 is OTP verification, which calls handleOtpVerify and moves to step 4
+    return null
 }

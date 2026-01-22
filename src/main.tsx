@@ -20,6 +20,7 @@ import BillingCustomersRoute from './routes/billingCustomers.tsx'
 import BillingInvoicesRoute from './routes/billingInvoices.tsx'
 import BillingInvoiceCreateRoute from './routes/billingInvoiceCreate.tsx'
 import BillingInvoiceEditRoute from './routes/billingInvoiceEdit.tsx'
+import ProfileRoute from './routes/profile.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
@@ -70,6 +71,7 @@ const routeTree = rootRoute.addChildren([
     BillingInvoicesRoute(rootRoute),
     BillingInvoiceCreateRoute(rootRoute),
     BillingInvoiceEditRoute(rootRoute),
+    ProfileRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()

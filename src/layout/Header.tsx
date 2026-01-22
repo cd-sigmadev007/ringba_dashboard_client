@@ -30,6 +30,22 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
         ? [user.firstName, user.lastName].filter(Boolean).join(' ') ||
           user.email
         : undefined
+    
+    const getApiBaseUrl = () => {
+        const baseUrl =
+            (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001'
+        return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
+    }
+
+    const toAbsolutePictureUrl = (url?: string | null) => {
+        if (!url) return undefined
+        if (url.startsWith('http://') || url.startsWith('https://')) return url
+        const base = getApiBaseUrl()
+        const path = url.startsWith('/') ? url : `/${url}`
+        return `${base}${path}`
+    }
+
+    const userPicture = toAbsolutePictureUrl(user?.profilePictureUrl)
 
     return (
         <>
@@ -79,7 +95,7 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
                                 <UserDropdown
                                     userName={userName}
                                     userEmail={user?.email}
-                                    userPicture={undefined}
+                                    userPicture={userPicture}
                                     role={role || undefined}
                                     onLogout={() => logout()}
                                 />
