@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { AxiosInstance } from 'axios'
 
 /**
  * Mock API client for testing

@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { CampaignDto } from '@/modules/org/services/campaignApi'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
 import { campaignApi } from '@/modules/org/services/campaignApi'
-import type { CampaignDto } from '@/modules/org/services/campaignApi'
 
 // Mock campaignApi
 vi.mock('@/modules/org/services/campaignApi', () => ({
@@ -25,12 +25,14 @@ describe('campaignStore', () => {
 
     describe('fetchCampaigns', () => {
         it('should fetch and set campaigns', async () => {
-            const mockCampaigns: CampaignDto[] = [
+            const mockCampaigns: Array<CampaignDto> = [
                 { id: '1', name: 'Campaign 1', campaign_id: 'C1' },
                 { id: '2', name: 'Campaign 2', campaign_id: 'C2' },
-            ] as CampaignDto[]
+            ] as Array<CampaignDto>
 
-            vi.mocked(campaignApi.fetchCampaigns).mockResolvedValueOnce(mockCampaigns)
+            vi.mocked(campaignApi.fetchCampaigns).mockResolvedValueOnce(
+                mockCampaigns
+            )
 
             await useCampaignStore.getState().fetchCampaigns()
 
@@ -42,7 +44,9 @@ describe('campaignStore', () => {
             const error = new Error('Failed to fetch')
             vi.mocked(campaignApi.fetchCampaigns).mockRejectedValueOnce(error)
 
-            await expect(useCampaignStore.getState().fetchCampaigns()).rejects.toThrow()
+            await expect(
+                useCampaignStore.getState().fetchCampaigns()
+            ).rejects.toThrow()
 
             expect(useCampaignStore.getState().error).toBeTruthy()
             expect(useCampaignStore.getState().loading).toBe(false)
@@ -57,14 +61,18 @@ describe('campaignStore', () => {
                 campaign_id: 'C3',
             } as CampaignDto
 
-            vi.mocked(campaignApi.createCampaign).mockResolvedValueOnce(newCampaign)
+            vi.mocked(campaignApi.createCampaign).mockResolvedValueOnce(
+                newCampaign
+            )
 
             const result = await useCampaignStore.getState().createCampaign({
                 name: 'New Campaign',
             })
 
             expect(result).toEqual(newCampaign)
-            expect(useCampaignStore.getState().campaigns).toContainEqual(newCampaign)
+            expect(useCampaignStore.getState().campaigns).toContainEqual(
+                newCampaign
+            )
         })
 
         it('should handle create errors', async () => {
@@ -97,14 +105,20 @@ describe('campaignStore', () => {
                 campaign_id: 'C1',
             } as CampaignDto
 
-            vi.mocked(campaignApi.updateCampaign).mockResolvedValueOnce(updatedCampaign)
+            vi.mocked(campaignApi.updateCampaign).mockResolvedValueOnce(
+                updatedCampaign
+            )
 
-            const result = await useCampaignStore.getState().updateCampaign('1', {
-                name: 'New Name',
-            })
+            const result = await useCampaignStore
+                .getState()
+                .updateCampaign('1', {
+                    name: 'New Name',
+                })
 
             expect(result).toEqual(updatedCampaign)
-            expect(useCampaignStore.getState().campaigns[0].name).toBe('New Name')
+            expect(useCampaignStore.getState().campaigns[0].name).toBe(
+                'New Name'
+            )
         })
 
         it('should handle update errors', async () => {
@@ -112,9 +126,11 @@ describe('campaignStore', () => {
                 new Error('Failed to update')
             )
 
-            const result = await useCampaignStore.getState().updateCampaign('1', {
-                name: 'New Name',
-            })
+            const result = await useCampaignStore
+                .getState()
+                .updateCampaign('1', {
+                    name: 'New Name',
+                })
 
             expect(result).toBe(null)
             expect(useCampaignStore.getState().error).toBeTruthy()
@@ -123,14 +139,16 @@ describe('campaignStore', () => {
 
     describe('deleteCampaign', () => {
         it('should delete campaign from store', async () => {
-            const campaigns: CampaignDto[] = [
+            const campaigns: Array<CampaignDto> = [
                 { id: '1', name: 'Campaign 1' },
                 { id: '2', name: 'Campaign 2' },
-            ] as CampaignDto[]
+            ] as Array<CampaignDto>
 
             useCampaignStore.setState({ campaigns })
 
-            vi.mocked(campaignApi.deleteCampaign).mockResolvedValueOnce(undefined)
+            vi.mocked(campaignApi.deleteCampaign).mockResolvedValueOnce(
+                undefined
+            )
 
             const result = await useCampaignStore.getState().deleteCampaign('1')
 

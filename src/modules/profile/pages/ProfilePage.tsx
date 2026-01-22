@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useNavigate } from '@tanstack/react-router'
+import { ProfilePictureUpload } from '../components/ProfilePictureUpload'
 import { useAuth } from '@/contexts/AuthContext'
 import { Input } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import { ProfilePictureUpload } from '../components/ProfilePictureUpload'
 import { useThemeStore } from '@/store/themeStore'
-import toast from 'react-hot-toast'
-import { useNavigate } from '@tanstack/react-router'
 
 const ProfilePage: React.FC = () => {
     const { user, updateProfile, refetchMe } = useAuth()
@@ -67,7 +67,9 @@ const ProfilePage: React.FC = () => {
     return (
         <div className="p-4 md:p-6 lg:p-8">
             <div className="max-w-2xl mx-auto">
-                <h1 className={`text-2xl font-semibold mb-6 ${textClr}`}>Profile</h1>
+                <h1 className={`text-2xl font-semibold mb-6 ${textClr}`}>
+                    Profile
+                </h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="bg-white dark:bg-[#002B57] rounded-lg p-6 shadow-sm">
@@ -80,7 +82,8 @@ const ProfilePage: React.FC = () => {
                         />
                         {profilePicture && (
                             <p className={`text-xs mt-2 ${textMuted}`}>
-                                New picture will be saved when you click "Save Changes"
+                                New picture will be saved when you click "Save
+                                Changes"
                             </p>
                         )}
                     </div>
@@ -96,7 +99,10 @@ const ProfilePage: React.FC = () => {
                                 value={firstName}
                                 onChange={(e) => {
                                     setFirstName(e.target.value)
-                                    setErrors((prev) => ({ ...prev, firstName: undefined }))
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        firstName: undefined,
+                                    }))
                                 }}
                                 placeholder="Enter first name"
                                 error={errors.firstName}
@@ -141,7 +147,11 @@ const ProfilePage: React.FC = () => {
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" variant="primary" disabled={loading}>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            disabled={loading}
+                        >
                             {loading ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>

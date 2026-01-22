@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-    getCustomers,
-    getCustomerById,
     createCustomer,
-    updateCustomer,
     deleteCustomer,
+    getCustomerById,
+    getCustomers,
+    updateCustomer,
 } from '@/modules/billing/services/customersApi'
 import { apiClient } from '@/services/api'
 
@@ -51,7 +51,10 @@ describe('customersApi', () => {
         vi.mocked(apiClient.post).mockResolvedValueOnce(mockResponse as any)
 
         const result = await createCustomer(customerData)
-        expect(apiClient.post).toHaveBeenCalledWith('/api/admin/customers', customerData)
+        expect(apiClient.post).toHaveBeenCalledWith(
+            '/api/admin/customers',
+            customerData
+        )
         // createCustomer returns the full response object
         expect(result).toEqual(mockResponse)
     })
@@ -63,7 +66,10 @@ describe('customersApi', () => {
         vi.mocked(apiClient.put).mockResolvedValueOnce(mockResponse as any)
 
         const result = await updateCustomer('1', updateData)
-        expect(apiClient.put).toHaveBeenCalledWith('/api/admin/customers/1', updateData)
+        expect(apiClient.put).toHaveBeenCalledWith(
+            '/api/admin/customers/1',
+            updateData
+        )
         // updateCustomer returns the full response object
         expect(result).toEqual(mockResponse)
     })

@@ -5,9 +5,9 @@
 
 import React from 'react'
 import Footer from './Footer'
+import Header from './Header'
 import { useThemeStore } from '@/store/themeStore'
 import { cn } from '@/lib/utils'
-import Header from './Header'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
     const { theme } = useThemeStore()
@@ -22,10 +22,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         >
             <Header setOpenMenu={undefined} openMenu={undefined} />
             {/* Spacer for fixed header so main content starts below it */}
-            <div
-                className="h-[56px] flex-shrink-0 lg:h-[65px]"
-                aria-hidden
-            />
+            <div className="h-[56px] flex-shrink-0 lg:h-[65px]" aria-hidden />
             <main
                 className="flex-1 flex items-center justify-center px-4 py-8 min-h-0"
                 style={{

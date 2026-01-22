@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { buildAddressFromCallData } from '@/modules/caller-analysis/utils/addressUtils'
+import { describe, expect, it } from 'vitest'
 import type { CallData } from '@/modules/caller-analysis/types'
+import { buildAddressFromCallData } from '@/modules/caller-analysis/utils/addressUtils'
 
 describe('addressUtils', () => {
     describe('buildAddressFromCallData', () => {

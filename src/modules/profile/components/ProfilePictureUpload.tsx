@@ -1,7 +1,6 @@
-import React, { useState, useRef } from 'react'
-import { DefaultAvatar } from '@/assets/svg'
+import React, { useRef, useState } from 'react'
+import { DefaultAvatar, DeleteIcon  } from '@/assets/svg'
 import Button from '@/components/ui/Button'
-import { DeleteIcon } from '@/assets/svg'
 
 interface ProfilePictureUploadProps {
     currentPictureUrl?: string | null
@@ -19,7 +18,8 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
 
     const getApiBaseUrl = () => {
         const baseUrl =
-            (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001'
+            (import.meta as any).env?.VITE_API_BASE_URL ||
+            'http://localhost:3001'
         return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
     }
 
@@ -35,9 +35,17 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
         const file = e.target.files?.[0]
         if (file) {
             // Validate file type
-            const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml']
+            const allowedTypes = [
+                'image/png',
+                'image/jpeg',
+                'image/webp',
+                'image/gif',
+                'image/svg+xml',
+            ]
             if (!allowedTypes.includes(file.type)) {
-                alert('Invalid file type. Please select an image file (PNG, JPEG, WebP, GIF, or SVG).')
+                alert(
+                    'Invalid file type. Please select an image file (PNG, JPEG, WebP, GIF, or SVG).'
+                )
                 return
             }
 

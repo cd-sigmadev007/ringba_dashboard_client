@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { parseTranscriptToEntries } from '@/modules/caller-analysis/utils/transcriptUtils'
 
 describe('transcriptUtils', () => {
     describe('parseTranscriptToEntries', () => {
         it('should return empty array for null or undefined', () => {
-            expect(parseTranscriptToEntries(null)).toEqual([])
+            expect(parseTranscriptToEntries(null as any)).toEqual([])
             expect(parseTranscriptToEntries(undefined)).toEqual([])
         })
 
@@ -14,7 +14,8 @@ describe('transcriptUtils', () => {
         })
 
         it('should parse transcript with timestamps and speakers', () => {
-            const transcript = '00:00 A - Hello,\n00:20 B - Hi there,\n00:40 A - How are you?'
+            const transcript =
+                '00:00 A - Hello,\n00:20 B - Hi there,\n00:40 A - How are you?'
             const result = parseTranscriptToEntries(transcript)
 
             expect(result).toHaveLength(3)
@@ -63,7 +64,8 @@ describe('transcriptUtils', () => {
         })
 
         it('should append lines without speaker markers to last entry', () => {
-            const transcript = '00:00 A - Hello,\nThis is continuation,\n00:20 B - Hi there'
+            const transcript =
+                '00:00 A - Hello,\nThis is continuation,\n00:20 B - Hi there'
             const result = parseTranscriptToEntries(transcript)
 
             expect(result).toHaveLength(2)
@@ -72,7 +74,8 @@ describe('transcriptUtils', () => {
         })
 
         it('should handle first line without speaker marker', () => {
-            const transcript = 'This is a line without speaker,\n00:20 A - Hello'
+            const transcript =
+                'This is a line without speaker,\n00:20 A - Hello'
             const result = parseTranscriptToEntries(transcript)
 
             expect(result).toHaveLength(2)

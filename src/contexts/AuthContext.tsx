@@ -126,7 +126,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             firstName: u.firstName ?? null,
                             lastName: u.lastName ?? null,
                             profilePictureUrl: u.profilePictureUrl ?? null,
-                            onboardingCompletedAt: u.onboardingCompletedAt ?? null,
+                            onboardingCompletedAt:
+                                u.onboardingCompletedAt ?? null,
                         },
                         accessToken: state.accessToken,
                         loading: false,
@@ -305,7 +306,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (error) {
                 setState((s) => ({
                     ...s,
-                    error: error instanceof Error ? error.message : 'Failed to update profile',
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : 'Failed to update profile',
                 }))
                 throw error
             }

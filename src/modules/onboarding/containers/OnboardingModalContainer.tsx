@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Modal } from '@/components/ui/Modal'
 import {
     OnboardingStep1Welcome,
     OnboardingStep2Profile,
     OnboardingStep3Complete,
 } from '../components'
+import { Modal } from '@/components/ui/Modal'
 import { authApi } from '@/modules/auth/services/authApi'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -19,13 +19,15 @@ export interface OnboardingModalContainerProps {
  * Non-skippable onboarding modal (3 steps). Shown when user.onboardingCompletedAt is null.
  * Step 2: First name (required), Last name (optional). On "Let's Go!" step 3: complete-onboarding with names, refetchMe, onComplete.
  */
-export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> = ({
-    open,
-    onComplete,
-}) => {
+export const OnboardingModalContainer: React.FC<
+    OnboardingModalContainerProps
+> = ({ open, onComplete }) => {
     const { user, refetchMe } = useAuth()
     const [step, setStep] = useState(1)
-    const [step2Names, setStep2Names] = useState<{ firstName: string; lastName: string } | null>(null)
+    const [step2Names, setStep2Names] = useState<{
+        firstName: string
+        lastName: string
+    } | null>(null)
 
     const handleStep1LetsGo = () => setStep(2)
     const handleStep2Continue = (firstName: string, lastName: string) => {
@@ -34,7 +36,10 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
     }
     const handleStep3LetsGo = async () => {
         try {
-            await authApi.completeOnboarding(step2Names?.firstName, step2Names?.lastName)
+            await authApi.completeOnboarding(
+                step2Names?.firstName,
+                step2Names?.lastName
+            )
             await refetchMe()
             onComplete()
         } catch (_) {}
@@ -54,7 +59,10 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
             contentClassName="!mx-0 !mb-0 !p-0"
         >
             {step === 1 && (
-                <OnboardingStep1Welcome onLetsGo={handleStep1LetsGo} dots={dots} />
+                <OnboardingStep1Welcome
+                    onLetsGo={handleStep1LetsGo}
+                    dots={dots}
+                />
             )}
             {step === 2 && (
                 <OnboardingStep2Profile
@@ -65,7 +73,10 @@ export const OnboardingModalContainer: React.FC<OnboardingModalContainerProps> =
                 />
             )}
             {step === 3 && (
-                <OnboardingStep3Complete onLetsGo={handleStep3LetsGo} dots={dots} />
+                <OnboardingStep3Complete
+                    onLetsGo={handleStep3LetsGo}
+                    dots={dots}
+                />
             )}
         </Modal>
     )

@@ -30,10 +30,11 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
         ? [user.firstName, user.lastName].filter(Boolean).join(' ') ||
           user.email
         : undefined
-    
+
     const getApiBaseUrl = () => {
         const baseUrl =
-            (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001'
+            (import.meta as any).env?.VITE_API_BASE_URL ||
+            'http://localhost:3001'
         return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
     }
 

@@ -5,6 +5,7 @@
 
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { useDownloadInvoicePDF, useInvoices } from '../hooks/useInvoices'
 import { InvoicesTable } from '../components/InvoicesTable'
 import type { Invoice } from '../types'
@@ -12,7 +13,6 @@ import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import { AddIcon } from '@/assets/svg'
 import { usePermissions } from '@/hooks/usePermissions'
-import { useEffect } from 'react'
 
 export default function InvoicesPage() {
     const { theme } = useThemeStore()

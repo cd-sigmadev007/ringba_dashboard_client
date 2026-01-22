@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
     getApiBaseUrl,
-    toAbsoluteLogoUrl,
-    getRoleLabel,
-    getInvitationStatusLabel,
     getInvitationStatusColor,
+    getInvitationStatusLabel,
+    getRoleLabel,
+    toAbsoluteLogoUrl,
 } from '@/modules/org/utils/userUtils'
 
 describe('userUtils', () => {
@@ -52,7 +52,9 @@ describe('userUtils', () => {
         it('should prepend API base URL to relative paths', () => {
             // Mock getApiBaseUrl
             vi.mock('@/modules/org/utils/userUtils', async () => {
-                const actual = await vi.importActual('@/modules/org/utils/userUtils')
+                const actual = await vi.importActual(
+                    '@/modules/org/utils/userUtils'
+                )
                 return {
                     ...actual,
                     getApiBaseUrl: () => 'http://localhost:3001',
@@ -104,23 +106,37 @@ describe('userUtils', () => {
     describe('getInvitationStatusColor', () => {
         it('should return default color for null or undefined', () => {
             expect(getInvitationStatusColor(null, false)).toBe('text-[#5E6278]')
-            expect(getInvitationStatusColor(undefined, true)).toBe('text-[#A1A5B7]')
+            expect(getInvitationStatusColor(undefined, true)).toBe(
+                'text-[#A1A5B7]'
+            )
         })
 
         it('should return color for known statuses', () => {
-            expect(getInvitationStatusColor('send', false)).toBe('text-yellow-500')
-            expect(getInvitationStatusColor('accepted', false)).toBe('text-green-500')
-            expect(getInvitationStatusColor('expired', false)).toBe('text-red-500')
+            expect(getInvitationStatusColor('send', false)).toBe(
+                'text-yellow-500'
+            )
+            expect(getInvitationStatusColor('accepted', false)).toBe(
+                'text-green-500'
+            )
+            expect(getInvitationStatusColor('expired', false)).toBe(
+                'text-red-500'
+            )
         })
 
         it('should return default color for unknown statuses', () => {
-            expect(getInvitationStatusColor('unknown', false)).toBe('text-[#5E6278]')
-            expect(getInvitationStatusColor('unknown', true)).toBe('text-[#A1A5B7]')
+            expect(getInvitationStatusColor('unknown', false)).toBe(
+                'text-[#5E6278]'
+            )
+            expect(getInvitationStatusColor('unknown', true)).toBe(
+                'text-[#A1A5B7]'
+            )
         })
 
         it('should use dark mode colors when isDark is true', () => {
             expect(getInvitationStatusColor(null, true)).toBe('text-[#A1A5B7]')
-            expect(getInvitationStatusColor('unknown', true)).toBe('text-[#A1A5B7]')
+            expect(getInvitationStatusColor('unknown', true)).toBe(
+                'text-[#A1A5B7]'
+            )
         })
     })
 })

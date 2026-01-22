@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { AuthCard } from './AuthCard'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
@@ -34,10 +34,10 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
 
-    const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''))
+    const [digits, setDigits] = useState<Array<string>>(Array(OTP_LENGTH).fill(''))
     const [loading, setLoading] = useState(false)
     const [cooldown, setCooldown] = useState(0)
-    const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+    const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 
     const textClr = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const textMuted = 'text-[#A1A5B7]'
@@ -89,7 +89,10 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
 
     const handlePaste = (e: React.ClipboardEvent) => {
         e.preventDefault()
-        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
+        const pasted = e.clipboardData
+            .getData('text')
+            .replace(/\D/g, '')
+            .slice(0, OTP_LENGTH)
         if (!pasted) return
         const next = [...digits]
         for (let i = 0; i < pasted.length; i++) next[i] = pasted[i]
@@ -145,7 +148,10 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
                     <strong className={textClr}>{email}</strong>
                 </p>
 
-                <form onSubmit={handleVerify} className="flex flex-col gap-4 items-center">
+                <form
+                    onSubmit={handleVerify}
+                    className="flex flex-col gap-4 items-center"
+                >
                     <div
                         className="flex justify-center gap-1 w-full"
                         onPaste={handlePaste}
@@ -160,7 +166,9 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
                                 inputMode="numeric"
                                 maxLength={1}
                                 value={digits[i]}
-                                onChange={(e) => handleChange(i, e.target.value)}
+                                onChange={(e) =>
+                                    handleChange(i, e.target.value)
+                                }
                                 onKeyDown={(e) => handleKeyDown(i, e)}
                                 className={inputBase}
                                 aria-label={`Digit ${i + 1}`}
@@ -169,7 +177,9 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
                     </div>
 
                     {error && (
-                        <p className="text-sm text-[#F64E60] text-center w-full">{error}</p>
+                        <p className="text-sm text-[#F64E60] text-center w-full">
+                            {error}
+                        </p>
                     )}
 
                     <Button
@@ -185,8 +195,15 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
                             Didn&apos;t receive any code?
                         </p>
                         {cooldown > 0 ? (
-                            <p className={`text-sm font-medium ${textClr} mt-1`}>
-                                Resend in {String(Math.floor(cooldown / 60)).padStart(2, '0')}:{String(cooldown % 60).padStart(2, '0')}
+                            <p
+                                className={`text-sm font-medium ${textClr} mt-1`}
+                            >
+                                Resend in{' '}
+                                {String(Math.floor(cooldown / 60)).padStart(
+                                    2,
+                                    '0'
+                                )}
+                                :{String(cooldown % 60).padStart(2, '0')}
                             </p>
                         ) : (
                             <button

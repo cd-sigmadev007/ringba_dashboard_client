@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAuth } from '@/contexts/AuthContext'
@@ -42,7 +42,10 @@ describe('usePermissions', () => {
         expect(result.current.isAuthenticated).toBe(true)
         expect(result.current.role).toBe('super_admin')
         expect(result.current.org_id).toBe('org-1')
-        expect(result.current.campaign_ids).toEqual(['campaign-1', 'campaign-2'])
+        expect(result.current.campaign_ids).toEqual([
+            'campaign-1',
+            'campaign-2',
+        ])
     })
 
     it('should return empty state for unauthenticated user', () => {

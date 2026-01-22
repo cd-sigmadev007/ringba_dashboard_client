@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import clsx from 'clsx'
+import { useNavigate } from '@tanstack/react-router'
 import { Modal } from './Modal'
 import { useThemeStore } from '@/store/themeStore'
 import { ChevronDownDark, ChevronDownLight, DefaultAvatar } from '@/assets/svg'
 import { useClickOutside, useIsMobile } from '@/lib'
-import { useNavigate } from '@tanstack/react-router'
 
 interface UserDropdownProps {
     userName?: string

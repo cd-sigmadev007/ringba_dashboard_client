@@ -167,7 +167,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                         fill="#F64E60"
                                     />
                                 </svg>
-                                <p className="text-sm" style={{ color: '#F64E60' }}>
+                                <p
+                                    className="text-sm"
+                                    style={{ color: '#F64E60' }}
+                                >
                                     {error}
                                 </p>
                             </>

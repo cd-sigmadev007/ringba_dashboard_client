@@ -30,7 +30,10 @@ export const authApi = {
 
     completeOnboarding(firstName?: string, lastName?: string): Promise<void> {
         return apiClient
-            .post('/api/auth/complete-onboarding', { first_name: firstName, last_name: lastName })
+            .post('/api/auth/complete-onboarding', {
+                first_name: firstName,
+                last_name: lastName,
+            })
             .then(() => {})
     },
 

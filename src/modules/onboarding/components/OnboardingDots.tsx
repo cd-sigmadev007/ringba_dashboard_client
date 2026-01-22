@@ -13,7 +13,11 @@ export const OnboardingDots: React.FC<OnboardingDotsProps> = ({
     current,
     className,
 }) => (
-    <div className={cn('flex gap-1.5 items-center', className)} role="tablist" aria-label="Onboarding step">
+    <div
+        className={cn('flex gap-1.5 items-center', className)}
+        role="tablist"
+        aria-label="Onboarding step"
+    >
         {Array.from({ length: total }).map((_, i) => (
             <div
                 key={i}

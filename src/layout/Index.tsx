@@ -70,7 +70,14 @@ const RootLayout: React.FC = () => {
             navigate({ to: '/login' })
             return
         }
-    }, [isAuthenticated, loading, location.pathname, navigate, isAuthRoute, user])
+    }, [
+        isAuthenticated,
+        loading,
+        location.pathname,
+        navigate,
+        isAuthRoute,
+        user,
+    ])
 
     if (isAuthRoute) {
         return (

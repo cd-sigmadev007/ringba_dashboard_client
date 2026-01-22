@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { useFilterStore } from '@/modules/caller-analysis/store/filterStore'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { FilterState } from '@/modules/caller-analysis/types'
+import { useFilterStore } from '@/modules/caller-analysis/store/filterStore'
 
 describe('filterStore', () => {
     beforeEach(() => {
@@ -23,7 +23,7 @@ describe('filterStore', () => {
 
     it('should set filters', () => {
         const newFilters: FilterState = {
-            dateRange: { from: '2025-01-01', to: '2025-01-31' },
+            dateRange: { from: new Date('2025-01-01'), to: new Date('2025-01-31') },
             campaignFilter: ['campaign-1'],
             statusFilter: ['converted'],
             durationFilter: 'medium',
@@ -38,7 +38,7 @@ describe('filterStore', () => {
 
     it('should set temp filters', () => {
         const tempFilters: FilterState = {
-            dateRange: { from: '2025-01-01' },
+            dateRange: { from: new Date('2025-01-01') },
             campaignFilter: ['campaign-2'],
             statusFilter: [],
             durationFilter: 'all',
@@ -55,7 +55,7 @@ describe('filterStore', () => {
 
     it('should reset temp filters to current filters', () => {
         const filters: FilterState = {
-            dateRange: { from: '2025-01-01' },
+            dateRange: { from: new Date('2025-01-01') },
             campaignFilter: ['campaign-1'],
             statusFilter: ['converted'],
             durationFilter: 'medium',
@@ -76,7 +76,7 @@ describe('filterStore', () => {
 
     it('should apply temp filters to filters', () => {
         const tempFilters: FilterState = {
-            dateRange: { from: '2025-01-01' },
+            dateRange: { from: new Date('2025-01-01') },
             campaignFilter: ['campaign-1'],
             statusFilter: ['converted'],
             durationFilter: 'medium',
@@ -92,7 +92,7 @@ describe('filterStore', () => {
 
     it('should clear all filters', () => {
         const filters: FilterState = {
-            dateRange: { from: '2025-01-01' },
+            dateRange: { from: new Date('2025-01-01') },
             campaignFilter: ['campaign-1'],
             statusFilter: ['converted'],
             durationFilter: 'medium',

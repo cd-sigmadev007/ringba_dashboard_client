@@ -1,7 +1,7 @@
 import React from 'react'
+import { OnboardingDots } from './OnboardingDots'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
-import { OnboardingDots } from './OnboardingDots'
 
 import onboarding1Svg from '@/assets/svg/onboarding-1.svg'
 
@@ -26,17 +26,27 @@ export const OnboardingStep1Welcome: React.FC<OnboardingStep1WelcomeProps> = ({
     return (
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 justify-between items-center p-6">
             <div className="flex flex-col flex-1 w-full md:max-w-[300px]">
-                <h2 className={`text-2xl font-semibold ${textClr}`}>Welcome Aboard!</h2>
+                <h2 className={`text-2xl font-semibold ${textClr}`}>
+                    Welcome Aboard!
+                </h2>
                 <p className={`text-sm ${textMuted} mt-2 mb-6`}>
                     Let&apos;s set up your profile and get started!
                 </p>
                 <Button onClick={onLetsGo} className="w-full">
                     Let&apos;s Go!
                 </Button>
-                <OnboardingDots total={dots.total} current={dots.current} className="mt-8" />
+                <OnboardingDots
+                    total={dots.total}
+                    current={dots.current}
+                    className="mt-8"
+                />
             </div>
             <div className="flex-1 flex items-center justify-center w-full max-w-[240px] md:max-w-[280px]">
-                <img src={onboarding1Svg} alt="" className="w-full h-auto object-contain" />
+                <img
+                    src={onboarding1Svg}
+                    alt=""
+                    className="w-full h-auto object-contain"
+                />
             </div>
         </div>
     )

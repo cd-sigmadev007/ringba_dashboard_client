@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
-import type { AuthUser } from '@/contexts/AuthContext'
 import { createMockUser } from '../utils'
+import type { AuthUser } from '@/contexts/AuthContext'
 
 /**
  * Mock auth context for testing

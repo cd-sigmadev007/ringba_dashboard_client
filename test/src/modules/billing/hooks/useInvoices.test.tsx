@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
-import { useInvoices, useInvoice } from '@/modules/billing/hooks/useInvoices'
+import { useInvoice, useInvoices } from '@/modules/billing/hooks/useInvoices'
 import * as invoicesApi from '@/modules/billing/services/invoicesApi'
 
 vi.mock('@/modules/billing/services/invoicesApi', () => ({
@@ -17,7 +17,9 @@ const createWrapper = () => {
         },
     })
     const Wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+            {children}
+        </QueryClientProvider>
     )
     Wrapper.displayName = 'TestWrapper'
     return Wrapper
@@ -34,7 +36,9 @@ describe('useInvoices', () => {
             { id: '2', invoice_number: 'INV-002' },
         ]
 
-        vi.mocked(invoicesApi.fetchInvoices).mockResolvedValueOnce(mockInvoices as any)
+        vi.mocked(invoicesApi.fetchInvoices).mockResolvedValueOnce(
+            mockInvoices as any
+        )
 
         const { result } = renderHook(() => useInvoices(), {
             wrapper: createWrapper(),
@@ -48,7 +52,9 @@ describe('useInvoices', () => {
     })
 
     it('should handle fetch error', async () => {
-        vi.mocked(invoicesApi.fetchInvoices).mockRejectedValueOnce(new Error('Failed'))
+        vi.mocked(invoicesApi.fetchInvoices).mockRejectedValueOnce(
+            new Error('Failed')
+        )
 
         const { result } = renderHook(() => useInvoices(), {
             wrapper: createWrapper(),
@@ -67,7 +73,9 @@ describe('useInvoice', () => {
     it('should fetch single invoice', async () => {
         const mockInvoice = { id: '1', invoice_number: 'INV-001' }
 
-        vi.mocked(invoicesApi.getInvoiceById).mockResolvedValueOnce(mockInvoice as any)
+        vi.mocked(invoicesApi.getInvoiceById).mockResolvedValueOnce(
+            mockInvoice as any
+        )
 
         const { result } = renderHook(() => useInvoice('1'), {
             wrapper: createWrapper(),

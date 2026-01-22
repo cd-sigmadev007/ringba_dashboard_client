@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
-import { mapApiDataToHistoryEntries } from '@/modules/caller-analysis/utils/historyUtils'
+import { describe, expect, it, vi } from 'vitest'
 import type { FrontendCallerData } from '@/types/api'
+import { mapApiDataToHistoryEntries } from '@/modules/caller-analysis/utils/historyUtils'
 
 // Mock dependencies
 vi.mock('@/modules/caller-analysis/utils/dateUtils', () => ({
@@ -21,13 +21,18 @@ vi.mock('@/lib/utils/format', () => ({
 describe('historyUtils', () => {
     describe('mapApiDataToHistoryEntries', () => {
         it('should map API data to history entries', () => {
-            const apiData: FrontendCallerData[] = [
+            const apiData: Array<FrontendCallerData> = [
                 {
+                    id: '1',
+                    callerId: 'caller-1',
                     lastCall: 'Nov 07, 2025, 08:08:30 PM ET',
                     duration: '2m 30s',
+                    lifetimeRevenue: 100,
                     revenue: 100,
-                    latestPayout: 50,
+                    latestPayout: '50',
                     campaign: 'campaign-1',
+                    action: 'converted',
+                    status: ['converted'],
                     audioUrl: 'http://example.com/audio.mp3',
                     transcript: '00:00 A - Hello',
                 } as FrontendCallerData,
@@ -49,15 +54,39 @@ describe('historyUtils', () => {
         })
 
         it('should determine converted status from payout', () => {
-            const apiData: FrontendCallerData[] = [
+            const apiData: Array<FrontendCallerData> = [
                 {
-                    latestPayout: 50,
+                    id: '1',
+                    callerId: 'caller-1',
+                    lastCall: '',
+                    duration: '',
+                    lifetimeRevenue: 0,
+                    campaign: '',
+                    action: '',
+                    status: [],
+                    latestPayout: '50',
                 } as FrontendCallerData,
                 {
-                    latestPayout: 0,
+                    id: '2',
+                    callerId: 'caller-2',
+                    lastCall: '',
+                    duration: '',
+                    lifetimeRevenue: 0,
+                    campaign: '',
+                    action: '',
+                    status: [],
+                    latestPayout: '0',
                 } as FrontendCallerData,
                 {
-                    latestPayout: -10,
+                    id: '3',
+                    callerId: 'caller-3',
+                    lastCall: '',
+                    duration: '',
+                    lifetimeRevenue: 0,
+                    campaign: '',
+                    action: '',
+                    status: [],
+                    latestPayout: '-10',
                 } as FrontendCallerData,
             ]
 
@@ -69,7 +98,7 @@ describe('historyUtils', () => {
         })
 
         it('should extract first campaign ID from comma-separated campaigns', () => {
-            const apiData: FrontendCallerData[] = [
+            const apiData: Array<FrontendCallerData> = [
                 {
                     campaign: 'campaign-1, campaign-2, campaign-3',
                 } as FrontendCallerData,
@@ -81,9 +110,16 @@ describe('historyUtils', () => {
         })
 
         it('should handle missing campaign', () => {
-            const apiData: FrontendCallerData[] = [
+            const apiData: Array<FrontendCallerData> = [
                 {
-                    campaign: undefined,
+                    id: '1',
+                    callerId: 'caller-1',
+                    lastCall: '',
+                    duration: '',
+                    lifetimeRevenue: 0,
+                    campaign: '',
+                    action: '',
+                    status: [],
                 } as FrontendCallerData,
             ]
 
@@ -93,7 +129,7 @@ describe('historyUtils', () => {
         })
 
         it('should handle invalid revenue values', () => {
-            const apiData: FrontendCallerData[] = [
+            const apiData: Array<FrontendCallerData> = [
                 {
                     revenue: 'invalid',
                 } as any,

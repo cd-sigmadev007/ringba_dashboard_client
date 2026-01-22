@@ -1,17 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import axios from 'axios'
+import type {
+    CreateInvoiceRequest,
+    Invoice,
+    UpdateInvoiceRequest,
+} from '@/modules/billing/types'
 import {
+    createInvoice,
+    deleteInvoice,
+    downloadInvoicePDF,
     fetchInvoices,
     getInvoiceById,
-    createInvoice,
-    updateInvoice,
-    deleteInvoice,
-    sendInvoice,
-    downloadInvoicePDF,
     saveDraft,
+    sendInvoice,
+    updateInvoice,
 } from '@/modules/billing/services/invoicesApi'
 import { apiClient } from '@/services/api'
-import axios from 'axios'
-import type { CreateInvoiceRequest, UpdateInvoiceRequest, Invoice } from '@/modules/billing/types'
 
 // Mock apiClient
 vi.mock('@/services/api', () => ({
@@ -24,16 +28,11 @@ vi.mock('@/services/api', () => ({
 }))
 
 // Mock axios for downloadInvoicePDF
-vi.mock('axios', async () => {
-    const actual = await vi.importActual('axios')
-    return {
-        ...actual,
-        default: {
-            ...actual.default,
-            get: vi.fn(),
-        },
-    }
-})
+vi.mock('axios', () => ({
+    default: {
+        get: vi.fn(),
+    },
+}))
 
 describe('invoicesApi', () => {
     beforeEach(() => {
@@ -42,7 +41,7 @@ describe('invoicesApi', () => {
 
     describe('fetchInvoices', () => {
         it('should fetch all invoices', async () => {
-            const mockInvoices: Invoice[] = [
+            const mockInvoices: Array<Invoice> = [
                 { id: '1', invoice_number: 'INV-001' } as Invoice,
                 { id: '2', invoice_number: 'INV-002' } as Invoice,
             ]
@@ -60,7 +59,10 @@ describe('invoicesApi', () => {
 
     describe('getInvoiceById', () => {
         it('should fetch invoice by ID', async () => {
-            const mockInvoice: Invoice = { id: '1', invoice_number: 'INV-001' } as Invoice
+            const mockInvoice: Invoice = {
+                id: '1',
+                invoice_number: 'INV-001',
+            } as Invoice
 
             vi.mocked(apiClient.get).mockResolvedValueOnce({
                 data: mockInvoice,
@@ -78,8 +80,19 @@ describe('invoicesApi', () => {
             const invoiceData: CreateInvoiceRequest = {
                 invoice_date: '2025-01-01',
                 due_date: '2025-01-31',
-                billed_by_name: 'Test Company',
-            } as CreateInvoiceRequest
+                billed_by_id: 'billed-by-1',
+                billed_to_id: 'billed-to-1',
+                billed_to_type: 'organization',
+                currency_code: 'USD',
+                currency_symbol: '$',
+                items: [
+                    {
+                        description: 'Test Item',
+                        quantity: 1,
+                        unit_price: 1000,
+                    },
+                ],
+            }
 
             const mockInvoice: Invoice = { id: '1', ...invoiceData } as Invoice
 
@@ -113,7 +126,8 @@ describe('invoicesApi', () => {
 
             await createInvoice(invoiceData, logoFile)
 
-            const formDataCall = vi.mocked(apiClient.post).mock.calls[0][1] as FormData
+            const formDataCall = vi.mocked(apiClient.post).mock
+                .calls[0][1] as FormData
             expect(formDataCall).toBeInstanceOf(FormData)
         })
     })
@@ -151,7 +165,9 @@ describe('invoicesApi', () => {
 
             await deleteInvoice('1')
 
-            expect(apiClient.delete).toHaveBeenCalledWith('/api/admin/invoices/1')
+            expect(apiClient.delete).toHaveBeenCalledWith(
+                '/api/admin/invoices/1'
+            )
         })
     })
 
@@ -161,13 +177,17 @@ describe('invoicesApi', () => {
 
             await sendInvoice('1')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/admin/invoices/1/send')
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/admin/invoices/1/send'
+            )
         })
     })
 
     describe('downloadInvoicePDF', () => {
         it('should download invoice PDF', async () => {
-            const mockBlob = new Blob(['pdf content'], { type: 'application/pdf' })
+            const mockBlob = new Blob(['pdf content'], {
+                type: 'application/pdf',
+            })
             // downloadInvoicePDF uses axios directly, not apiClient
             vi.mocked(axios.get).mockResolvedValueOnce({
                 data: mockBlob,

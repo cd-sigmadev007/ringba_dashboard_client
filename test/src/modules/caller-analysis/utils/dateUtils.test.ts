@@ -1,6 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { parseLastCallDateAndTime } from '@/modules/caller-analysis/utils/dateUtils'
-import dayjs from 'dayjs'
 
 describe('dateUtils', () => {
     describe('parseLastCallDateAndTime', () => {
@@ -15,7 +14,9 @@ describe('dateUtils', () => {
         })
 
         it('should parse date with year format', () => {
-            const result = parseLastCallDateAndTime('Nov 07, 2025, 08:08:30 PM ET')
+            const result = parseLastCallDateAndTime(
+                'Nov 07, 2025, 08:08:30 PM ET'
+            )
             expect(result.date).toBe('Nov 07, 2025')
             expect(result.time).toBe('08:08:30 PM ET')
         })

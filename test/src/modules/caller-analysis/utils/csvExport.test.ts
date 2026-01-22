@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { exportToCSV } from '@/modules/caller-analysis/utils/csvExport'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CallData } from '@/modules/caller-analysis/types'
+import { exportToCSV } from '@/modules/caller-analysis/utils/csvExport'
 
 describe('csvExport', () => {
     let createElementSpy: any
@@ -16,9 +16,15 @@ describe('csvExport', () => {
             click: vi.fn(),
             style: {},
         }
-        createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any)
-        appendChildSpy = vi.spyOn(document.body, 'appendChild').mockImplementation(() => mockLink)
-        removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink)
+        createElementSpy = vi
+            .spyOn(document, 'createElement')
+            .mockReturnValue(mockLink)
+        appendChildSpy = vi
+            .spyOn(document.body, 'appendChild')
+            .mockImplementation(() => mockLink)
+        removeChildSpy = vi
+            .spyOn(document.body, 'removeChild')
+            .mockImplementation(() => mockLink)
         clickSpy = mockLink.click
 
         // Mock URL.createObjectURL and revokeObjectURL
@@ -31,7 +37,9 @@ describe('csvExport', () => {
     })
 
     it('should warn and return early when data is empty', () => {
-        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const consoleWarnSpy = vi
+            .spyOn(console, 'warn')
+            .mockImplementation(() => {})
         exportToCSV([])
         expect(consoleWarnSpy).toHaveBeenCalledWith('No data to export')
         expect(createElementSpy).not.toHaveBeenCalled()
@@ -39,7 +47,7 @@ describe('csvExport', () => {
     })
 
     it('should create CSV with headers and data', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 lastCall: 'Nov 07, 2025, 08:08:30 PM ET',
@@ -62,7 +70,10 @@ describe('csvExport', () => {
         exportToCSV(data)
 
         expect(createElementSpy).toHaveBeenCalledWith('a')
-        expect(mockLink.setAttribute).toHaveBeenCalledWith('href', 'blob:mock-url')
+        expect(mockLink.setAttribute).toHaveBeenCalledWith(
+            'href',
+            'blob:mock-url'
+        )
         expect(mockLink.setAttribute).toHaveBeenCalledWith(
             'download',
             expect.stringContaining('caller-analysis-')
@@ -74,7 +85,7 @@ describe('csvExport', () => {
     })
 
     it('should handle multiple rows', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 campaign: 'Campaign 1',
@@ -94,10 +105,15 @@ describe('csvExport', () => {
     })
 
     it('should handle empty values', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
+                id: '1',
                 callerId: '',
+                lastCall: '',
+                duration: '',
+                lifetimeRevenue: 0,
                 campaign: '',
+                action: '',
                 status: [],
             } as CallData,
         ]
@@ -109,7 +125,7 @@ describe('csvExport', () => {
     })
 
     it('should handle array status values', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 status: ['converted', 'pending'],
@@ -123,7 +139,7 @@ describe('csvExport', () => {
     })
 
     it('should use custom filename when provided', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
             } as CallData,
@@ -131,11 +147,14 @@ describe('csvExport', () => {
 
         exportToCSV(data, 'custom-export.csv')
 
-        expect(mockLink.setAttribute).toHaveBeenCalledWith('download', 'custom-export.csv')
+        expect(mockLink.setAttribute).toHaveBeenCalledWith(
+            'download',
+            'custom-export.csv'
+        )
     })
 
     it('should escape CSV values with commas', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 address: '123 Main St, Apt 4B',
@@ -149,7 +168,7 @@ describe('csvExport', () => {
     })
 
     it('should escape CSV values with quotes', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 address: '123 "Main" St',
@@ -163,7 +182,7 @@ describe('csvExport', () => {
     })
 
     it('should handle numeric revenue values', () => {
-        const data: CallData[] = [
+        const data: Array<CallData> = [
             {
                 callerId: '+1234567890',
                 revenue: 100,

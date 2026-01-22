@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useOrgStore } from '@/modules/org/store/orgStore'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { OrgData } from '@/modules/org/store/orgStore'
+import { useOrgStore } from '@/modules/org/store/orgStore'
 
 // Mock fetch
 global.fetch = vi.fn()
@@ -45,7 +45,9 @@ describe('orgStore', () => {
 
             expect(useOrgStore.getState().org).toBe(null)
             expect(useOrgStore.getState().loading).toBe(false)
-            expect(useOrgStore.getState().error).toBe('Failed to load organization')
+            expect(useOrgStore.getState().error).toBe(
+                'Failed to load organization'
+            )
         })
 
         it('should set loading state during fetch', async () => {
@@ -97,7 +99,6 @@ describe('orgStore', () => {
                 name: 'Initial Name',
             }
             useOrgStore.setState({ org: initialOrg })
-
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: false,
             })
@@ -118,7 +119,6 @@ describe('orgStore', () => {
                 apiKeyMasked: 'old-key',
             }
             useOrgStore.setState({ org: initialOrg })
-
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ apiKeyMasked: 'new-key' }),
@@ -135,7 +135,6 @@ describe('orgStore', () => {
                 name: 'Test Org',
             }
             useOrgStore.setState({ org: initialOrg })
-
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: false,
             })

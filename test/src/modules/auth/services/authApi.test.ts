@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { authApi } from '@/modules/auth/services/authApi'
 import { apiClient } from '@/services/api'
 
@@ -22,7 +22,9 @@ describe('authApi', () => {
 
             const result = await authApi.validateInvite('token-123')
 
-            expect(apiClient.get).toHaveBeenCalledWith('/api/invitations/validate/token-123')
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/api/invitations/validate/token-123'
+            )
             expect(result).toEqual({ email: 'test@example.com' })
         })
 
@@ -42,9 +44,12 @@ describe('authApi', () => {
 
             await authApi.forgotPassword('test@example.com')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/forgot-password', {
-                email: 'test@example.com',
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/forgot-password',
+                {
+                    email: 'test@example.com',
+                }
+            )
         })
     })
 
@@ -76,10 +81,13 @@ describe('authApi', () => {
 
             await authApi.resetPassword('reset-token-123', 'newPassword123')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/reset-password', {
-                token: 'reset-token-123',
-                newPassword: 'newPassword123',
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/reset-password',
+                {
+                    token: 'reset-token-123',
+                    newPassword: 'newPassword123',
+                }
+            )
         })
     })
 
@@ -89,10 +97,13 @@ describe('authApi', () => {
 
             await authApi.requestOtp('test@example.com', 'login')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/request-otp', {
-                email: 'test@example.com',
-                purpose: 'login',
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/request-otp',
+                {
+                    email: 'test@example.com',
+                    purpose: 'login',
+                }
+            )
         })
 
         it('should request OTP for signup', async () => {
@@ -100,10 +111,13 @@ describe('authApi', () => {
 
             await authApi.requestOtp('test@example.com', 'signup')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/request-otp', {
-                email: 'test@example.com',
-                purpose: 'signup',
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/request-otp',
+                {
+                    email: 'test@example.com',
+                    purpose: 'signup',
+                }
+            )
         })
     })
 
@@ -113,10 +127,13 @@ describe('authApi', () => {
 
             await authApi.completeOnboarding('John', 'Doe')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/complete-onboarding', {
-                first_name: 'John',
-                last_name: 'Doe',
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/complete-onboarding',
+                {
+                    first_name: 'John',
+                    last_name: 'Doe',
+                }
+            )
         })
 
         it('should complete onboarding with only first name', async () => {
@@ -124,10 +141,13 @@ describe('authApi', () => {
 
             await authApi.completeOnboarding('John')
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/complete-onboarding', {
-                first_name: 'John',
-                last_name: undefined,
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/complete-onboarding',
+                {
+                    first_name: 'John',
+                    last_name: undefined,
+                }
+            )
         })
 
         it('should complete onboarding without names', async () => {
@@ -135,10 +155,13 @@ describe('authApi', () => {
 
             await authApi.completeOnboarding()
 
-            expect(apiClient.post).toHaveBeenCalledWith('/api/auth/complete-onboarding', {
-                first_name: undefined,
-                last_name: undefined,
-            })
+            expect(apiClient.post).toHaveBeenCalledWith(
+                '/api/auth/complete-onboarding',
+                {
+                    first_name: undefined,
+                    last_name: undefined,
+                }
+            )
         })
     })
 })

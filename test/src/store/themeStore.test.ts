@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { useThemeStore } from '@/store/themeStore'
 
 describe('themeStore', () => {
@@ -52,18 +52,30 @@ describe('themeStore', () => {
 
     it('should apply theme class to document element', () => {
         useThemeStore.getState().setTheme('light')
-        expect(document.documentElement.classList.contains('theme-light')).toBe(true)
-        expect(document.documentElement.classList.contains('theme-dark')).toBe(false)
+        expect(document.documentElement.classList.contains('theme-light')).toBe(
+            true
+        )
+        expect(document.documentElement.classList.contains('theme-dark')).toBe(
+            false
+        )
 
         useThemeStore.getState().setTheme('dark')
-        expect(document.documentElement.classList.contains('theme-dark')).toBe(true)
-        expect(document.documentElement.classList.contains('theme-light')).toBe(false)
+        expect(document.documentElement.classList.contains('theme-dark')).toBe(
+            true
+        )
+        expect(document.documentElement.classList.contains('theme-light')).toBe(
+            false
+        )
     })
 
     it('should remove both theme classes before adding new one', () => {
         document.documentElement.classList.add('theme-light')
         useThemeStore.getState().setTheme('dark')
-        expect(document.documentElement.classList.contains('theme-light')).toBe(false)
-        expect(document.documentElement.classList.contains('theme-dark')).toBe(true)
+        expect(document.documentElement.classList.contains('theme-light')).toBe(
+            false
+        )
+        expect(document.documentElement.classList.contains('theme-dark')).toBe(
+            true
+        )
     })
 })

@@ -60,7 +60,9 @@ export const InviteStep2Form: React.FC<InviteStep2FormProps> = ({
                 <div className="flex justify-center mb-6">
                     <Logo />
                 </div>
-                <h1 className={`text-xl font-semibold ${textClr} text-center`}>Welcome</h1>
+                <h1 className={`text-xl font-semibold ${textClr} text-center`}>
+                    Welcome
+                </h1>
                 <p className={`text-sm ${textMuted} mt-1 mb-2 text-center`}>
                     Create a new account.
                 </p>

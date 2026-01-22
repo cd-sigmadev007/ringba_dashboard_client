@@ -1,13 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+import type { DurationRange } from '@/components'
 import {
-    parseDuration,
     matchesCampaignFilter,
-    matchesStatusFilter,
     matchesDurationFilter,
     matchesDurationRange,
     matchesSearchQuery,
+    matchesStatusFilter,
+    parseDuration,
 } from '@/modules/caller-analysis/utils/filterUtils'
-import type { DurationRange } from '@/components'
 
 describe('filterUtils', () => {
     describe('parseDuration', () => {
@@ -43,34 +43,65 @@ describe('filterUtils', () => {
         })
 
         it('should match single filter', () => {
-            expect(matchesCampaignFilter('Campaign A', ['Campaign A'])).toBe(true)
+            expect(matchesCampaignFilter('Campaign A', ['Campaign A'])).toBe(
+                true
+            )
             expect(matchesCampaignFilter('Campaign A', ['Campaign'])).toBe(true)
             expect(matchesCampaignFilter('Campaign A', ['A'])).toBe(true)
             expect(matchesCampaignFilter('Campaign A', ['B'])).toBe(false)
         })
 
         it('should match any filter when multiple filters provided', () => {
-            expect(matchesCampaignFilter('Campaign A', ['Campaign A', 'Campaign B'])).toBe(true)
-            expect(matchesCampaignFilter('Campaign B', ['Campaign A', 'Campaign B'])).toBe(true)
-            expect(matchesCampaignFilter('Campaign C', ['Campaign A', 'Campaign B'])).toBe(false)
+            expect(
+                matchesCampaignFilter('Campaign A', [
+                    'Campaign A',
+                    'Campaign B',
+                ])
+            ).toBe(true)
+            expect(
+                matchesCampaignFilter('Campaign B', [
+                    'Campaign A',
+                    'Campaign B',
+                ])
+            ).toBe(true)
+            expect(
+                matchesCampaignFilter('Campaign C', [
+                    'Campaign A',
+                    'Campaign B',
+                ])
+            ).toBe(false)
         })
 
         it('should handle filter combinations with commas', () => {
             // For comma-separated filters, the code splits by comma, trims, and checks if campaign contains ALL parts
             // "Campaign A Campaign B" contains both "Campaign A" and "Campaign B" (after trim)
-            expect(matchesCampaignFilter('Campaign A Campaign B', ['Campaign A, Campaign B'])).toBe(true)
+            expect(
+                matchesCampaignFilter('Campaign A Campaign B', [
+                    'Campaign A, Campaign B',
+                ])
+            ).toBe(true)
             // "Campaign A" doesn't contain "Campaign B", so it should be false
-            expect(matchesCampaignFilter('Campaign A', ['Campaign A, Campaign B'])).toBe(false)
+            expect(
+                matchesCampaignFilter('Campaign A', ['Campaign A, Campaign B'])
+            ).toBe(false)
             // "Campaign A B C" contains both "A" and "B" (after trim)
             expect(matchesCampaignFilter('Campaign A B C', ['A, B'])).toBe(true)
             // "Campaign A B" doesn't contain "Campaign A" as a substring (it's "Campaign" + "A" + "B")
             // So it won't match "Campaign A, Campaign B" filter
-            expect(matchesCampaignFilter('Campaign A B', ['Campaign A, Campaign B'])).toBe(false)
+            expect(
+                matchesCampaignFilter('Campaign A B', [
+                    'Campaign A, Campaign B',
+                ])
+            ).toBe(false)
         })
 
         it('should trim filter strings', () => {
-            expect(matchesCampaignFilter('Campaign A', [' Campaign A '])).toBe(true)
-            expect(matchesCampaignFilter('Campaign A', ['  Campaign  '])).toBe(true)
+            expect(matchesCampaignFilter('Campaign A', [' Campaign A '])).toBe(
+                true
+            )
+            expect(matchesCampaignFilter('Campaign A', ['  Campaign  '])).toBe(
+                true
+            )
         })
     })
 
@@ -81,14 +112,22 @@ describe('filterUtils', () => {
 
         it('should match when status array includes filter', () => {
             expect(matchesStatusFilter(['converted'], ['converted'])).toBe(true)
-            expect(matchesStatusFilter(['converted', 'pending'], ['converted'])).toBe(true)
+            expect(
+                matchesStatusFilter(['converted', 'pending'], ['converted'])
+            ).toBe(true)
             expect(matchesStatusFilter(['converted'], ['pending'])).toBe(false)
         })
 
         it('should match any filter when multiple filters provided', () => {
-            expect(matchesStatusFilter(['converted'], ['converted', 'pending'])).toBe(true)
-            expect(matchesStatusFilter(['pending'], ['converted', 'pending'])).toBe(true)
-            expect(matchesStatusFilter(['failed'], ['converted', 'pending'])).toBe(false)
+            expect(
+                matchesStatusFilter(['converted'], ['converted', 'pending'])
+            ).toBe(true)
+            expect(
+                matchesStatusFilter(['pending'], ['converted', 'pending'])
+            ).toBe(true)
+            expect(
+                matchesStatusFilter(['failed'], ['converted', 'pending'])
+            ).toBe(false)
         })
     })
 
@@ -185,7 +224,9 @@ describe('filterUtils', () => {
         })
 
         it('should handle phone numbers with formatting', () => {
-            expect(matchesSearchQuery('+1 (234) 567-890', '1234567890')).toBe(true)
+            expect(matchesSearchQuery('+1 (234) 567-890', '1234567890')).toBe(
+                true
+            )
             expect(matchesSearchQuery('+1-234-567-890', '234')).toBe(true)
         })
 

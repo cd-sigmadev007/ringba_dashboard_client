@@ -176,6 +176,7 @@ export type { Invoice, CreateInvoiceRequest } from './types'
 ```
 
 **Key Characteristics:**
+
 - Clean public API via `index.ts`
 - Self-contained with minimal cross-module dependencies
 - Clear separation of concerns (components, hooks, services, types)
@@ -183,6 +184,7 @@ export type { Invoice, CreateInvoiceRequest } from './types'
 #### Example: `caller-analysis` Module
 
 This module demonstrates a more complex structure with:
+
 - Multiple stores (`filterStore`, `columnStore`)
 - Container components (`CallerAnalysisContainer`)
 - Complex hooks (`useCallerAnalysis`, `useCallerAnalysisApi`)
@@ -217,14 +219,27 @@ export class ApiClient {
 
     // HTTP methods
     async get<T>(url: string, config?: AxiosRequestConfig): Promise<T>
-    async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
-    async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    async post<T>(
+        url: string,
+        data?: any,
+        config?: AxiosRequestConfig
+    ): Promise<T>
+    async put<T>(
+        url: string,
+        data?: any,
+        config?: AxiosRequestConfig
+    ): Promise<T>
     async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T>
-    async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    async patch<T>(
+        url: string,
+        data?: any,
+        config?: AxiosRequestConfig
+    ): Promise<T>
 }
 ```
 
 **Features:**
+
 - Automatic token injection via interceptors
 - 401 retry logic with token refresh
 - Centralized error handling
@@ -252,7 +267,7 @@ export async function createInvoice(
 ): Promise<Invoice> {
     const formData = new FormData()
     // ... form data preparation
-    
+
     const response = await apiClient.post<InvoiceResponse>(
         '/api/admin/invoices',
         formData,
@@ -267,6 +282,7 @@ export async function createInvoice(
 ```
 
 **Service Function Guidelines:**
+
 - One service file per resource/domain
 - Functions are pure and typed
 - Handle data transformation (FormData, query params)
@@ -363,11 +379,13 @@ export function useCreateInvoice() {
 ```
 
 **Query Key Conventions:**
+
 - Use hierarchical keys: `['module', 'resource', 'id']`
 - Examples: `['billing', 'invoices']`, `['caller', id]`, `['org', 'campaigns']`
 - Include filters/params in keys for proper caching
 
 **Best Practices:**
+
 - Use `useQuery` for reads
 - Use `useMutation` for writes
 - Invalidate related queries on mutations
@@ -384,9 +402,10 @@ Client-side state is managed with Zustand stores:
 // store/themeStore.ts
 export const useThemeStore = create<ThemeState>((set) => ({
     theme: 'dark',
-    toggleTheme: () => set((state) => ({ 
-        theme: state.theme === 'light' ? 'dark' : 'light' 
-    })),
+    toggleTheme: () =>
+        set((state) => ({
+            theme: state.theme === 'light' ? 'dark' : 'light',
+        })),
     setTheme: (theme) => set({ theme }),
 }))
 ```
@@ -401,7 +420,7 @@ export const useFilterStore = create<FilterStore>()(
             filters: initialFilterState,
             tempFilters: initialFilterState,
             setFilters: (filters) => set({ filters }),
-            applyTempFilters: () => 
+            applyTempFilters: () =>
                 set((state) => ({ filters: state.tempFilters })),
         }),
         {
@@ -413,6 +432,7 @@ export const useFilterStore = create<FilterStore>()(
 ```
 
 **Store Patterns:**
+
 - Use Zustand for UI state, filters, preferences
 - Use `persist` middleware for localStorage persistence
 - Keep stores focused and single-purpose
@@ -454,6 +474,7 @@ const [searchQuery, setSearchQuery] = useState('')
 ```
 
 **When to Use:**
+
 - UI-only state (modals, dropdowns, form inputs)
 - Temporary state that doesn't need persistence
 - State that doesn't need to be shared
@@ -533,6 +554,7 @@ export enum UserRole {
 ```
 
 **Role Definitions:**
+
 - **`super_admin`**: Full system access, can manage all organizations and users
 - **`org_admin`**: Organization-level admin, can manage their organization and users
 - **`media_buyer`**: Limited access, can view assigned campaigns and caller analysis
@@ -547,18 +569,19 @@ import { usePermissions } from '@/hooks/usePermissions'
 
 export function MyComponent() {
     const { role, org_id, campaign_ids, isAuthenticated, isLoading } = usePermissions()
-    
+
     // Check if user has access
     const canAccess = role === 'super_admin' || role === 'org_admin'
-    
+
     if (isLoading) return <div>Loading...</div>
     if (!canAccess) return <div>Access Denied</div>
-    
+
     return <div>Protected Content</div>
 }
 ```
 
 **Hook Returns:**
+
 - `role`: UserRole | null - Current user's role
 - `org_id`: string | null - User's organization ID
 - `campaign_ids`: Array<string> - User's assigned campaign IDs
@@ -575,12 +598,12 @@ Protect entire pages by checking role at the component level:
 // modules/org/pages/UsersPage.tsx
 export default function UsersPage() {
     const { role, isLoading } = usePermissions()
-    
+
     // Access control: Only super_admin and org_admin can access
     const canAccess = role === 'super_admin' || role === 'org_admin'
-    
+
     if (isLoading) return <div>Loading...</div>
-    
+
     if (!canAccess) {
         return (
             <div>
@@ -589,7 +612,7 @@ export default function UsersPage() {
             </div>
         )
     }
-    
+
     return <UsersTable />
 }
 ```
@@ -630,7 +653,7 @@ Conditionally render features based on role:
 export default function CampaignsPage() {
     const { role } = usePermissions()
     const canManageCampaigns = role === 'super_admin' || role === 'org_admin'
-    
+
     return (
         <div>
             <CampaignsTable />
@@ -650,12 +673,12 @@ export default function CampaignsPage() {
 // Billing pages should check access
 export default function InvoicesPage() {
     const { role, isLoading } = usePermissions()
-    
+
     // Billing access: Only super_admin and org_admin
     const canAccessBilling = role === 'super_admin' || role === 'org_admin'
-    
+
     if (isLoading) return <div>Loading...</div>
-    
+
     if (!canAccessBilling) {
         return (
             <div>
@@ -664,18 +687,20 @@ export default function InvoicesPage() {
             </div>
         )
     }
-    
+
     return <InvoicesTable />
 }
 ```
 
 **Billing Navigation:**
+
 - The billing menu item in navigation should be hidden for `media_buyer` role
 - All billing routes (`/billing/*`) should check access before rendering
 
 **Billing Routes:**
+
 - `/billing/invoices` - Invoices management
-- `/billing/customers` - Customers management  
+- `/billing/customers` - Customers management
 - `/billing/organizations` - Organizations management
 
 All these routes should implement the access control check shown above.
@@ -717,19 +742,19 @@ interface ProtectedComponentProps {
     fallback?: React.ReactNode
 }
 
-export function ProtectedComponent({ 
-    allowedRoles, 
-    children, 
-    fallback 
+export function ProtectedComponent({
+    allowedRoles,
+    children,
+    fallback
 }: ProtectedComponentProps) {
     const { role, isLoading } = usePermissions()
-    
+
     if (isLoading) return <div>Loading...</div>
-    
+
     if (!role || !allowedRoles.includes(role)) {
         return fallback || <div>Access Denied</div>
     }
-    
+
     return <>{children}</>
 }
 
@@ -746,30 +771,30 @@ export function ProtectedComponent({
 ### Component Hierarchy
 
 1. **UI Components** (`components/ui/`)
-   - Base, reusable components
-   - Examples: `Button`, `Input`, `Modal`, `Table`, `Select`
-   - Use `class-variance-authority` for variants
-   - Fully typed with TypeScript
+    - Base, reusable components
+    - Examples: `Button`, `Input`, `Modal`, `Table`, `Select`
+    - Use `class-variance-authority` for variants
+    - Fully typed with TypeScript
 
 2. **Common Components** (`components/common/`)
-   - Shared components used across modules
-   - Examples: `Search`, `Tooltip`
-   - Combine multiple UI components
+    - Shared components used across modules
+    - Examples: `Search`, `Tooltip`
+    - Combine multiple UI components
 
 3. **Module Components** (`modules/{module}/components/`)
-   - Feature-specific components
-   - Examples: `InvoicesTable`, `CallerAnalysisContainer`
-   - Use module hooks and services
+    - Feature-specific components
+    - Examples: `InvoicesTable`, `CallerAnalysisContainer`
+    - Use module hooks and services
 
 4. **Page Components** (`modules/{module}/pages/`)
-   - Route-level components
-   - Examples: `InvoicesPage`, `DashboardPage`
-   - Compose module components and hooks
+    - Route-level components
+    - Examples: `InvoicesPage`, `DashboardPage`
+    - Compose module components and hooks
 
 5. **Container Components** (`modules/{module}/containers/`)
-   - Smart components with business logic
-   - Examples: `CallerAnalysisContainer`, `OnboardingModalContainer`
-   - Bridge between pages and presentational components
+    - Smart components with business logic
+    - Examples: `CallerAnalysisContainer`, `OnboardingModalContainer`
+    - Bridge between pages and presentational components
 
 ### Component Patterns
 
@@ -795,7 +820,7 @@ const buttonVariants = cva(
     }
 )
 
-interface ButtonProps 
+interface ButtonProps
     extends ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof buttonVariants> {
     loading?: boolean
@@ -820,9 +845,9 @@ import { Button } from '@/components/ui/Button'
 
 export function InvoicesTable() {
     const { data: invoices, isLoading } = useInvoices()
-    
+
     if (isLoading) return <div>Loading...</div>
-    
+
     return (
         <table>
             {/* table content */}
@@ -850,7 +875,7 @@ export function useInvoices() {
 
 export function useCreateInvoice() {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: createInvoice,
         onSuccess: () => {
@@ -888,24 +913,28 @@ export function useInvoice(id: string | null) {
 ```typescript
 export function useUpdateInvoice() {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: ({ id, data }) => updateInvoice(id, data),
         onMutate: async ({ id, data }) => {
             // Cancel outgoing refetches
-            await queryClient.cancelQueries({ 
-                queryKey: ['billing', 'invoices', id] 
+            await queryClient.cancelQueries({
+                queryKey: ['billing', 'invoices', id],
             })
-            
+
             // Snapshot previous value
-            const previous = queryClient.getQueryData(['billing', 'invoices', id])
-            
+            const previous = queryClient.getQueryData([
+                'billing',
+                'invoices',
+                id,
+            ])
+
             // Optimistically update
             queryClient.setQueryData(['billing', 'invoices', id], (old) => ({
                 ...old,
                 ...data,
             }))
-            
+
             return { previous }
         },
         onError: (err, variables, context) => {
@@ -930,24 +959,29 @@ export function useUpdateInvoice() {
 // modules/caller-analysis/hooks/useCallerAnalysisApi.ts
 export const useCallerAnalysisApi = () => {
     const queryClient = useQueryClient()
-    
+
     const getCallersQueryKey = (params: CallerQueryParams = {}) => [
         'callers',
         params,
     ]
-    
-    const useGetAllCallers = (filters: FilterState, page: number, limit: number) => {
-        const queryParams = callerApiService.convertFilterStateToQueryParams(filters)
+
+    const useGetAllCallers = (
+        filters: FilterState,
+        page: number,
+        limit: number
+    ) => {
+        const queryParams =
+            callerApiService.convertFilterStateToQueryParams(filters)
         queryParams.page = page
         queryParams.limit = limit
-        
+
         return useQuery({
             queryKey: getCallersQueryKey(queryParams),
             queryFn: () => callerApiService.getAllCallers(queryParams),
             staleTime: 5 * 60 * 1000,
         })
     }
-    
+
     return {
         useGetAllCallers,
         // ... other hooks
@@ -1068,6 +1102,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
 ```
 
 **Theme Classes:**
+
 - `theme-dark`: Applied to `html` element for dark mode
 - `theme-light`: Applied to `html` element for light mode
 - CSS custom properties defined in `styles/main.css`
@@ -1262,6 +1297,7 @@ import { Button } from '../../../components/ui/Button'
 5. Update navigation to hide items for restricted roles
 
 **Example for Billing:**
+
 ```typescript
 // In billing pages
 const { role, isLoading } = usePermissions()
@@ -1285,6 +1321,7 @@ This architecture provides:
 - **Testability**: Isolated modules and pure functions
 
 For more details, refer to:
+
 - `CLIENT_ARCHITECTURE.md` - High-level architecture overview
 - `STRUCTURE.md` - Project structure details
 - Individual module `README.md` files for module-specific documentation

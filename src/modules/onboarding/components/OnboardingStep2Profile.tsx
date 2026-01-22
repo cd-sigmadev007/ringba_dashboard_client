@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
+import { OnboardingDots } from './OnboardingDots'
 import { Input } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
-import { OnboardingDots } from './OnboardingDots'
 
 export interface OnboardingStep2ProfileProps {
     initialFirstName: string
@@ -43,31 +43,37 @@ export const OnboardingStep2Profile: React.FC<OnboardingStep2ProfileProps> = ({
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 justify-between items-stretch p-6">
             {/* Left: title, description, dots at bottom (Figma 2439-34655) */}
             <div className="flex flex-col flex-1 min-w-0 md:max-w-[300px]">
-                <h2 className={`text-2xl font-semibold ${textClr}`}>Profile Setup</h2>
+                <h2 className={`text-2xl font-semibold ${textClr}`}>
+                    Profile Setup
+                </h2>
                 <p className={`text-sm ${textMuted} mt-2`}>
                     Provide your name and set-up your passwords.
                 </p>
-                <OnboardingDots total={dots.total} current={dots.current} className="mt-auto pt-6 md:pt-0 self-start" />
+                <OnboardingDots
+                    total={dots.total}
+                    current={dots.current}
+                    className="mt-auto pt-6 md:pt-0 self-start"
+                />
             </div>
             {/* Right: form */}
             <div className="flex flex-col gap-[40px] flex-1 w-full min-w-0 md:max-w-[300px]">
                 <div className="flex flex-col gap-4">
-                <Input
-                    label="First Name"
-                    value={firstName}
-                    onChange={(e) => {
-                        setFirstName(e.target.value)
-                        setError((e) => ({ ...e, firstName: undefined }))
-                    }}
-                    placeholder="First name"
-                    error={error.firstName}
-                />
-                <Input
-                    label="Last Name (optional)"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last name"
-                />
+                    <Input
+                        label="First Name"
+                        value={firstName}
+                        onChange={(e) => {
+                            setFirstName(e.target.value)
+                            setError((prev) => ({ ...prev, firstName: undefined }))
+                        }}
+                        placeholder="First name"
+                        error={error.firstName}
+                    />
+                    <Input
+                        label="Last Name (optional)"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last name"
+                    />
                 </div>
                 <Button onClick={handleContinue} className="w-full mt-4">
                     Continue

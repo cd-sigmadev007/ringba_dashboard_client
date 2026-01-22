@@ -1,7 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type {
+    CreateUserRequest,
+    UserDto,
+} from '@/modules/org/services/usersApi'
 import { useUsersStore } from '@/modules/org/store/usersStore'
 import { usersApi } from '@/modules/org/services/usersApi'
-import type { UserDto, CreateUserRequest } from '@/modules/org/services/usersApi'
 
 // Mock usersApi
 vi.mock('@/modules/org/services/usersApi', () => ({
@@ -30,10 +33,10 @@ describe('usersStore', () => {
 
     describe('fetchUsers', () => {
         it('should fetch and set users', async () => {
-            const mockUsers: UserDto[] = [
+            const mockUsers: Array<UserDto> = [
                 { id: '1', email: 'user1@example.com', role: 'media_buyer' },
                 { id: '2', email: 'user2@example.com', role: 'org_admin' },
-            ] as UserDto[]
+            ] as Array<UserDto>
 
             vi.mocked(usersApi.fetchUsers).mockResolvedValueOnce(mockUsers)
 
@@ -47,7 +50,9 @@ describe('usersStore', () => {
             const error = new Error('Failed to fetch')
             vi.mocked(usersApi.fetchUsers).mockRejectedValueOnce(error)
 
-            await expect(useUsersStore.getState().fetchUsers()).rejects.toThrow()
+            await expect(
+                useUsersStore.getState().fetchUsers()
+            ).rejects.toThrow()
 
             expect(useUsersStore.getState().error).toBeTruthy()
             expect(useUsersStore.getState().loading).toBe(false)
@@ -64,23 +69,25 @@ describe('usersStore', () => {
 
             const createRequest: CreateUserRequest = {
                 email: 'user3@example.com',
-                role: 'media_buyer',
             }
 
             vi.mocked(usersApi.createUser).mockResolvedValueOnce(newUser)
 
-            const result = await useUsersStore.getState().createUser(createRequest)
+            const result = await useUsersStore
+                .getState()
+                .createUser(createRequest)
 
             expect(result).toEqual(newUser)
             expect(useUsersStore.getState().users).toContainEqual(newUser)
         })
 
         it('should handle create errors', async () => {
-            vi.mocked(usersApi.createUser).mockRejectedValueOnce(new Error('Failed to create'))
+            vi.mocked(usersApi.createUser).mockRejectedValueOnce(
+                new Error('Failed to create')
+            )
 
             const result = await useUsersStore.getState().createUser({
                 email: 'user@example.com',
-                role: 'media_buyer',
             })
 
             expect(result).toBe(null)
@@ -90,10 +97,10 @@ describe('usersStore', () => {
 
     describe('deleteUser', () => {
         it('should remove user from store', async () => {
-            const users: UserDto[] = [
+            const users: Array<UserDto> = [
                 { id: '1', email: 'user1@example.com' },
                 { id: '2', email: 'user2@example.com' },
-            ] as UserDto[]
+            ] as Array<UserDto>
 
             useUsersStore.setState({ users })
 

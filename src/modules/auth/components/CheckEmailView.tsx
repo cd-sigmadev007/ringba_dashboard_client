@@ -22,7 +22,11 @@ export const CheckEmailView: React.FC<CheckEmailViewProps> = ({
     return (
         <AuthCard>
             <div className="p-6 sm:p-8 text-center">
-                <img src={tickPng} alt="" className="w-16 h-16 mx-auto mb-6 object-contain" />
+                <img
+                    src={tickPng}
+                    alt=""
+                    className="w-16 h-16 mx-auto mb-6 object-contain"
+                />
                 <h1 className={`text-xl font-semibold ${textClr}`}>
                     Check Your Email
                 </h1>

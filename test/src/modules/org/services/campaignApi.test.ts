@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { campaignApi } from '@/modules/org/services/campaignApi'
 import { apiClient } from '@/services/api'
 
@@ -32,7 +32,9 @@ describe('campaignApi', () => {
         const logoFile = new File([''], 'logo.png')
         const mockCampaign = { id: '1', ...campaignData }
 
-        vi.mocked(apiClient.post).mockResolvedValueOnce({ data: mockCampaign } as any)
+        vi.mocked(apiClient.post).mockResolvedValueOnce({
+            data: mockCampaign,
+        } as any)
 
         const result = await campaignApi.createCampaign(campaignData, logoFile)
 
@@ -47,7 +49,11 @@ describe('campaignApi', () => {
     })
 
     it('should update campaign', async () => {
-        const updateData = { name: 'Updated Campaign', campaign_id: null, description: null }
+        const updateData = {
+            name: 'Updated Campaign',
+            campaign_id: null,
+            description: null,
+        }
         const mockCampaign = { id: '1', ...updateData }
 
         vi.mocked(apiClient.put).mockResolvedValueOnce(mockCampaign as any)

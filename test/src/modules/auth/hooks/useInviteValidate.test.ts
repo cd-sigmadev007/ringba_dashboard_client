@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useInviteValidate } from '@/modules/auth/hooks/useInviteValidate'
 import { authApi } from '@/modules/auth/services/authApi'
@@ -29,7 +29,9 @@ describe('useInviteValidate', () => {
             writable: true,
         })
 
-        vi.mocked(authApi.validateInvite).mockResolvedValueOnce({ email: 'test@example.com' })
+        vi.mocked(authApi.validateInvite).mockResolvedValueOnce({
+            email: 'test@example.com',
+        })
 
         const { result } = renderHook(() => useInviteValidate())
 
@@ -56,7 +58,9 @@ describe('useInviteValidate', () => {
     })
 
     it('should handle invalid token', async () => {
-        vi.mocked(authApi.validateInvite).mockRejectedValueOnce(new Error('Invalid token'))
+        vi.mocked(authApi.validateInvite).mockRejectedValueOnce(
+            new Error('Invalid token')
+        )
 
         const { result } = renderHook(() => useInviteValidate())
 

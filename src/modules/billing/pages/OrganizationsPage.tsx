@@ -3,7 +3,7 @@
  * Main page for billing/organizations matching Figma design (node-id: 4643-10916)
  */
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
 import {

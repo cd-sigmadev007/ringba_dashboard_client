@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { useColumnStore } from '@/modules/caller-analysis/store/columnStore'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { ColumnVisibility } from '@/modules/caller-analysis/hooks/useTableColumns'
+import { useColumnStore } from '@/modules/caller-analysis/store/columnStore'
 
 describe('columnStore', () => {
     beforeEach(() => {
@@ -34,7 +34,9 @@ describe('columnStore', () => {
 
         useColumnStore.getState().setColumnVisibility(newVisibility)
 
-        expect(useColumnStore.getState().columnVisibility).toEqual(newVisibility)
+        expect(useColumnStore.getState().columnVisibility).toEqual(
+            newVisibility
+        )
     })
 
     it('should toggle a column', () => {

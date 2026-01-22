@@ -121,7 +121,10 @@ const UsersPage: React.FC = () => {
                     const displayName =
                         firstName && lastName
                             ? `${firstName} ${lastName}`.trim()
-                            : firstName || lastName || email.split('@')[0] || email
+                            : firstName ||
+                              lastName ||
+                              email.split('@')[0] ||
+                              email
                     const url = toAbsoluteLogoUrl(row?.original?.logo_url)
                     return (
                         <div className="flex items-center gap-2">
@@ -134,7 +137,9 @@ const UsersPage: React.FC = () => {
                             ) : (
                                 <DefaultAvatar className="w-6 h-6" />
                             )}
-                            <span className="text-sm font-medium">{displayName}</span>
+                            <span className="text-sm font-medium">
+                                {displayName}
+                            </span>
                         </div>
                     )
                 },

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { AuthCard } from './AuthCard'
 import { Input } from '@/components/ui/Input'
@@ -16,7 +16,9 @@ function passChecks(p: string) {
     const hasUpper = /[A-Z]/.test(p)
     const hasNumber = /[0-9]/.test(p)
     const hasSpecial = /[^A-Za-z0-9]/.test(p)
-    const count = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length
+    const count = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+        Boolean
+    ).length
     return {
         length: p.length >= 8,
         threeOf: count >= 3,
@@ -70,7 +72,8 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
     const validate = () => {
         const next: { password?: string; confirm?: string } = {}
         if (!password) next.password = 'Password is required'
-        else if (!checks.length) next.password = 'At least 8 characters required'
+        else if (!checks.length)
+            next.password = 'At least 8 characters required'
         else if (!checks.threeOf)
             next.password = 'Use at least 3 of: lower, upper, number, special'
         if (password !== confirm) next.confirm = 'Passwords do not match'
@@ -100,7 +103,9 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                 <div className="flex justify-center mb-6">
                     <Logo />
                 </div>
-                <h1 className={`text-xl font-semibold ${textClr} text-center`}>Welcome</h1>
+                <h1 className={`text-xl font-semibold ${textClr} text-center`}>
+                    Welcome
+                </h1>
                 <p className={`text-sm ${textMuted} mt-1 mb-6 text-center`}>
                     Create a new account. Set your password to continue.
                 </p>
@@ -119,7 +124,10 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                         value={password}
                         onChange={(e) => {
                             setPassword(e.target.value)
-                            setFieldError((f) => ({ ...f, password: undefined }))
+                            setFieldError((f) => ({
+                                ...f,
+                                password: undefined,
+                            }))
                         }}
                         placeholder="Enter password"
                         error={fieldError.password}
@@ -142,12 +150,12 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                         <div
                             className={cn(
                                 'rounded-[5px] border p-4',
-                                isDark
-                                    ? 'border-[#1B456F]'
-                                    : 'border-[#E1E5E9]'
+                                isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
                             )}
                         >
-                            <p className={`text-sm font-medium ${textMuted} mb-3`}>
+                            <p
+                                className={`text-sm font-medium ${textMuted} mb-3`}
+                            >
                                 Your password must contain:
                             </p>
                             <ul className="space-y-2 text-sm">
@@ -176,7 +184,9 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                                             color: checks.hasLower ? OK : ERR,
                                         }}
                                     >
-                                        <span>{checks.hasLower ? '✓' : '✗'}</span>
+                                        <span>
+                                            {checks.hasLower ? '✓' : '✗'}
+                                        </span>
                                         <span>Lower case letters (a-z)</span>
                                     </p>
                                     <p
@@ -185,7 +195,9 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                                             color: checks.hasUpper ? OK : ERR,
                                         }}
                                     >
-                                        <span>{checks.hasUpper ? '✓' : '✗'}</span>
+                                        <span>
+                                            {checks.hasUpper ? '✓' : '✗'}
+                                        </span>
                                         <span>Upper case letters (A-Z)</span>
                                     </p>
                                     <p
@@ -194,7 +206,9 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                                             color: checks.hasNumber ? OK : ERR,
                                         }}
                                     >
-                                        <span>{checks.hasNumber ? '✓' : '✗'}</span>
+                                        <span>
+                                            {checks.hasNumber ? '✓' : '✗'}
+                                        </span>
                                         <span>Numbers (0-9)</span>
                                     </p>
                                     <p
@@ -203,8 +217,12 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                                             color: checks.hasSpecial ? OK : ERR,
                                         }}
                                     >
-                                        <span>{checks.hasSpecial ? '✓' : '✗'}</span>
-                                        <span>Special characters (e.g. !@#$%^&*)</span>
+                                        <span>
+                                            {checks.hasSpecial ? '✓' : '✗'}
+                                        </span>
+                                        <span>
+                                            Special characters (e.g. !@#$%^&*)
+                                        </span>
                                     </p>
                                 </li>
                             </ul>
@@ -235,9 +253,7 @@ export const InviteStep1Form: React.FC<InviteStep1FormProps> = ({
                             </button>
                         }
                     />
-                    {error && (
-                        <p className="text-sm text-[#F64E60]">{error}</p>
-                    )}
+                    {error && <p className="text-sm text-[#F64E60]">{error}</p>}
                     <Button type="submit" disabled={loading} className="w-full">
                         {loading ? 'Sending code...' : 'Continue'}
                     </Button>

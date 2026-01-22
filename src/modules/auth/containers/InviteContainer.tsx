@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useInviteValidate } from '../hooks'
 import {
-    InviteInvalidView,
-    InviteStep1Form,
-    InviteOtpForm,
-    ValidatingInviteView,
     EmailVerifiedView,
+    InviteInvalidView,
+    InviteOtpForm,
+    InviteStep1Form,
+    ValidatingInviteView,
 } from '../components'
 import { useAuth } from '@/contexts/AuthContext'
 

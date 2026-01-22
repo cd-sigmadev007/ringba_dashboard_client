@@ -14,7 +14,9 @@ export interface EmailVerifiedViewProps {
  * "Great!" logs the user in and navigates to main layout; onboarding modal shows on top.
  * Figma: 4031-1412
  */
-export const EmailVerifiedView: React.FC<EmailVerifiedViewProps> = ({ onGreat }) => {
+export const EmailVerifiedView: React.FC<EmailVerifiedViewProps> = ({
+    onGreat,
+}) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const textClr = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
@@ -23,8 +25,15 @@ export const EmailVerifiedView: React.FC<EmailVerifiedViewProps> = ({ onGreat })
     return (
         <AuthCard>
             <div className="p-6 sm:p-8 flex flex-col items-center text-center">
-                <img src={donePng} alt="" className="mx-auto mb-6 object-contain flex-shrink-0" aria-hidden />
-                <h1 className={`text-xl font-semibold ${textClr}`}>Email Verified!</h1>
+                <img
+                    src={donePng}
+                    alt=""
+                    className="mx-auto mb-6 object-contain flex-shrink-0"
+                    aria-hidden
+                />
+                <h1 className={`text-xl font-semibold ${textClr}`}>
+                    Email Verified!
+                </h1>
                 <p className={`text-sm ${textMuted} mt-1 mb-6`}>
                     Your email has been successfully verified.
                 </p>
