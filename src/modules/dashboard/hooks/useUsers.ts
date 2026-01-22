@@ -3,15 +3,16 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useAuth0 } from '@auth0/auth0-react'
 import {
     assignUserRole,
     assignUserToOrg,
     getAllUsers,
 } from '../services/adminApi'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function useUsers() {
-    const { isAuthenticated } = useAuth0()
+    const { user } = useAuth()
+    const isAuthenticated = !!user
 
     return useQuery({
         queryKey: ['users'],

@@ -1,0 +1,8 @@
+export { default as LoginPage } from './LoginPage'
+export { default as LoginOtpPage } from './LoginOtpPage'
+export { default as ForgotPasswordPage } from './ForgotPasswordPage'
+export { default as CheckEmailPage } from './CheckEmailPage'
+export { default as ResetPasswordPage } from './ResetPasswordPage'
+export { default as PasswordChangedPage } from './PasswordChangedPage'
+export { default as DeviceRegistrationSuccessPage } from './DeviceRegistrationSuccessPage'
+export { default as InvitePage } from './InvitePage'

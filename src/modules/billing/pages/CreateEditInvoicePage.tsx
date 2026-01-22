@@ -25,6 +25,7 @@ import type { CreateInvoiceRequest } from '../types'
 import Button from '@/components/ui/Button'
 import { SendIcon } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
+import { usePermissions } from '@/hooks/usePermissions'
 
 export default function CreateEditInvoicePage() {
     const { theme } = useThemeStore()
@@ -33,6 +34,16 @@ export default function CreateEditInvoicePage() {
     const params = useParams({ strict: false })
     const id = params?.id
     const isEditMode = !!id
+    const { role } = usePermissions()
+
+    // Access control: Only super_admin and org_admin can access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+
+    useEffect(() => {
+        if (role && !canAccess) {
+            navigate({ to: '/caller-analysis' })
+        }
+    }, [role, canAccess, navigate])
 
     const { data: existingInvoice } = useInvoice(isEditMode ? id : null)
     const { data: organizations } = useOrganizations()
@@ -520,6 +531,10 @@ export default function CreateEditInvoicePage() {
         sendMutation.isPending ||
         saveDraftMutation.isPending ||
         deleteMutation.isPending
+
+    if (!canAccess) {
+        return null
+    }
 
     return (
         <div className="min-h-screen content">

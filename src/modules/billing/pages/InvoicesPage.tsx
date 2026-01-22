@@ -5,12 +5,14 @@
 
 import clsx from 'clsx'
 import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { useDownloadInvoicePDF, useInvoices } from '../hooks/useInvoices'
 import { InvoicesTable } from '../components/InvoicesTable'
 import type { Invoice } from '../types'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
 import { AddIcon } from '@/assets/svg'
+import { usePermissions } from '@/hooks/usePermissions'
 
 export default function InvoicesPage() {
     const { theme } = useThemeStore()
@@ -18,6 +20,16 @@ export default function InvoicesPage() {
     const navigate = useNavigate()
     const { data: invoices = [], isLoading } = useInvoices()
     const downloadMutation = useDownloadInvoicePDF()
+    const { role } = usePermissions()
+
+    // Access control: Only super_admin and org_admin can access
+    const canAccess = role === 'super_admin' || role === 'org_admin'
+
+    useEffect(() => {
+        if (role && !canAccess) {
+            navigate({ to: '/caller-analysis' })
+        }
+    }, [role, canAccess, navigate])
 
     const handleCreate = () => {
         navigate({ to: '/billing/invoices/new' })
@@ -33,6 +45,10 @@ export default function InvoicesPage() {
         } catch (error) {
             // Error handling is done in the mutation hook
         }
+    }
+
+    if (!canAccess) {
+        return null
     }
 
     return (

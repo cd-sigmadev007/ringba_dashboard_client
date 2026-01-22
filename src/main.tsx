@@ -5,7 +5,6 @@ import {
     createRootRoute,
     createRouter,
 } from '@tanstack/react-router'
-import { Auth0Provider } from '@auth0/auth0-react'
 import { Toaster } from 'react-hot-toast'
 import TanStackQueryDemo from './routes/demo.tanstack-query.tsx'
 import CallerAnalysis from './routes/caller-analysis.tsx'
@@ -21,14 +20,23 @@ import BillingCustomersRoute from './routes/billingCustomers.tsx'
 import BillingInvoicesRoute from './routes/billingInvoices.tsx'
 import BillingInvoiceCreateRoute from './routes/billingInvoiceCreate.tsx'
 import BillingInvoiceEditRoute from './routes/billingInvoiceEdit.tsx'
+import ProfileRoute from './routes/profile.tsx'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
 import reportWebVitals from './reportWebVitals.ts'
 
 import RootLayout from './layout/Index.tsx'
-import CallbackRoute from './routes/callback.tsx'
+import LoginRoute from './routes/login'
+import LoginOtpRoute from './routes/loginOtp'
+import DeviceRegistrationSuccessRoute from './routes/deviceRegistrationSuccess'
+import ForgotPasswordRoute from './routes/forgotPassword'
+import CheckEmailRoute from './routes/checkEmail'
+import ResetPasswordRoute from './routes/resetPassword'
+import PasswordChangedRoute from './routes/passwordChanged'
+import InviteRoute from './routes/invite.$token'
 import { ApiClientSetup } from './services/api/setupApiClient'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 // Initialize theme on app startup
 const savedTheme = localStorage.getItem('theme') || 'dark'
@@ -41,11 +49,18 @@ const rootRoute = createRootRoute({
 })
 
 const routeTree = rootRoute.addChildren([
+    LoginRoute(rootRoute),
+    LoginOtpRoute(rootRoute),
+    DeviceRegistrationSuccessRoute(rootRoute),
+    ForgotPasswordRoute(rootRoute),
+    CheckEmailRoute(rootRoute),
+    ResetPasswordRoute(rootRoute),
+    PasswordChangedRoute(rootRoute),
+    InviteRoute(rootRoute),
     DashboardRoute(rootRoute),
     TanStackQueryDemo(rootRoute),
     CallerAnalysis(rootRoute),
     ApiDemo(rootRoute),
-    CallbackRoute(rootRoute),
     OrganizationRoute(rootRoute),
     OrganizationCampaignsRoute(rootRoute),
     OrganizationUsersRoute(rootRoute),
@@ -56,6 +71,7 @@ const routeTree = rootRoute.addChildren([
     BillingInvoicesRoute(rootRoute),
     BillingInvoiceCreateRoute(rootRoute),
     BillingInvoiceEditRoute(rootRoute),
+    ProfileRoute(rootRoute),
 ])
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
@@ -86,28 +102,9 @@ const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement)
 
-    const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN
-    const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID
-    const auth0Audience = import.meta.env.VITE_AUTH0_AUDIENCE
-
-    if (!auth0Domain || !auth0ClientId || !auth0Audience) {
-        console.error(
-            'Missing Auth0 environment variables. Please check your .env file.'
-        )
-    }
-
     root.render(
         <StrictMode>
-            <Auth0Provider
-                domain={auth0Domain || ''}
-                clientId={auth0ClientId || ''}
-                authorizationParams={{
-                    redirect_uri: window.location.origin + '/callback',
-                    audience: auth0Audience,
-                    scope: 'openid profile email',
-                }}
-                cacheLocation="localstorage"
-            >
+            <AuthProvider>
                 <TanStackQueryProvider.Provider
                     {...TanStackQueryProviderContext}
                 >
@@ -141,7 +138,7 @@ if (rootElement && !rootElement.innerHTML) {
                         />
                     </ApiClientSetup>
                 </TanStackQueryProvider.Provider>
-            </Auth0Provider>
+            </AuthProvider>
         </StrictMode>
     )
 }

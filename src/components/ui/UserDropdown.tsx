@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import clsx from 'clsx'
+import { useNavigate } from '@tanstack/react-router'
 import { Modal } from './Modal'
 import { useThemeStore } from '@/store/themeStore'
 import { ChevronDownDark, ChevronDownLight, DefaultAvatar } from '@/assets/svg'
@@ -23,6 +24,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
     onLogout,
     className,
 }) => {
+    const navigate = useNavigate()
     const [openDropdown, setOpenDropdown] = useState(false)
     const [dropdownPosition, setDropdownPosition] = useState<'bottom' | 'top'>(
         'bottom'
@@ -84,6 +86,20 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
                 )}
             >
                 <span className="flex-1">{getRoleLabel()}</span>
+            </li>
+            {/* Profile */}
+            <li
+                className={clsx(
+                    'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
+                    optionText,
+                    optionHover
+                )}
+                onClick={() => {
+                    navigate({ to: '/profile' })
+                    setOpenDropdown(false)
+                }}
+            >
+                <span className="flex-1">Profile</span>
             </li>
             {/* Logout */}
             <li

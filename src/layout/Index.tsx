@@ -2,57 +2,101 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router'
-import { useAuth0 } from '@auth0/auth0-react'
 
-// import LoadingBar from 'react-top-loading-bar';
 import Header from './Header'
 import Footer from './Footer'
 import Aside from './Aside'
+import { AuthLayout } from './AuthLayout'
+import { useAuth } from '@/contexts/AuthContext'
+import { OnboardingModalContainer } from '@/modules/onboarding/containers/OnboardingModalContainer'
 import Styles from '@/styles/index'
+
+const AUTH_ROUTES = [
+    '/login',
+    '/login-otp',
+    '/device-registration-success',
+    '/forgot-password',
+    '/check-email',
+    '/reset-password',
+    '/password-changed',
+]
+const protectedRoutes = [
+    '/dashboard',
+    '/organization',
+    '/caller-analysis',
+    '/billing',
+]
 
 const RootLayout: React.FC = () => {
     const [openMenu, setOpenMenu] = useState(false)
-    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+    const { user, loading } = useAuth()
+    const isAuthenticated = !!user
     const navigate = useNavigate()
     const location = useLocation()
-
-    // Protected routes that require authentication
-    const protectedRoutes = ['/dashboard', '/organization', '/caller-analysis']
+    const isAuthRoute =
+        AUTH_ROUTES.includes(location.pathname) ||
+        location.pathname.startsWith('/invite/')
 
     useEffect(() => {
-        // Don't redirect if still loading or already on callback page
-        if (isLoading) return
-        if (location.pathname === '/callback') return
+        if (loading) return
+        if (isAuthRoute) return
 
-        const isProtectedRoute = protectedRoutes.some((route) =>
-            location.pathname.startsWith(route)
-        )
-
-        // If user is authenticated and on root path, redirect to caller analysis
         if (isAuthenticated && location.pathname === '/') {
             navigate({ to: '/caller-analysis' })
             return
         }
 
-        // If user is not authenticated and trying to access protected route, redirect to login
-        if (isProtectedRoute && !isAuthenticated) {
-            loginWithRedirect({
-                appState: {
-                    returnTo: location.pathname,
-                },
-            })
+        if (
+            !isAuthenticated &&
+            protectedRoutes.some((r) => location.pathname.startsWith(r))
+        ) {
+            navigate({ to: '/login' })
+            return
+        }
+
+        // Billing routes: only super_admin and org_admin can access
+        if (
+            isAuthenticated &&
+            user &&
+            location.pathname.startsWith('/billing') &&
+            user.role !== 'super_admin' &&
+            user.role !== 'org_admin'
+        ) {
+            navigate({ to: '/caller-analysis' })
+            return
+        }
+
+        if (!isAuthenticated && location.pathname === '/') {
+            navigate({ to: '/login' })
             return
         }
     }, [
         isAuthenticated,
-        isLoading,
+        loading,
         location.pathname,
         navigate,
-        loginWithRedirect,
+        isAuthRoute,
+        user,
     ])
+
+    if (isAuthRoute) {
+        return (
+            <Styles>
+                <AuthLayout>
+                    <Outlet />
+                </AuthLayout>
+            </Styles>
+        )
+    }
+
+    const showOnboarding = !!(user && !user.onboardingCompletedAt)
 
     return (
         <Styles>
+            <OnboardingModalContainer
+                open={showOnboarding}
+                onComplete={() => {}}
+            />
             <div
                 className={clsx(
                     'min-h-screen overflow-y-auto',

@@ -161,6 +161,7 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const location = useLocation()
+    const { role } = usePermissions()
     const [expandedItems, setExpandedItems] = useState<Set<string | number>>(
         new Set()
     )
@@ -188,11 +189,6 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
         })
     }
 
-    // ✅ Define navigatesignup
-    const navigatesignup = () => {
-        window.location.href = '/signup'
-    }
-
     return (
         <aside
             className={clsx(
@@ -205,22 +201,26 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
             )}
         >
             <ul className="flex flex-col gap-y-2.5 sidebar-item-list">
-                {map(navLinks, (navItem: NavLinkItem) => (
-                    <NavItem
-                        key={navItem.id}
-                        navItem={navItem}
-                        setOpenMenu={setOpenMenu}
-                        expandedItems={expandedItems}
-                        toggleExpanded={toggleExpanded}
-                    />
-                ))}
+                {map(navLinks, (navItem: NavLinkItem) => {
+                    // Filter out nav items that should be hidden for current role
+                    const hideForRoles = navItem.hideForRoles || []
+                    if (hideForRoles.includes(role || '')) {
+                        return null
+                    }
+                    return (
+                        <NavItem
+                            key={navItem.id}
+                            navItem={navItem}
+                            setOpenMenu={setOpenMenu}
+                            expandedItems={expandedItems}
+                            toggleExpanded={toggleExpanded}
+                        />
+                    )
+                })}
             </ul>
 
             <div className="flex flex-col gap-y-5 lg:hidden overflow-scroll">
                 <ThemeSwitcher />
-                <Button className="h-11" onClick={navigatesignup}>
-                    Join Beta
-                </Button>
             </div>
         </aside>
     )

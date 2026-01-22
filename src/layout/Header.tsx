@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from '@tanstack/react-router'
-import { useAuth0 } from '@auth0/auth0-react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import Logo from '../components/logo'
 import Button from '../components/ui/Button'
 import { useThemeStore } from '../store/themeStore'
@@ -12,6 +11,7 @@ import {
 } from '../assets/svg'
 import { usePermissions } from '../hooks/usePermissions'
 import UserDropdown from '../components/ui/UserDropdown'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface HeaderProps {
     setOpenMenu?: (open: boolean) => void
@@ -22,9 +22,31 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
     const [openSearchBar, setOpenSearchBar] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { isAuthenticated, isLoading, loginWithRedirect, logout, user } =
-        useAuth0()
+    const { user, loading, logout } = useAuth()
+    const navigate = useNavigate()
     const { role } = usePermissions()
+    const isAuthenticated = !!user
+    const userName = user
+        ? [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+          user.email
+        : undefined
+
+    const getApiBaseUrl = () => {
+        const baseUrl =
+            (import.meta as any).env?.VITE_API_BASE_URL ||
+            'http://localhost:3001'
+        return baseUrl.replace(/\/api$/, '').replace(/\/+$/, '')
+    }
+
+    const toAbsolutePictureUrl = (url?: string | null) => {
+        if (!url) return undefined
+        if (url.startsWith('http://') || url.startsWith('https://')) return url
+        const base = getApiBaseUrl()
+        const path = url.startsWith('/') ? url : `/${url}`
+        return `${base}${path}`
+    }
+
+    const userPicture = toAbsolutePictureUrl(user?.profilePictureUrl)
 
     return (
         <>
@@ -68,25 +90,20 @@ const Index: React.FC<HeaderProps> = ({ setOpenMenu, openMenu }) => {
 
                         {/* Right side buttons */}
                         <div className="flex items-center gap-x-1 lg:gap-x-2.5">
-                            {isLoading ? (
+                            {loading ? (
                                 <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-10 w-20 rounded"></div>
                             ) : isAuthenticated ? (
                                 <UserDropdown
-                                    userName={user?.name || user?.nickname}
+                                    userName={userName}
                                     userEmail={user?.email}
-                                    userPicture={user?.picture}
+                                    userPicture={userPicture}
                                     role={role || undefined}
-                                    onLogout={() =>
-                                        logout({
-                                            logoutParams: {
-                                                returnTo:
-                                                    window.location.origin,
-                                            },
-                                        })
-                                    }
+                                    onLogout={() => logout()}
                                 />
                             ) : (
-                                <Button onClick={() => loginWithRedirect()}>
+                                <Button
+                                    onClick={() => navigate({ to: '/login' })}
+                                >
                                     Login
                                 </Button>
                             )}

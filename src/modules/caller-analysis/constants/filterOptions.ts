@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import type { SelectOption } from '@/components/ui/FilterSelect.tsx'
+import { useAuth } from '@/contexts/AuthContext'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
 import { apiClient } from '@/services/api'
 
@@ -8,7 +8,8 @@ import { apiClient } from '@/services/api'
 export function useCampaignOptions(): Array<SelectOption> {
     const campaigns = useCampaignStore((s) => s.campaigns)
     const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns)
-    const { isAuthenticated, isLoading: authLoading } = useAuth0()
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user
 
     // Automatically fetch campaigns when auth is ready and campaigns array is empty
     useEffect(() => {
