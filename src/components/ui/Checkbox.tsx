@@ -33,7 +33,7 @@ interface CheckboxProps {
 export const Checkbox: React.FC<CheckboxProps> = ({
     checked,
     className,
-    size = 20,
+    size = 14,
 }) => {
     return (
         <div
@@ -47,8 +47,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         >
             {checked && (
                 <svg
-                    width={size * 0.6}
-                    height={size * 0.6}
+                    width={size}
+                    height={size}
                     viewBox="0 0 12 12"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
