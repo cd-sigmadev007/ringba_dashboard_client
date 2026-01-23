@@ -67,6 +67,53 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+/**
+ * Categorize and format error messages for user display
+ */
+function getErrorMessage(error: any): string {
+    // Network error (no response from server)
+    if (error.request && !error.response) {
+        return 'Network error. Please check your connection and try again.'
+    }
+
+    // Timeout error
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        return 'Request timed out. Please try again.'
+    }
+
+    // HTTP error responses
+    if (error.response) {
+        const status = error.response.status
+        const message =
+            error.response.data?.message || error.response.data?.error
+
+        switch (status) {
+            case 401:
+                return message || 'Invalid email or password'
+            case 403:
+                return message || 'Too many attempts. Please try again later.'
+            case 404:
+                return message || 'Resource not found'
+            case 429:
+                return 'Too many requests. Please try again later.'
+            case 500:
+            case 502:
+            case 503:
+            case 504:
+                return 'Server error. Please try again later.'
+            default:
+                return message || 'An error occurred. Please try again.'
+        }
+    }
+
+    // Generic error
+    if (error instanceof Error) {
+        return error.message
+    }
+
+    return 'An unexpected error occurred. Please try again.'
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, setState] = useState<AuthState>({
         user: null,
@@ -179,31 +226,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             password: string
         }): Promise<{ requiresOtp?: boolean }> => {
             setState((s) => ({ ...s, error: null }))
-            const res = await apiClient.post<{
-                requiresOtp?: boolean
-                accessToken?: string
-                user?: AuthUser
-            }>('/api/auth/login', params)
-            const d = (res as any)?.data ?? res
-            if (d?.requiresOtp) {
+            try {
+                const res = await apiClient.post<{
+                    requiresOtp?: boolean
+                    accessToken?: string
+                    user?: AuthUser
+                }>('/api/auth/login', params)
+                const d = (res as any)?.data ?? res
+                if (d?.requiresOtp) {
+                    setState((s) => ({
+                        ...s,
+                        pendingLogin: { email: params.email },
+                        loading: false,
+                        error: null,
+                    }))
+                    return { requiresOtp: true }
+                }
+                if (d?.accessToken && d?.user) {
+                    setState((s) => ({
+                        ...s,
+                        user: d.user,
+                        accessToken: d.accessToken,
+                        pendingLogin: null,
+                        error: null,
+                    }))
+                    return {}
+                }
+                return {}
+            } catch (error: any) {
+                const errorMessage = getErrorMessage(error)
                 setState((s) => ({
                     ...s,
-                    pendingLogin: { email: params.email },
+                    error: errorMessage,
                     loading: false,
                 }))
-                return { requiresOtp: true }
+                throw error
             }
-            if (d?.accessToken && d?.user) {
-                setState((s) => ({
-                    ...s,
-                    user: d.user,
-                    accessToken: d.accessToken,
-                    pendingLogin: null,
-                    error: null,
-                }))
-                return {}
-            }
-            return {}
         },
         []
     )
@@ -242,9 +300,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const requestInviteOtp = useCallback(async (invitationToken: string) => {
         setState((s) => ({ ...s, error: null }))
-        await apiClient.post('/api/auth/request-invite-otp', {
-            invitationToken,
-        })
+        try {
+            await apiClient.post('/api/auth/request-invite-otp', {
+                invitationToken,
+            })
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error)
+            setState((s) => ({
+                ...s,
+                error: errorMessage,
+            }))
+            throw error
+        }
     }, [])
 
     const setPassword = useCallback(
@@ -254,23 +321,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             otp: string
         }) => {
             setState((s) => ({ ...s, error: null }))
-            const res = await apiClient.post<{
-                accessToken?: string
-                user?: AuthUser
-            }>('/api/auth/set-password', params)
-            const data = (res as any)?.data ?? res
-            const u = data?.user
-            const token = data?.accessToken
-            if (u && token) {
+            try {
+                const res = await apiClient.post<{
+                    accessToken?: string
+                    user?: AuthUser
+                }>('/api/auth/set-password', params)
+                const data = (res as any)?.data ?? res
+                const u = data?.user
+                const token = data?.accessToken
+                if (u && token) {
+                    setState((s) => ({
+                        ...s,
+                        user: u,
+                        accessToken: token,
+                        error: null,
+                    }))
+                } else {
+                    const errorMessage =
+                        'Failed to set password. Please try again.'
+                    setState((s) => ({ ...s, error: errorMessage }))
+                    throw new Error(errorMessage)
+                }
+            } catch (error: any) {
+                const errorMessage = getErrorMessage(error)
                 setState((s) => ({
                     ...s,
-                    user: u,
-                    accessToken: token,
-                    error: null,
+                    error: errorMessage,
                 }))
-            } else {
-                setState((s) => ({ ...s, error: 'Set password failed' }))
-                throw new Error('Set password failed')
+                throw error
             }
         },
         []

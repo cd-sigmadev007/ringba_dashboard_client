@@ -16,7 +16,6 @@ import {
     AuthBgHands2,
     AuthBgRefresh,
     AuthBgSearch,
-    AuthBgSettings,
 } from '@/assets/svg'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {

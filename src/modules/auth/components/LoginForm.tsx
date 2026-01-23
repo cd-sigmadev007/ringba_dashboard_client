@@ -19,7 +19,6 @@ export interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({
     onSubmit,
-    error,
     clearError,
 }) => {
     const { theme } = useThemeStore()
@@ -132,8 +131,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             Forgot password?
                         </Link>
                     </div>
-
-                    {error && <p className="text-sm text-[#F64E60]">{error}</p>}
 
                     <Button
                         type="submit"

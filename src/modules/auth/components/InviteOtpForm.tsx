@@ -28,7 +28,6 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
     onBack,
     onRequestCode,
     onVerify,
-    error,
     clearError,
 }) => {
     const { theme } = useThemeStore()
@@ -177,12 +176,6 @@ export const InviteOtpForm: React.FC<InviteOtpFormProps> = ({
                             />
                         ))}
                     </div>
-
-                    {error && (
-                        <p className="text-sm text-[#F64E60] text-center w-full">
-                            {error}
-                        </p>
-                    )}
 
                     <Button
                         type="submit"

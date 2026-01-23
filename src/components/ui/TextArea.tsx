@@ -44,11 +44,11 @@ export const TextArea: React.FC<TextAreaProps> = ({
                 placeholder={placeholder}
                 className={clsx(
                     // base sizing and radius matches Input
-                    'w-full px-[15px] py-[10px]  rounded-[7px] px[15px] py-[10px] text-[14px] resize-vertical outline-none border placeholder:text-[#A1A5B7]',
-                    // base + focus colors mirror Input
+                    'w-full px-[15px] py-[10px] rounded-[7px] text-[14px] resize-vertical outline-none border transition-all duration-100 ease-in',
+                    // base + focus colors mirror Input with proper contrast
                     isDark
-                        ? 'bg-[#002B57] focus:bg-[#001E3C] text-white border-transparent'
-                        : 'bg-white focus:bg-[#FFFFFF] text-[#3F4254] border-transparent',
+                        ? 'bg-[#002B57] focus:bg-[#001E3C] text-[#F5F8FA] placeholder:text-[#A1A5B7] border-transparent'
+                        : 'bg-white focus:bg-white text-[#3F4254] placeholder:text-[#A1A5B7] border-[#ECECEC]',
                     // focus ring color
                     'focus:border-[#007FFF]',
                     // error state - match Input component

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 import { useInviteValidate } from '../hooks'
 import {
     EmailVerifiedView,
@@ -22,7 +23,18 @@ export const InviteContainer: React.FC = () => {
 
     const { requestInviteOtp } = useAuth()
 
-    const handleRequestCode = () => requestInviteOtp(token)
+    const handleRequestCode = async () => {
+        try {
+            await requestInviteOtp(token)
+            toast.success('Verification code sent to your email')
+        } catch (err: any) {
+            const errorMessage =
+                error ||
+                err?.message ||
+                'Failed to send verification code. Please try again.'
+            toast.error(errorMessage)
+        }
+    }
 
     const handleStep1Continue = (data: { password: string }) => {
         setStep1Data({ password: data.password, otp: '' })
@@ -37,13 +49,22 @@ export const InviteContainer: React.FC = () => {
     const handleOtpVerify = async (otp: string) => {
         if (!step1Data?.password) return
         setStep1Data((s) => (s ? { ...s, otp } : null))
-        // Names are already in DB from invite creation, no need to collect them here
-        await setPassword({
-            invitationToken: token,
-            password: step1Data.password,
-            otp: otp,
-        })
-        setStep(4) // Email Verified screen (only 1st time; next login goes straight to main)
+        try {
+            // Names are already in DB from invite creation, no need to collect them here
+            await setPassword({
+                invitationToken: token,
+                password: step1Data.password,
+                otp: otp,
+            })
+            toast.success('Password set successfully')
+            setStep(4) // Email Verified screen (only 1st time; next login goes straight to main)
+        } catch (err: any) {
+            const errorMessage =
+                error ||
+                err?.message ||
+                'Failed to set password. Please try again.'
+            toast.error(errorMessage)
+        }
     }
 
     const handleEmailVerifiedGreat = async () => {
@@ -74,7 +95,6 @@ export const InviteContainer: React.FC = () => {
                 onBack={handleOtpBack}
                 onRequestCode={handleRequestCode}
                 onVerify={handleOtpVerify}
-                error={error}
                 clearError={clearError}
             />
         )

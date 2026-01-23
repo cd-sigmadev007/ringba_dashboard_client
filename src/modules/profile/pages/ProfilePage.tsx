@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useNavigate } from '@tanstack/react-router'
+import clsx from 'clsx'
+import ProfileHeader from '../components/ProfileHeader'
 import { ProfilePictureUpload } from '../components/ProfilePictureUpload'
+import { ChangePasswordForm } from '../components/ChangePasswordForm'
+import type { TabItem } from '@/components/ui/Tabs'
 import { useAuth } from '@/contexts/AuthContext'
 import { Input } from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { useThemeStore } from '@/store/themeStore'
+import { Tabs } from '@/components/ui/Tabs'
+
+const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { theme } = useThemeStore()
+    const isDark = theme === 'dark'
+    return (
+        <p
+            className={clsx(
+                'text-[14px] w-[220px] shrink-0',
+                isDark ? 'text-white' : 'text-[#3F4254]'
+            )}
+        >
+            {children}
+        </p>
+    )
+}
 
 const ProfilePage: React.FC = () => {
     const { user, updateProfile, refetchMe } = useAuth()
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const navigate = useNavigate()
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -26,13 +44,13 @@ const ProfilePage: React.FC = () => {
         }
     }, [user])
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSave = async () => {
         setErrors({})
 
         const fn = firstName.trim()
         if (!fn) {
             setErrors({ firstName: 'First name is required' })
+            toast.error('First name is required')
             return
         }
 
@@ -53,7 +71,6 @@ const ProfilePage: React.FC = () => {
         }
     }
 
-    const textClr = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const textMuted = 'text-[#A1A5B7]'
 
     if (!user) {
@@ -64,38 +81,42 @@ const ProfilePage: React.FC = () => {
         )
     }
 
-    return (
-        <div className="p-4 md:p-6 lg:p-8">
-            <div className="max-w-2xl mx-auto">
-                <h1 className={`text-2xl font-semibold mb-6 ${textClr}`}>
-                    Profile
-                </h1>
+    const tabs: Array<TabItem> = [
+        {
+            id: 'general',
+            label: 'General',
+            content: (
+                <div className="p-5 md:p-6">
+                    <div className="space-y-6">
+                        {/* Profile Picture */}
+                        <div className="flex items-start max-md:flex-col gap-[10px] w-full max-w-[720px]">
+                            <Label>Profile Picture</Label>
+                            <div className="w-full">
+                                <ProfilePictureUpload
+                                    currentPictureUrl={user.profilePictureUrl}
+                                    onPictureChange={setProfilePicture}
+                                />
+                                {profilePicture && (
+                                    <p
+                                        className={clsx(
+                                            'text-xs mt-2',
+                                            textMuted
+                                        )}
+                                    >
+                                        New picture will be saved when you click
+                                        "Save Changes"
+                                    </p>
+                                )}
+                            </div>
+                        </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="bg-white dark:bg-[#002B57] rounded-lg p-6 shadow-sm">
-                        <h2 className={`text-lg font-medium mb-4 ${textClr}`}>
-                            Profile Picture
-                        </h2>
-                        <ProfilePictureUpload
-                            currentPictureUrl={user.profilePictureUrl}
-                            onPictureChange={setProfilePicture}
-                        />
-                        {profilePicture && (
-                            <p className={`text-xs mt-2 ${textMuted}`}>
-                                New picture will be saved when you click "Save
-                                Changes"
-                            </p>
-                        )}
-                    </div>
+                        <div className="horizontal-line my-4"></div>
 
-                    <div className="bg-white dark:bg-[#002B57] rounded-lg p-6 shadow-sm space-y-4">
-                        <h2 className={`text-lg font-medium mb-4 ${textClr}`}>
-                            Personal Information
-                        </h2>
-
-                        <div>
+                        {/* First Name */}
+                        <div className="flex items-start max-md:flex-col gap-[10px] w-full max-w-[720px]">
+                            <Label>First Name</Label>
                             <Input
-                                label="First Name"
+                                placeholder="Enter first name"
                                 value={firstName}
                                 onChange={(e) => {
                                     setFirstName(e.target.value)
@@ -104,58 +125,79 @@ const ProfilePage: React.FC = () => {
                                         firstName: undefined,
                                     }))
                                 }}
-                                placeholder="Enter first name"
                                 error={errors.firstName}
+                                shadow={false}
+                                className="w-full"
                                 required
                             />
                         </div>
 
-                        <div>
+                        {/* Last Name */}
+                        <div className="flex items-start max-md:flex-col gap-[10px] w-full max-w-[720px]">
+                            <Label>Last Name (optional)</Label>
                             <Input
-                                label="Last Name (optional)"
+                                placeholder="Enter last name"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                placeholder="Enter last name"
+                                shadow={false}
+                                className="w-full"
                             />
                         </div>
 
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium mb-2"
-                            >
-                                Email
-                            </label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={user.email}
-                                disabled
-                                className="bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
-                            />
-                            <p className={`text-xs mt-1 ${textMuted}`}>
-                                Email cannot be changed
-                            </p>
+                        {/* Email */}
+                        <div className="flex items-start max-md:flex-col gap-[10px] w-full max-w-[720px]">
+                            <Label>Email</Label>
+                            <div className="w-full">
+                                <Input
+                                    type="email"
+                                    value={user.email}
+                                    disabled
+                                    className={clsx(
+                                        'cursor-not-allowed',
+                                        isDark
+                                            ? 'bg-[#001E3C] text-[#A1A5B7]'
+                                            : 'bg-gray-100 text-[#3F4254]'
+                                    )}
+                                    shadow={false}
+                                />
+                                <p className={clsx('text-xs mt-1', textMuted)}>
+                                    Email cannot be changed
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex justify-end gap-3">
                         <Button
-                            type="button"
                             variant="secondary"
-                            onClick={() => navigate({ to: '/' })}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
+                            onClick={handleSave}
                             disabled={loading}
                         >
                             {loading ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>
-                </form>
+                </div>
+            ),
+        },
+        {
+            id: 'password',
+            label: 'Password',
+            content: (
+                <div className="p-5 md:p-6">
+                    <ChangePasswordForm />
+                </div>
+            ),
+        },
+    ]
+
+    return (
+        <div className={clsx('p-4 md:p-6 lg:p-8')}>
+            <ProfileHeader />
+
+            <div className="flex flex-col gap-[24px] items-start mt-6 w-full">
+                <Tabs
+                    tabs={tabs}
+                    defaultActiveTab="general"
+                    tabsClassName={clsx('border-b border-[#1B456F] w-full')}
+                />
             </div>
         </div>
     )
