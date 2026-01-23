@@ -19,7 +19,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ children, className }) => {
     return (
         <div
             className={cn(
-                'w-full max-w-[400px] rounded-[10px] shadow-lg flex flex-col',
+                'w-full w-[400px] max-md:w-[90vw] rounded-[10px] shadow-lg flex flex-col',
                 isDark
                     ? 'bg-[#071B2F] border border-[#1B456F]'
                     : 'bg-white border border-[#E1E5E9]',

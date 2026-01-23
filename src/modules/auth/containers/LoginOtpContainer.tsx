@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 import { authApi } from '../services/authApi'
 import { LoginOtpForm } from '../components'
 import { useAuth } from '@/contexts/AuthContext'
@@ -22,15 +23,31 @@ export const LoginOtpContainer: React.FC = () => {
         sessionStorage.getItem('loginRemember') === 'true'
 
     const handleSubmit = async (otp: string) => {
-        await verifyLoginOtp({ email, otp, remember })
         try {
-            sessionStorage.removeItem('loginOtpEmail')
-            sessionStorage.removeItem('loginRemember')
-        } catch (_) {}
-        navigate({ to: '/device-registration-success' })
+            await verifyLoginOtp({ email, otp, remember })
+            try {
+                sessionStorage.removeItem('loginOtpEmail')
+                sessionStorage.removeItem('loginRemember')
+            } catch (_) {}
+            toast.success('Login successful')
+            navigate({ to: '/device-registration-success' })
+        } catch (err: any) {
+            const errorMessage =
+                error ||
+                err?.message ||
+                'Invalid verification code. Please try again.'
+            toast.error(errorMessage)
+        }
     }
 
-    const handleResend = () => authApi.requestOtp(email, 'login')
+    const handleResend = async () => {
+        try {
+            await authApi.requestOtp(email, 'login')
+            toast.success('Verification code sent to your email')
+        } catch (err: any) {
+            toast.error('Failed to send verification code. Please try again.')
+        }
+    }
 
     const handleLogout = async () => {
         try {
@@ -47,7 +64,6 @@ export const LoginOtpContainer: React.FC = () => {
             onSubmit={handleSubmit}
             onResend={handleResend}
             onLogout={handleLogout}
-            error={error}
             clearError={clearError}
         />
     )

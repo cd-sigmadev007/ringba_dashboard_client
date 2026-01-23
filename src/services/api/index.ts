@@ -183,27 +183,50 @@ function createErrorInterceptor(
             } catch (_) {}
         }
 
+        // Enhanced error logging with more details
         if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
             console.error('🔒 Authentication failed:', {
                 url: config?.url,
                 status: error.response?.status,
                 message: error.response?.data?.message || 'Unauthorized',
+                data: error.response.data,
             })
         } else if (error.response?.status === HTTP_STATUS.FORBIDDEN) {
             console.error('🚫 Access forbidden:', {
                 url: config?.url,
+                status: error.response?.status,
                 message: error.response?.data?.message || 'Forbidden',
+                data: error.response.data,
+            })
+        } else if (error.response?.status === 429) {
+            console.error('⏱️ Rate limit exceeded:', {
+                url: config?.url,
+                status: error.response?.status,
+                message: error.response?.data?.message || 'Too many requests',
+            })
+        } else if (error.response?.status >= 500) {
+            console.error('🔴 Server error:', {
+                url: config?.url,
+                status: error.response?.status,
+                message: error.response?.data?.message || 'Server error',
             })
         } else if (error.response) {
             console.error('❌ API Error:', {
                 url: config?.url,
                 status: error.response.status,
                 message: error.response.data?.message || 'Request failed',
+                data: error.response.data,
             })
         } else if (error.request) {
             console.error('🌐 Network Error:', {
                 url: config?.url,
                 message: 'No response received from server',
+                code: error.code,
+            })
+        } else {
+            console.error('❓ Unknown error:', {
+                url: config?.url,
+                message: error.message || 'An unexpected error occurred',
             })
         }
 

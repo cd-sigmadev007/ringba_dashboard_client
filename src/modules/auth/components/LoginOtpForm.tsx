@@ -10,7 +10,6 @@ export interface LoginOtpFormProps {
     onSubmit: (otp: string) => Promise<void>
     onResend: () => Promise<void>
     onLogout: () => Promise<void>
-    error?: string | null
     clearError: () => void
 }
 
@@ -19,7 +18,6 @@ export const LoginOtpForm: React.FC<LoginOtpFormProps> = ({
     onSubmit,
     onResend,
     onLogout,
-    error,
     clearError,
 }) => {
     const { theme } = useThemeStore()
@@ -104,8 +102,6 @@ export const LoginOtpForm: React.FC<LoginOtpFormProps> = ({
                         placeholder="Enter code"
                         error={fieldError}
                     />
-
-                    {error && <p className="text-sm text-[#F64E60]">{error}</p>}
 
                     <Button
                         type="submit"

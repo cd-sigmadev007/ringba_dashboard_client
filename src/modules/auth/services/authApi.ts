@@ -60,4 +60,15 @@ export const authApi = {
         })
         return res.data
     },
+
+    requestChangePasswordOtp(): Promise<void> {
+        return apiClient.post('/api/auth/request-change-password-otp', {})
+    },
+
+    changePassword(otp: string, newPassword: string): Promise<void> {
+        return apiClient.post('/api/auth/change-password', {
+            otp,
+            newPassword,
+        })
+    },
 }

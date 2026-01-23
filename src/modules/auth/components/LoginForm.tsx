@@ -19,7 +19,6 @@ export interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({
     onSubmit,
-    error,
     clearError,
 }) => {
     const { theme } = useThemeStore()
@@ -115,7 +114,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                         }
                     />
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center max-md:flex-col max-md:gap-4 max-md:items-start justify-between">
                         <label
                             className="flex items-center gap-2 cursor-pointer"
                             onClick={() => setRemember((r) => !r)}
@@ -132,8 +131,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             Forgot password?
                         </Link>
                     </div>
-
-                    {error && <p className="text-sm text-[#F64E60]">{error}</p>}
 
                     <Button
                         type="submit"

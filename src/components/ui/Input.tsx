@@ -130,9 +130,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         type={type}
                         className={cn(
                             inputVariants({ variant: inputVariant, inputSize }),
-                            // Only apply dark mode styles if customBg is not provided
+                            // Dark mode styles - ensure proper contrast
                             !className?.includes('bg-[') && isDark
-                                ? 'bg-[#002B57] focus:bg-[#001E3C] text-white'
+                                ? 'bg-[#002B57] focus:bg-[#001E3C] text-[#F5F8FA] placeholder:text-[#A1A5B7]'
+                                : '',
+                            // Light mode - ensure proper contrast and border
+                            !className?.includes('bg-[') && !isDark
+                                ? 'bg-white text-[#3F4254] border-[#ECECEC] focus:border-[#007FFF]'
                                 : '',
                             leftIcon && 'pl-10',
                             rightIcon && 'pr-10',
