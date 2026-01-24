@@ -16,6 +16,7 @@ import {
     WarningIcon,
 } from '@/assets/svg'
 import { cn } from '@/lib'
+import { useColumnStore } from '../store/columnStore'
 
 // Caller ID cell component with copy functionality
 const CallerIdCell: React.FC<{ callerId: string }> = ({ callerId }) => {
@@ -78,6 +79,7 @@ export const useTableColumns = (
 ) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
+    const { selectedDynamicFields } = useColumnStore()
 
     return useMemo<Array<ColumnDef<CallData>>>(() => {
         const allColumns: Array<ColumnDef<CallData>> = []
@@ -371,6 +373,74 @@ export const useTableColumns = (
             }
         )
 
+        // Add dynamic columns from store
+        const dynamicColumns: Array<ColumnDef<CallData>> = []
+        
+        selectedDynamicFields.forEach((fieldName) => {
+            // Skip if already a fixed column
+            const isFixedColumn = allColumns.some(
+                (col) => (col.id || (col as any).accessorKey) === fieldName
+            )
+            
+            if (!isFixedColumn) {
+                dynamicColumns.push({
+                    id: fieldName,
+                    header: fieldName
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    accessorKey: fieldName,
+                    meta: { width: 150, category: 'dynamic' },
+                    cell: ({ row }) => {
+                        // Get value from attributes jsonb
+                        const attributes = (row.original as any).attributes || {}
+                        // Try the field name first, then try common variations for backward compatibility
+                        let displayValue = attributes[fieldName] ?? null
+                        
+                        // Backward compatibility: if fieldName is 'publisher' but data has 'publisherName', use that
+                        if (displayValue === null && fieldName === 'publisher' && attributes.publisherName) {
+                            displayValue = attributes.publisherName
+                        }
+                        // Reverse: if fieldName is 'publisherName' but data has 'publisher', use that
+                        if (displayValue === null && fieldName === 'publisherName' && attributes.publisher) {
+                            displayValue = attributes.publisher
+                        }
+                        
+                        // Debug logging
+                        if (fieldName === 'publisher' || fieldName === 'publisherName') {
+                            console.log(`[useTableColumns] Dynamic field "${fieldName}":`, {
+                                fieldName,
+                                hasAttributes: !!attributes,
+                                attributesKeys: Object.keys(attributes),
+                                displayValue,
+                                rowId: row.original.id,
+                            })
+                        }
+                        
+                        if (displayValue === null || displayValue === undefined) {
+                            return <span className="text-sm text-gray-400">—</span>
+                        }
+                        
+                        return (
+                            <span className="text-sm">
+                                {typeof displayValue === 'object'
+                                    ? JSON.stringify(displayValue)
+                                    : String(displayValue)}
+                            </span>
+                        )
+                    },
+                })
+            }
+        })
+
+        // Insert dynamic columns before action column
+        const actionColumnIndex = allColumns.findIndex((col) => col.id === 'action')
+        if (actionColumnIndex !== -1 && dynamicColumns.length > 0) {
+            allColumns.splice(actionColumnIndex, 0, ...dynamicColumns)
+        } else if (dynamicColumns.length > 0) {
+            // If no action column, append dynamic columns
+            allColumns.push(...dynamicColumns)
+        }
+
         // Filter columns based on visibility
         if (visibleColumns) {
             return allColumns.filter((col) => {
@@ -389,5 +459,6 @@ export const useTableColumns = (
         isPlaying,
         visibleColumns,
         enableRowSelection,
+        selectedDynamicFields,
     ])
 }

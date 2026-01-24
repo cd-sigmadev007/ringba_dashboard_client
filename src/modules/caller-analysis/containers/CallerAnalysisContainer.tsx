@@ -1,6 +1,6 @@
 import React from 'react'
 import clsx from 'clsx'
-import { useCallerAnalysis, useTableColumns } from '../hooks'
+import { useCallerAnalysisGraphQL, useTableColumns } from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
 import { CallDetailsModal } from '../components/CallDetailsModal'
@@ -24,6 +24,7 @@ import { WaveformAudioPlayer } from '@/components/ui/WaveformAudioPlayer'
 import { RefreshButton } from '@/components/ui/RefreshButton'
 import { useCampaignStore } from '@/modules/org/store/campaignStore'
 import { apiClient } from '@/services/api'
+// Using GraphQL for caller analysis
 
 export const CallerAnalysisContainer: React.FC = () => {
     const { theme } = useThemeStore()
@@ -69,6 +70,7 @@ export const CallerAnalysisContainer: React.FC = () => {
     const { columnVisibility, toggleColumn } = useColumnStore()
 
     // Column options for dropdown
+    // Includes all CallerFilter fields for filtering
     const columnOptions: Array<ColumnOption> = React.useMemo(
         () => [
             {
@@ -113,24 +115,90 @@ export const CallerAnalysisContainer: React.FC = () => {
                 category: 'applied',
                 visible: columnVisibility.action ?? true,
             },
+            // CallerFilter fields - these can be used for filtering
+            {
+                id: 'phoneNumber',
+                label: 'Phone Number',
+                category: 'caller',
+                visible: columnVisibility.phoneNumber ?? false,
+            },
+            {
+                id: 'callTimestamp',
+                label: 'Call Timestamp',
+                category: 'caller',
+                visible: columnVisibility.callTimestamp ?? false,
+            },
+            {
+                id: 'callLengthInSeconds',
+                label: 'Call Length (seconds)',
+                category: 'caller',
+                visible: columnVisibility.callLengthInSeconds ?? false,
+            },
+            // Note: dateFrom, dateTo, durationMin, durationMax, and search are filter parameters only,
+            // not displayable columns, so they are not included in columnOptions
         ],
         [columnVisibility]
     )
 
-    const {
-        filters,
-        filteredData,
-        updateFilters,
-        removeFilters,
-        clearAllFilters,
-        isLoading,
-        isLoadingBatch,
-        refetch,
-        lastUpdated,
-        loadNextBatch,
-        BATCH_SIZE,
-        totalRecords,
-    } = useCallerAnalysis()
+    // Use GraphQL hook for caller analysis
+    const graphqlHook = useCallerAnalysisGraphQL()
+    
+    const filters = graphqlHook.filters
+    const filteredData = graphqlHook.data
+    const isLoading = graphqlHook.isLoading
+    const isLoadingBatch = false
+    const totalRecords = graphqlHook.totalRecords
+    const BATCH_SIZE = 100
+    
+    // Wrap refetch to match expected signature
+    const refetch = React.useCallback(() => {
+        graphqlHook.refetch().catch((err) => {
+            console.error('Error refetching:', err)
+        })
+    }, [graphqlHook.refetch])
+    
+    const lastUpdated = new Date()
+    const loadNextBatch = graphqlHook.loadNextPage
+    
+    // Wrap removeFilters to match expected interface
+    const removeFilters = React.useMemo(() => ({
+        campaign: (_filter: string) => {
+            graphqlHook.removeFilters('campaignFilter')
+        },
+        status: (_filter: string) => {
+            graphqlHook.removeFilters('statusFilter')
+        },
+        durationRange: () => {
+            graphqlHook.removeFilters('durationRange')
+        },
+        search: () => {
+            graphqlHook.removeFilters('searchQuery')
+        },
+        dateRange: () => {
+            graphqlHook.removeFilters('dateRange')
+        },
+    }), [graphqlHook.removeFilters])
+    
+    // Wrap updateFilters to match expected interface
+    const updateFilters = React.useMemo(() => ({
+        dateRange: (range: { from?: Date; to?: Date }) => {
+            graphqlHook.updateFilters({ dateRange: range })
+        },
+        campaign: (value: string | string[]) => {
+            graphqlHook.updateFilters({ campaignFilter: Array.isArray(value) ? value : [value] })
+        },
+        status: (value: string | string[]) => {
+            graphqlHook.updateFilters({ statusFilter: Array.isArray(value) ? value : [value] })
+        },
+        durationRange: (range: { min?: number; max?: number }) => {
+            graphqlHook.updateFilters({ durationRange: range })
+        },
+        search: (query: string) => {
+            graphqlHook.updateFilters({ searchQuery: query })
+        },
+    }), [graphqlHook.updateFilters])
+    
+    const clearAllFilters = graphqlHook.clearAllFilters
 
     // Sync filter store with hook's filter state
     const { setFilters: setStoreFilters } = useFilterStore()

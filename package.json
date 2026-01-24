@@ -30,6 +30,8 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dayjs": "^1.11.19",
+        "graphql": "^16.12.0",
+        "graphql-request": "^7.4.0",
         "html2pdf.js": "^0.12.1",
         "lodash": "^4.17.21",
         "node-path": "^0.0.3",
