@@ -37,6 +37,8 @@ export interface CallData {
     targetName?: string | null
     ai_processed?: boolean
     summary?: string | null
+    publisher?: string | null
+    attributes?: Record<string, any> // Full attributes jsonb for dynamic fields
 }
 
 export interface FilterState {
