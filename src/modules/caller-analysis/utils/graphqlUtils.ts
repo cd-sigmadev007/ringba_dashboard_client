@@ -1,11 +1,10 @@
 import dayjs from 'dayjs'
-import type { Caller, CallerFilter, FilterOperator  } from '../graphql/types'
-import type { CallData } from '../types'
+import type { Caller, CallerFilter, FilterOperator } from '../graphql/types'
+import type { CallData, FilterState } from '../types'
 
 /**
  * Convert FilterState to GraphQL CallerFilter
  */
-import type { FilterState } from '../types'
 
 /**
  * Convert GraphQL Caller to CallData format

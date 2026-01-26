@@ -58,7 +58,7 @@ export const useCallerAnalysisGraphQL = () => {
 
     const updateFilters = (newFilters: Partial<FilterState>) => {
         setFilters((prev) => ({ ...prev, ...newFilters }))
-        setCursor(undefined) // Reset cursor when filters change
+        setPage(1) // Reset page when filters change
     }
 
     const removeFilters = (filterType: keyof FilterState) => {
@@ -73,7 +73,7 @@ export const useCallerAnalysisGraphQL = () => {
                         ? 'all'
                         : [],
         }))
-        setCursor(undefined)
+        setPage(1)
     }
 
     const clearAllFilters = () => {
@@ -86,7 +86,7 @@ export const useCallerAnalysisGraphQL = () => {
             searchQuery: '',
         })
         setDynamicFilters([])
-        setCursor(undefined)
+        setPage(1)
     }
 
     const hasActiveFilters = useMemo(() => {
@@ -120,12 +120,12 @@ export const useCallerAnalysisGraphQL = () => {
         operator: FilterOperator
     ) => {
         setDynamicFilters((prev) => [...prev, { field, value, operator }])
-        setCursor(undefined)
+        setPage(1)
     }
 
     const removeDynamicFilter = (index: number) => {
         setDynamicFilters((prev) => prev.filter((_, i) => i !== index))
-        setCursor(undefined)
+        setPage(1)
     }
 
     const updateDynamicFilter = (
@@ -136,7 +136,7 @@ export const useCallerAnalysisGraphQL = () => {
         setDynamicFilters((prev) =>
             prev.map((f, i) => (i === index ? { ...f, value, operator } : f))
         )
-        setCursor(undefined)
+        setPage(1)
     }
 
     return {

@@ -26,7 +26,7 @@ describe('orgStore', () => {
 
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: true,
-                json: async () => mockOrg,
+                json: () => Promise.resolve(mockOrg),
             })
 
             await useOrgStore.getState().fetchOrg()
@@ -62,7 +62,7 @@ describe('orgStore', () => {
 
             resolveFetch({
                 ok: true,
-                json: async () => ({}),
+                json: () => Promise.resolve({}),
             })
             await fetchPromise2
 
@@ -85,7 +85,7 @@ describe('orgStore', () => {
 
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: true,
-                json: async () => updatedOrg,
+                json: () => Promise.resolve(updatedOrg),
             })
 
             await useOrgStore.getState().updateOrg({ name: 'Updated Name' })
@@ -121,7 +121,7 @@ describe('orgStore', () => {
             useOrgStore.setState({ org: initialOrg })
             ;(global.fetch as any).mockResolvedValueOnce({
                 ok: true,
-                json: async () => ({ apiKeyMasked: 'new-key' }),
+                json: () => Promise.resolve({ apiKeyMasked: 'new-key' }),
             })
 
             await useOrgStore.getState().rotateApiKey()
