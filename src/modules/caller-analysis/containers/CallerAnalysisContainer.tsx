@@ -142,62 +142,72 @@ export const CallerAnalysisContainer: React.FC = () => {
 
     // Use GraphQL hook for caller analysis
     const graphqlHook = useCallerAnalysisGraphQL()
-    
+
     const filters = graphqlHook.filters
     const filteredData = graphqlHook.data
     const isLoading = graphqlHook.isLoading
     const isLoadingBatch = false
     const totalRecords = graphqlHook.totalRecords
     const BATCH_SIZE = 100
-    
+
     // Wrap refetch to match expected signature
     const refetch = React.useCallback(() => {
         graphqlHook.refetch().catch((err) => {
             console.error('Error refetching:', err)
         })
     }, [graphqlHook.refetch])
-    
+
     const lastUpdated = new Date()
     const loadNextBatch = graphqlHook.loadNextPage
-    
+
     // Wrap removeFilters to match expected interface
-    const removeFilters = React.useMemo(() => ({
-        campaign: (_filter: string) => {
-            graphqlHook.removeFilters('campaignFilter')
-        },
-        status: (_filter: string) => {
-            graphqlHook.removeFilters('statusFilter')
-        },
-        durationRange: () => {
-            graphqlHook.removeFilters('durationRange')
-        },
-        search: () => {
-            graphqlHook.removeFilters('searchQuery')
-        },
-        dateRange: () => {
-            graphqlHook.removeFilters('dateRange')
-        },
-    }), [graphqlHook.removeFilters])
-    
+    const removeFilters = React.useMemo(
+        () => ({
+            campaign: (_filter: string) => {
+                graphqlHook.removeFilters('campaignFilter')
+            },
+            status: (_filter: string) => {
+                graphqlHook.removeFilters('statusFilter')
+            },
+            durationRange: () => {
+                graphqlHook.removeFilters('durationRange')
+            },
+            search: () => {
+                graphqlHook.removeFilters('searchQuery')
+            },
+            dateRange: () => {
+                graphqlHook.removeFilters('dateRange')
+            },
+        }),
+        [graphqlHook.removeFilters]
+    )
+
     // Wrap updateFilters to match expected interface
-    const updateFilters = React.useMemo(() => ({
-        dateRange: (range: { from?: Date; to?: Date }) => {
-            graphqlHook.updateFilters({ dateRange: range })
-        },
-        campaign: (value: string | string[]) => {
-            graphqlHook.updateFilters({ campaignFilter: Array.isArray(value) ? value : [value] })
-        },
-        status: (value: string | string[]) => {
-            graphqlHook.updateFilters({ statusFilter: Array.isArray(value) ? value : [value] })
-        },
-        durationRange: (range: { min?: number; max?: number }) => {
-            graphqlHook.updateFilters({ durationRange: range })
-        },
-        search: (query: string) => {
-            graphqlHook.updateFilters({ searchQuery: query })
-        },
-    }), [graphqlHook.updateFilters])
-    
+    const updateFilters = React.useMemo(
+        () => ({
+            dateRange: (range: { from?: Date; to?: Date }) => {
+                graphqlHook.updateFilters({ dateRange: range })
+            },
+            campaign: (value: string | Array<string>) => {
+                graphqlHook.updateFilters({
+                    campaignFilter: Array.isArray(value) ? value : [value],
+                })
+            },
+            status: (value: string | Array<string>) => {
+                graphqlHook.updateFilters({
+                    statusFilter: Array.isArray(value) ? value : [value],
+                })
+            },
+            durationRange: (range: { min?: number; max?: number }) => {
+                graphqlHook.updateFilters({ durationRange: range })
+            },
+            search: (query: string) => {
+                graphqlHook.updateFilters({ searchQuery: query })
+            },
+        }),
+        [graphqlHook.updateFilters]
+    )
+
     const clearAllFilters = graphqlHook.clearAllFilters
 
     // Sync filter store with hook's filter state

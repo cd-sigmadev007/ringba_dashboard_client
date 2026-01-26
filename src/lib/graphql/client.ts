@@ -13,14 +13,17 @@ export function initializeGraphQLAuth(accessTokenGetter: () => string | null) {
 }
 
 // Create a request function that adds auth headers
-async function createAuthenticatedRequest<T = any, V = any>(
+async function createAuthenticatedRequest<
+    T = any,
+    TVariables extends Record<string, unknown> = Record<string, unknown>
+>(
     query: any, // Can be string or DocumentNode from gql tag
-    variables?: V
+    variables?: TVariables
 ): Promise<T> {
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
     }
-    
+
     // Add Bearer token if available (fallback - cookies should be primary)
     // Note: We use cookies as primary auth method, Bearer token is just a fallback
     const token = getAccessToken?.()
@@ -28,12 +31,12 @@ async function createAuthenticatedRequest<T = any, V = any>(
         headers['Authorization'] = `Bearer ${token}`
     }
     // Cookies are sent automatically via credentials: 'include'
-    
+
     const client = new GraphQLClient(`${API_BASE_URL}/graphql`, {
         credentials: 'include', // Required for cookies to be sent
         headers,
     })
-    
+
     try {
         const result = await client.request<T>(query, variables)
         return result
@@ -49,7 +52,10 @@ async function createAuthenticatedRequest<T = any, V = any>(
 
 // Export a client-like object that uses the authenticated request function
 export const graphqlClient = {
-    request: <T = any, V = any>(query: string, variables?: V): Promise<T> => {
-        return createAuthenticatedRequest<T, V>(query, variables)
+    request: <T = any, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+        query: string,
+        variables?: TVariables
+    ): Promise<T> => {
+        return createAuthenticatedRequest<T, TVariables>(query, variables)
     },
 }

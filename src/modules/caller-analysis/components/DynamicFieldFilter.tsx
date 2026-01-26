@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useGetFieldValues } from '../graphql/hooks'
-import type { FieldDefinition, CallerFilter } from '../graphql/types'
 import { FilterOperator } from '../graphql/types'
+import type { CallerFilter, FieldDefinition } from '../graphql/types'
 import Button from '@/components/ui/Button'
 
 interface DynamicFieldFilterProps {
@@ -60,7 +60,7 @@ export const DynamicFieldFilter: React.FC<DynamicFieldFilterProps> = ({
                                 ) : (
                                     fieldValues.edges.map((edge) => (
                                         <div
-                                            key={edge.cursor}
+                                            key={`${edge.node.value ?? 'empty'}-${edge.node.count}`}
                                             className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex items-center justify-between"
                                             onClick={() => {
                                                 setLocalValue(edge.node.value)
@@ -136,7 +136,9 @@ export const DynamicFieldFilter: React.FC<DynamicFieldFilterProps> = ({
 
             <select
                 value={localOperator}
-                onChange={(e) => setLocalOperator(e.target.value as FilterOperator)}
+                onChange={(e) =>
+                    setLocalOperator(e.target.value as FilterOperator)
+                }
                 className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white"
             >
                 <option value={FilterOperator.EQ}>=</option>

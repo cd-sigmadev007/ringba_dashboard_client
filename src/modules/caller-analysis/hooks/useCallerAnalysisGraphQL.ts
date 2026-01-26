@@ -1,9 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGetCallers } from '../graphql/hooks'
-import { convertGraphQLCallerToCallData, convertFilterStateToGraphQLFilter } from '../utils/graphqlUtils'
+import {
+    convertFilterStateToGraphQLFilter,
+    convertGraphQLCallerToCallData,
+} from '../utils/graphqlUtils'
+import { CallerOrderField, OrderDirection } from '../graphql/types'
 import type { FilterState } from '../types'
 import type { CallerOrderBy, FilterOperator } from '../graphql/types'
-import { CallerOrderField, OrderDirection } from '../graphql/types'
 
 export const useCallerAnalysisGraphQL = () => {
     const [filters, setFilters] = useState<FilterState>({
@@ -55,7 +58,7 @@ export const useCallerAnalysisGraphQL = () => {
 
     const updateFilters = (newFilters: Partial<FilterState>) => {
         setFilters((prev) => ({ ...prev, ...newFilters }))
-        setCursor(undefined) // Reset cursor when filters change
+        setPage(1) // Reset page when filters change
     }
 
     const removeFilters = (filterType: keyof FilterState) => {
@@ -70,7 +73,7 @@ export const useCallerAnalysisGraphQL = () => {
                         ? 'all'
                         : [],
         }))
-        setCursor(undefined)
+        setPage(1)
     }
 
     const clearAllFilters = () => {
@@ -83,7 +86,7 @@ export const useCallerAnalysisGraphQL = () => {
             searchQuery: '',
         })
         setDynamicFilters([])
-        setCursor(undefined)
+        setPage(1)
     }
 
     const hasActiveFilters = useMemo(() => {
@@ -111,14 +114,18 @@ export const useCallerAnalysisGraphQL = () => {
         }
     }
 
-    const addDynamicFilter = (field: string, value: any, operator: FilterOperator) => {
+    const addDynamicFilter = (
+        field: string,
+        value: any,
+        operator: FilterOperator
+    ) => {
         setDynamicFilters((prev) => [...prev, { field, value, operator }])
-        setCursor(undefined)
+        setPage(1)
     }
 
     const removeDynamicFilter = (index: number) => {
         setDynamicFilters((prev) => prev.filter((_, i) => i !== index))
-        setCursor(undefined)
+        setPage(1)
     }
 
     const updateDynamicFilter = (
@@ -129,7 +136,7 @@ export const useCallerAnalysisGraphQL = () => {
         setDynamicFilters((prev) =>
             prev.map((f, i) => (i === index ? { ...f, value, operator } : f))
         )
-        setCursor(undefined)
+        setPage(1)
     }
 
     return {

@@ -51,14 +51,14 @@ export interface DynamicFieldFilter {
 }
 
 export interface CallerFilter {
-    campaign?: string[]
-    status?: string[]
+    campaign?: Array<string>
+    status?: Array<string>
     dateFrom?: string
     dateTo?: string
     durationMin?: number
     durationMax?: number
     search?: string
-    dynamicFields?: DynamicFieldFilter[]
+    dynamicFields?: Array<DynamicFieldFilter>
 }
 
 export interface CallerOrderBy {
@@ -74,7 +74,7 @@ export interface Caller {
     lifetimeRevenue: number
     campaign: string
     action: string
-    status: string[]
+    status: Array<string>
     audioUrl?: string
     transcript?: string
     phoneNumber: string
@@ -111,7 +111,7 @@ export interface CallerEdge {
 }
 
 export interface CallerConnection {
-    edges: CallerEdge[]
+    edges: Array<CallerEdge>
     pageInfo: PageInfo
     totalCount: number
 }
@@ -126,6 +126,6 @@ export interface FieldValueEdge {
 }
 
 export interface FieldValueConnection {
-    edges: FieldValueEdge[]
+    edges: Array<FieldValueEdge>
     pageInfo: PageInfo
 }

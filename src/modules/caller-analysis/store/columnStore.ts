@@ -5,14 +5,14 @@ import type { ColumnVisibility } from '../hooks/useTableColumns'
 interface ColumnStore {
     columnVisibility: ColumnVisibility
     // Dynamic fields that are available but may not be selected
-    availableDynamicFields: string[]
+    availableDynamicFields: Array<string>
     // Selected dynamic fields (subset of availableDynamicFields)
-    selectedDynamicFields: string[]
+    selectedDynamicFields: Array<string>
     setColumnVisibility: (visibility: ColumnVisibility) => void
     toggleColumn: (columnId: keyof ColumnVisibility) => void
-    setAvailableDynamicFields: (fields: string[]) => void
+    setAvailableDynamicFields: (fields: Array<string>) => void
     toggleDynamicField: (fieldName: string) => void
-    setSelectedDynamicFields: (fields: string[]) => void
+    setSelectedDynamicFields: (fields: Array<string>) => void
     resetColumns: () => void
 }
 
@@ -51,10 +51,13 @@ export const useColumnStore = create<ColumnStore>()(
                 set({ availableDynamicFields: fields }),
             toggleDynamicField: (fieldName) =>
                 set((state) => {
-                    const isSelected = state.selectedDynamicFields.includes(fieldName)
+                    const isSelected =
+                        state.selectedDynamicFields.includes(fieldName)
                     return {
                         selectedDynamicFields: isSelected
-                            ? state.selectedDynamicFields.filter((f) => f !== fieldName)
+                            ? state.selectedDynamicFields.filter(
+                                  (f) => f !== fieldName
+                              )
                             : [...state.selectedDynamicFields, fieldName],
                     }
                 }),

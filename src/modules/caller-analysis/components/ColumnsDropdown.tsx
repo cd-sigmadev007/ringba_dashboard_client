@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useGetAvailableFields } from '../graphql/hooks'
+import { useColumnStore } from '../store/columnStore'
 import { CheckboxIcon, ChevronDownDark } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
 import { Search } from '@/components/common'
 import Button from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
-import { useGetAvailableFields } from '../graphql/hooks'
-import { useColumnStore } from '../store/columnStore'
 import { isFeatureEnabled } from '@/lib/config/featureFlags'
 
 export interface ColumnOption {
@@ -51,12 +51,16 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
             onClose()
         }
     })
-    
+
     // GraphQL field discovery (if enabled)
     const enableDynamicFields = isFeatureEnabled('ENABLE_DYNAMIC_FIELDS_UI')
-    const { data: availableFields, isLoading: loadingFields, error: fieldsError } = useGetAvailableFields()
+    const {
+        data: availableFields,
+        isLoading: loadingFields,
+        error: fieldsError,
+    } = useGetAvailableFields()
     const { selectedDynamicFields, toggleDynamicField } = useColumnStore()
-    
+
     // Log for debugging
     React.useEffect(() => {
         if (enableDynamicFields) {
@@ -64,25 +68,31 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
             console.log('[ColumnsDropdown] Available fields:', availableFields)
             console.log('[ColumnsDropdown] Loading:', loadingFields)
             if (fieldsError) {
-                console.error('[ColumnsDropdown] Error loading fields:', fieldsError)
+                console.error(
+                    '[ColumnsDropdown] Error loading fields:',
+                    fieldsError
+                )
             }
         }
     }, [enableDynamicFields, availableFields, loadingFields, fieldsError])
-    
+
     // Add dynamic fields to columns if enabled
-    const allColumns = enableDynamicFields && availableFields
-        ? [
-              ...columns,
-              ...availableFields
-                  .filter((f) => f.source === 'DYNAMIC')
-                  .map((f) => ({
-                      id: f.name,
-                      label: f.name.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-                      category: 'dynamic' as const,
-                      visible: selectedDynamicFields.includes(f.name),
-                  })),
-          ]
-        : columns
+    const allColumns =
+        enableDynamicFields && availableFields
+            ? [
+                  ...columns,
+                  ...availableFields
+                      .filter((f) => f.source === 'DYNAMIC')
+                      .map((f) => ({
+                          id: f.name,
+                          label: f.name
+                              .replace(/_/g, ' ')
+                              .replace(/\b\w/g, (l) => l.toUpperCase()),
+                          category: 'dynamic' as const,
+                          visible: selectedDynamicFields.includes(f.name),
+                      })),
+              ]
+            : columns
 
     // Group columns by category
     const groupedColumns: Array<ColumnGroup> = [
@@ -115,7 +125,9 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                   {
                       id: 'dynamic',
                       label: 'Dynamic Fields',
-                      columns: allColumns.filter((c) => c.category === 'dynamic'),
+                      columns: allColumns.filter(
+                          (c) => c.category === 'dynamic'
+                      ),
                       expanded: expandedGroups.has('dynamic'),
                   },
               ]
@@ -277,8 +289,13 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                             key={column.id}
                                             variant="ghost"
                                             onClick={() => {
-                                                if (column.category === 'dynamic') {
-                                                    toggleDynamicField(column.id)
+                                                if (
+                                                    column.category ===
+                                                    'dynamic'
+                                                ) {
+                                                    toggleDynamicField(
+                                                        column.id
+                                                    )
                                                 } else {
                                                     onColumnToggle(column.id)
                                                 }

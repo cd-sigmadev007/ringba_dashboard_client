@@ -1,21 +1,21 @@
 import { useQuery } from '@tanstack/react-query'
-import { graphqlClient } from '@/lib/graphql/client'
-import { useAuth } from '@/contexts/AuthContext'
 import {
-    GET_CALLERS_QUERY,
     GET_AVAILABLE_FIELDS_QUERY,
-    GET_FIELD_VALUES_QUERY,
+    GET_CALLERS_QUERY,
     GET_CALLER_BY_ID_QUERY,
     GET_CALLER_BY_PHONE_QUERY,
+    GET_FIELD_VALUES_QUERY,
 } from './queries'
 import type {
+    Caller,
+    CallerConnection,
     CallerFilter,
     CallerOrderBy,
-    CallerConnection,
     FieldDefinition,
     FieldValueConnection,
-    Caller,
 } from './types'
+import { graphqlClient } from '@/lib/graphql/client'
+import { useAuth } from '@/contexts/AuthContext'
 
 // Hook to get all callers with GraphQL
 export const useGetCallers = (
@@ -26,19 +26,18 @@ export const useGetCallers = (
 ) => {
     const { user, loading: authLoading } = useAuth()
     const isAuthenticated = !!user && !authLoading
-    
+
     return useQuery({
         queryKey: ['graphql', 'callers', filter, orderBy, page, limit],
         queryFn: async () => {
-            const data = await graphqlClient.request<{ callers: CallerConnection }>(
-                GET_CALLERS_QUERY,
-                {
-                    filter,
-                    orderBy,
-                    page,
-                    limit,
-                }
-            )
+            const data = await graphqlClient.request<{
+                callers: CallerConnection
+            }>(GET_CALLERS_QUERY, {
+                filter,
+                orderBy,
+                page,
+                limit,
+            })
             return data.callers
         },
         enabled: isAuthenticated, // Only run when authenticated
@@ -51,18 +50,24 @@ export const useGetCallers = (
 export const useGetAvailableFields = () => {
     const { user, loading: authLoading } = useAuth()
     const isAuthenticated = !!user && !authLoading
-    
+
     return useQuery({
         queryKey: ['graphql', 'availableFields'],
         queryFn: async () => {
             try {
                 const data = await graphqlClient.request<{
-                    availableFields: FieldDefinition[]
+                    availableFields: Array<FieldDefinition>
                 }>(GET_AVAILABLE_FIELDS_QUERY)
-                console.log('[GraphQL] Available fields fetched:', data.availableFields)
+                console.log(
+                    '[GraphQL] Available fields fetched:',
+                    data.availableFields
+                )
                 return data.availableFields
             } catch (error) {
-                console.error('[GraphQL] Error fetching available fields:', error)
+                console.error(
+                    '[GraphQL] Error fetching available fields:',
+                    error
+                )
                 throw error
             }
         },
@@ -82,7 +87,7 @@ export const useGetFieldValues = (
 ) => {
     const { user, loading: authLoading } = useAuth()
     const isAuthenticated = !!user && !authLoading
-    
+
     return useQuery({
         queryKey: ['graphql', 'fieldValues', fieldName, filter, page, limit],
         queryFn: async () => {
@@ -106,7 +111,7 @@ export const useGetFieldValues = (
 export const useGetCallerById = (id: string) => {
     const { user, loading: authLoading } = useAuth()
     const isAuthenticated = !!user && !authLoading
-    
+
     return useQuery({
         queryKey: ['graphql', 'caller', id],
         queryFn: async () => {
@@ -126,7 +131,7 @@ export const useGetCallerById = (id: string) => {
 export const useGetCallerByPhone = (phoneNumber: string) => {
     const { user, loading: authLoading } = useAuth()
     const isAuthenticated = !!user && !authLoading
-    
+
     return useQuery({
         queryKey: ['graphql', 'caller', 'phone', phoneNumber],
         queryFn: async () => {
