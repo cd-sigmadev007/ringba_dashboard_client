@@ -84,6 +84,14 @@ interface TableProps<T = any> {
         totalPages: number
     ) => void
     /**
+     * Total number of pages (for server-side pagination)
+     */
+    pageCount?: number
+    /**
+     * Whether pagination is manual (server-side) or automatic (client-side)
+     */
+    manualPagination?: boolean
+    /**
      * Custom header component to render above the table (inside the card)
      */
     customHeader?: React.ReactNode
@@ -112,6 +120,14 @@ interface TableProps<T = any> {
      * Callback when selection changes (returns Set of selected IDs)
      */
     onSelectionChange?: (selectedIds: Set<string>) => void
+    /**
+     * Total number of records (for server-side pagination display)
+     */
+    totalRecords?: number
+    /**
+     * Controlled page index (for server-side pagination)
+     */
+    pageIndex?: number
 }
 
 const Table = <T,>({
@@ -136,6 +152,10 @@ const Table = <T,>({
     onRowSelectionChange,
     getRowId,
     onSelectionChange,
+    pageCount,
+    manualPagination = false,
+    totalRecords,
+    pageIndex: controlledPageIndex,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -219,8 +239,43 @@ const Table = <T,>({
         state: {
             sorting,
             rowSelection: rowSelection || {},
+            ...(pagination && manualPagination
+                ? {
+                      pagination: {
+                          pageIndex:
+                              controlledPageIndex !== undefined
+                                  ? controlledPageIndex
+                                  : 0,
+                          pageSize,
+                      },
+                  }
+                : {}),
         },
         onSortingChange: setSorting,
+        onPaginationChange:
+            pagination && manualPagination && onPaginationChange
+                ? (updater) => {
+                      // Get the new pagination state
+                      const currentState = table.getState().pagination
+                      const newState =
+                          typeof updater === 'function'
+                              ? updater(currentState)
+                              : updater
+
+                      // Only notify parent if page index actually changed
+                      if (newState.pageIndex !== controlledPageIndex) {
+                          const totalPages =
+                              pageCount !== undefined
+                                  ? pageCount
+                                  : table.getPageCount()
+                          onPaginationChange(
+                              newState.pageIndex,
+                              newState.pageSize,
+                              totalPages
+                          )
+                      }
+                  }
+                : undefined,
         onRowSelectionChange: onRowSelectionChange
             ? (updater) => {
                   if (typeof updater === 'function') {
@@ -236,7 +291,13 @@ const Table = <T,>({
         getRowId: getRowId || ((row: any) => row.id),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: pagination ? getPaginationRowModel() : undefined,
+        getPaginationRowModel:
+            pagination && !manualPagination
+                ? getPaginationRowModel()
+                : undefined,
+        manualPagination: manualPagination,
+        pageCount:
+            manualPagination && pageCount !== undefined ? pageCount : undefined,
         enablePinning: true,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -266,21 +327,15 @@ const Table = <T,>({
         }
     }, [rowSelection, enableRowSelection, onSelectionChange])
 
-    // Notify parent of pagination changes
+    // Sync controlled page index for manual pagination
     useEffect(() => {
-        if (pagination && onPaginationChange) {
-            const pageIndex = table.getState().pagination.pageIndex
-            const currentPageSize = table.getState().pagination.pageSize
-            const totalPages = table.getPageCount()
-            onPaginationChange(pageIndex, currentPageSize, totalPages)
+        if (manualPagination && controlledPageIndex !== undefined) {
+            const currentPageIndex = table.getState().pagination.pageIndex
+            if (currentPageIndex !== controlledPageIndex) {
+                table.setPageIndex(controlledPageIndex)
+            }
         }
-    }, [
-        table.getState().pagination.pageIndex,
-        table.getState().pagination.pageSize,
-        table.getPageCount(),
-        pagination,
-        onPaginationChange,
-    ])
+    }, [controlledPageIndex, manualPagination, table])
 
     // Handle row click
     const handleRowClick = (row: T) => {
@@ -660,20 +715,36 @@ const Table = <T,>({
                         )}
                     >
                         Showing{' '}
-                        {table.getState().pagination.pageIndex * pageSize + 1}{' '}
+                        {manualPagination && totalRecords !== undefined
+                            ? table.getState().pagination.pageIndex * pageSize +
+                              1
+                            : table.getState().pagination.pageIndex * pageSize +
+                              1}{' '}
                         to{' '}
-                        {Math.min(
-                            (table.getState().pagination.pageIndex + 1) *
-                                pageSize,
-                            table.getPrePaginationRowModel().rows.length
-                        )}{' '}
-                        of {table.getPrePaginationRowModel().rows.length}{' '}
+                        {manualPagination && totalRecords !== undefined
+                            ? Math.min(
+                                  (table.getState().pagination.pageIndex + 1) *
+                                      pageSize,
+                                  totalRecords
+                              )
+                            : Math.min(
+                                  (table.getState().pagination.pageIndex + 1) *
+                                      pageSize,
+                                  table.getPrePaginationRowModel().rows.length
+                              )}{' '}
+                        of{' '}
+                        {manualPagination && totalRecords !== undefined
+                            ? totalRecords
+                            : table.getPrePaginationRowModel().rows.length}{' '}
                         entries
                     </div>
                     <div className="flex items-center gap-[10px]">
                         {/* Page Numbers */}
                         {(() => {
-                            const totalPages = table.getPageCount()
+                            const totalPages =
+                                manualPagination && pageCount !== undefined
+                                    ? pageCount
+                                    : table.getPageCount()
                             const currentPage =
                                 table.getState().pagination.pageIndex + 1
                             const maxVisiblePages = 3 // Show max 7 page numbers

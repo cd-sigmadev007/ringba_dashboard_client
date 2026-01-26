@@ -14,38 +14,36 @@ export const GET_CALLERS_QUERY = gql`
             page: $page
             limit: $limit
         ) {
-            edges {
-                node {
-                    id
-                    callerId
-                    lastCall
-                    duration
-                    lifetimeRevenue
-                    campaign
-                    action
-                    status
-                    audioUrl
-                    transcript
-                    phoneNumber
-                    callTimestamp
-                    callLengthInSeconds
-                    attributes
-                    firstName
-                    lastName
-                    email
-                    type
-                    address
-                    streetNumber
-                    streetName
-                    streetType
-                    city
-                    state
-                    zip
-                    revenue
-                    ringbaCost
-                    adCost
-                    targetName
-                }
+            data {
+                id
+                callerId
+                lastCall
+                duration
+                lifetimeRevenue
+                campaign
+                action
+                status
+                audioUrl
+                transcript
+                phoneNumber
+                callTimestamp
+                callLengthInSeconds
+                attributes
+                firstName
+                lastName
+                email
+                type
+                address
+                streetNumber
+                streetName
+                streetType
+                city
+                state
+                zip
+                revenue
+                ringbaCost
+                adCost
+                targetName
             }
             pageInfo {
                 hasNextPage
@@ -85,11 +83,9 @@ export const GET_FIELD_VALUES_QUERY = gql`
             page: $page
             limit: $limit
         ) {
-            edges {
-                node {
-                    value
-                    count
-                }
+            data {
+                value
+                count
             }
             pageInfo {
                 hasNextPage

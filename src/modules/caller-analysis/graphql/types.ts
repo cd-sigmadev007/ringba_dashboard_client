@@ -106,12 +106,8 @@ export interface PageInfo {
     totalCount: number
 }
 
-export interface CallerEdge {
-    node: Caller
-}
-
 export interface CallerConnection {
-    edges: Array<CallerEdge>
+    data: Array<Caller>
     pageInfo: PageInfo
     totalCount: number
 }
@@ -121,11 +117,7 @@ export interface FieldValue {
     count: number
 }
 
-export interface FieldValueEdge {
-    node: FieldValue
-}
-
 export interface FieldValueConnection {
-    edges: Array<FieldValueEdge>
+    data: Array<FieldValue>
     pageInfo: PageInfo
 }
