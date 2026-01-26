@@ -58,20 +58,20 @@ export const DynamicFieldFilter: React.FC<DynamicFieldFilterProps> = ({
                                         Loading...
                                     </div>
                                 ) : (
-                                    fieldValues.edges.map((edge) => (
+                                    fieldValues.data.map((item) => (
                                         <div
-                                            key={`${edge.node.value ?? 'empty'}-${edge.node.count}`}
+                                            key={`${item.value ?? 'empty'}-${item.count}`}
                                             className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex items-center justify-between"
                                             onClick={() => {
-                                                setLocalValue(edge.node.value)
+                                                setLocalValue(item.value)
                                                 setShowValues(false)
                                             }}
                                         >
                                             <span className="text-sm text-gray-900 dark:text-white">
-                                                {edge.node.value || '(empty)'}
+                                                {item.value || '(empty)'}
                                             </span>
                                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                {edge.node.count}
+                                                {item.count}
                                             </span>
                                         </div>
                                     ))

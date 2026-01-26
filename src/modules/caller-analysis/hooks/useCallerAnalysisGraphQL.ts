@@ -28,7 +28,7 @@ export const useCallerAnalysisGraphQL = () => {
     })
 
     const [page, setPage] = useState(1)
-    const [pageSize] = useState(100)
+    const [pageSize] = useState(50)
 
     // Convert filters to GraphQL format
     const graphQLFilter = useMemo(
@@ -47,8 +47,8 @@ export const useCallerAnalysisGraphQL = () => {
     // Convert GraphQL data to CallData format
     const data = useMemo(() => {
         if (!callerConnection) return []
-        return callerConnection.edges.map((edge) =>
-            convertGraphQLCallerToCallData(edge.node)
+        return callerConnection.data.map((caller) =>
+            convertGraphQLCallerToCallData(caller)
         )
     }, [callerConnection])
 
@@ -103,8 +103,20 @@ export const useCallerAnalysisGraphQL = () => {
     }, [filters, dynamicFilters])
 
     const loadNextPage = () => {
-        if (hasNextPage) {
-            setPage((prev) => prev + 1)
+        const currentPage = callerConnection?.pageInfo.currentPage || page
+        const totalPages = callerConnection?.pageInfo.totalPages || 0
+
+        // Only load next page if:
+        // 1. hasNextPage is true
+        // 2. Not currently loading
+        // 3. Current page is less than total pages (safety check)
+        if (hasNextPage && !isLoading && currentPage < totalPages) {
+            setPage((prev) => {
+                const nextPage = prev + 1
+                // Additional safety: don't go beyond totalPages
+                const maxPage = totalPages || nextPage
+                return Math.min(nextPage, maxPage)
+            })
         }
     }
 
@@ -163,6 +175,7 @@ export const useCallerAnalysisGraphQL = () => {
         loadNextPage,
         loadPreviousPage,
         page,
+        setPage,
         currentPage: callerConnection?.pageInfo.currentPage || 1,
         totalPages: callerConnection?.pageInfo.totalPages || 0,
 

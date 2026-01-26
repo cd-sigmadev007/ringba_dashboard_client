@@ -148,7 +148,6 @@ export const CallerAnalysisContainer: React.FC = () => {
     const isLoading = graphqlHook.isLoading
     const isLoadingBatch = false
     const totalRecords = graphqlHook.totalRecords
-    const BATCH_SIZE = 100
 
     // Wrap refetch to match expected signature
     const refetch = React.useCallback(() => {
@@ -158,7 +157,6 @@ export const CallerAnalysisContainer: React.FC = () => {
     }, [graphqlHook.refetch])
 
     const lastUpdated = new Date()
-    const loadNextBatch = graphqlHook.loadNextPage
 
     // Wrap removeFilters to match expected interface
     const removeFilters = React.useMemo(
@@ -384,36 +382,33 @@ export const CallerAnalysisContainer: React.FC = () => {
         toggleColumn(columnId as keyof ColumnVisibility)
     }
 
-    // Handle pagination changes - load next batch when user reaches last page
+    // Handle pagination changes - GraphQL uses server-side pagination, no batch loading needed
     const handlePaginationChange = React.useCallback(
         (pageIndex: number, _pageSize: number, totalPages: number) => {
-            // Check if user is on the last page
-            const isLastPage = pageIndex + 1 === totalPages
+            // GraphQL pagination: just update the page in the hook
+            const requestedPage = pageIndex + 1 // pageIndex is 0-based, GraphQL uses 1-based
 
-            if (isLastPage) {
-                // Calculate current batch based on loaded data
-                const currentBatch = Math.ceil(filteredData.length / BATCH_SIZE)
-                const totalBatches = Math.ceil(totalRecords / BATCH_SIZE)
+            console.log(`[Pagination] Page change requested:`, {
+                pageIndex,
+                requestedPage,
+                totalPages,
+                graphqlTotalPages: graphqlHook.totalPages,
+                totalRecords,
+            })
 
-                // If we have more batches to load, load the next one
-                // Only load if we're actually on the last page and have more data
-                if (currentBatch < totalBatches && !isLoadingBatch) {
-                    console.log(
-                        `📄 User reached last page (${pageIndex + 1}/${totalPages}), loading batch ${currentBatch + 1}`
-                    )
-                    loadNextBatch()
-                    // Note: Don't change page index - let the table stay on the current page
-                    // The new data will be added, increasing total pages, but we stay on the same page number
-                }
+            // Validate page bounds only - let the GraphQL hook handle duplicate prevention
+            if (requestedPage >= 1 && requestedPage <= totalPages) {
+                console.log(
+                    `[Pagination] Changing to page ${requestedPage} (total: ${totalPages})`
+                )
+                graphqlHook.setPage(requestedPage)
+            } else {
+                console.log(
+                    `[Pagination] Invalid page: ${requestedPage} (total: ${totalPages})`
+                )
             }
         },
-        [
-            filteredData.length,
-            BATCH_SIZE,
-            totalRecords,
-            isLoadingBatch,
-            loadNextBatch,
-        ]
+        [graphqlHook, totalRecords]
     )
 
     return (
@@ -478,6 +473,11 @@ export const CallerAnalysisContainer: React.FC = () => {
                         onRowSelectionChange={setRowSelection}
                         onSelectionChange={handleRowSelectionChange}
                         getRowId={(row) => row.id}
+                        manualPagination={true}
+                        pageCount={graphqlHook.totalPages}
+                        pageSize={50}
+                        totalRecords={totalRecords}
+                        pageIndex={graphqlHook.page - 1}
                         customHeader={
                             <div className="relative">
                                 <TableHeader
