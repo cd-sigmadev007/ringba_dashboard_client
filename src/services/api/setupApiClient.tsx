@@ -15,7 +15,7 @@ export function ApiClientSetup({ children }: { children: React.ReactNode }) {
             getAccessToken,
             refresh,
         })
-        
+
         // Initialize GraphQL client with same auth token getter
         initializeGraphQLAuth(getAccessToken)
     }, [getAccessToken, refresh])

@@ -107,12 +107,18 @@ export const FieldDiscoveryPanel: React.FC<FieldDiscoveryPanelProps> = ({
                                     <div className="space-y-2">
                                         {dynamicFields.map((field) => {
                                             const isSelected =
-                                                selectedDynamicFields.includes(field.name)
+                                                selectedDynamicFields.includes(
+                                                    field.name
+                                                )
                                             return (
                                                 <div
                                                     key={field.name}
                                                     className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer"
-                                                    onClick={() => toggleDynamicField(field.name)}
+                                                    onClick={() =>
+                                                        toggleDynamicField(
+                                                            field.name
+                                                        )
+                                                    }
                                                 >
                                                     <CheckboxIcon
                                                         checked={isSelected}

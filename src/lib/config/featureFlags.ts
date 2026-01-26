@@ -7,7 +7,8 @@ export const FEATURE_FLAGS = {
     /**
      * Enable dynamic fields UI
      */
-    ENABLE_DYNAMIC_FIELDS_UI: import.meta.env.VITE_ENABLE_DYNAMIC_FIELDS_UI === 'true',
+    ENABLE_DYNAMIC_FIELDS_UI:
+        import.meta.env.VITE_ENABLE_DYNAMIC_FIELDS_UI === 'true',
 
     /**
      * Enable GraphQL API usage (always enabled for caller analysis)

@@ -1,11 +1,19 @@
 import React from 'react'
 import { useGetAvailableFields } from '../graphql/hooks'
 import { DynamicFieldFilter } from './DynamicFieldFilter'
-import type { FieldDefinition, FilterOperator, CallerFilter } from '../graphql/types'
+import type {
+    CallerFilter,
+    FieldDefinition,
+    FilterOperator,
+} from '../graphql/types'
 import Button from '@/components/ui/Button'
 
 interface DynamicFiltersSectionProps {
-    filters: Array<{ field: FieldDefinition; value: any; operator: FilterOperator }>
+    filters: Array<{
+        field: FieldDefinition
+        value: any
+        operator: FilterOperator
+    }>
     onAddFilter: () => void
     onRemoveFilter: (index: number) => void
     onFilterChange: (
@@ -26,7 +34,9 @@ export const DynamicFiltersSection: React.FC<DynamicFiltersSectionProps> = ({
     const { data: availableFields } = useGetAvailableFields()
 
     const filterableFields =
-        availableFields?.filter((f) => f.filterable && f.source === 'DYNAMIC') || []
+        availableFields?.filter(
+            (f) => f.filterable && f.source === 'DYNAMIC'
+        ) || []
 
     return (
         <div className="space-y-2">

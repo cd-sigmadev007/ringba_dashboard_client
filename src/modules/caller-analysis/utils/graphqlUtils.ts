@@ -1,5 +1,11 @@
-import type { Caller } from '../graphql/types'
+import dayjs from 'dayjs'
+import type { Caller, CallerFilter, FilterOperator  } from '../graphql/types'
 import type { CallData } from '../types'
+
+/**
+ * Convert FilterState to GraphQL CallerFilter
+ */
+import type { FilterState } from '../types'
 
 /**
  * Convert GraphQL Caller to CallData format
@@ -7,16 +13,19 @@ import type { CallData } from '../types'
 export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
     // Debug logging for attributes
     if (caller.attributes && Object.keys(caller.attributes).length > 0) {
-        console.log('[convertGraphQLCallerToCallData] Converting caller with attributes:', {
-            id: caller.id,
-            attributesKeys: Object.keys(caller.attributes),
-            hasPublisher: 'publisher' in caller.attributes,
-            hasPublisherName: 'publisherName' in caller.attributes,
-            publisherValue: caller.attributes.publisher,
-            publisherNameValue: caller.attributes.publisherName,
-        })
+        console.log(
+            '[convertGraphQLCallerToCallData] Converting caller with attributes:',
+            {
+                id: caller.id,
+                attributesKeys: Object.keys(caller.attributes),
+                hasPublisher: 'publisher' in caller.attributes,
+                hasPublisherName: 'publisherName' in caller.attributes,
+                publisherValue: caller.attributes.publisher,
+                publisherNameValue: caller.attributes.publisherName,
+            }
+        )
     }
-    
+
     return {
         id: caller.id,
         callerId: caller.callerId,
@@ -51,16 +60,13 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
     }
 }
 
-/**
- * Convert FilterState to GraphQL CallerFilter
- */
-import type { FilterState } from '../types'
-import type { CallerFilter, FilterOperator } from '../graphql/types'
-import dayjs from 'dayjs'
-
 export const convertFilterStateToGraphQLFilter = (
     filterState: FilterState,
-    dynamicFilters?: Array<{ field: string; value: any; operator: FilterOperator }>
+    dynamicFilters?: Array<{
+        field: string
+        value: any
+        operator: FilterOperator
+    }>
 ): CallerFilter => {
     const filter: CallerFilter = {}
 

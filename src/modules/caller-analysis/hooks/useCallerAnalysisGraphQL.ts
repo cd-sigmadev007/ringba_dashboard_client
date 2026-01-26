@@ -1,9 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGetCallers } from '../graphql/hooks'
-import { convertGraphQLCallerToCallData, convertFilterStateToGraphQLFilter } from '../utils/graphqlUtils'
+import {
+    convertFilterStateToGraphQLFilter,
+    convertGraphQLCallerToCallData,
+} from '../utils/graphqlUtils'
+import { CallerOrderField, OrderDirection } from '../graphql/types'
 import type { FilterState } from '../types'
 import type { CallerOrderBy, FilterOperator } from '../graphql/types'
-import { CallerOrderField, OrderDirection } from '../graphql/types'
 
 export const useCallerAnalysisGraphQL = () => {
     const [filters, setFilters] = useState<FilterState>({
@@ -111,7 +114,11 @@ export const useCallerAnalysisGraphQL = () => {
         }
     }
 
-    const addDynamicFilter = (field: string, value: any, operator: FilterOperator) => {
+    const addDynamicFilter = (
+        field: string,
+        value: any,
+        operator: FilterOperator
+    ) => {
         setDynamicFilters((prev) => [...prev, { field, value, operator }])
         setCursor(undefined)
     }
