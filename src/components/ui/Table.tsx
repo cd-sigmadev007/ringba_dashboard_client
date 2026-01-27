@@ -112,6 +112,21 @@ interface TableProps<T = any> {
      * Callback when selection changes (returns Set of selected IDs)
      */
     onSelectionChange?: (selectedIds: Set<string>) => void
+    /**
+     * Total number of pages (for server-side pagination)
+     * If provided, overrides the calculated page count
+     */
+    totalPages?: number
+    /**
+     * Total number of records (for server-side pagination)
+     * If provided, used for display instead of data length
+     */
+    totalRecords?: number
+    /**
+     * Controlled page index (for server-side pagination)
+     * If provided, overrides internal pagination state
+     */
+    pageIndex?: number
 }
 
 const Table = <T,>({
@@ -136,6 +151,9 @@ const Table = <T,>({
     onRowSelectionChange,
     getRowId,
     onSelectionChange,
+    totalPages: externalTotalPages,
+    totalRecords: externalTotalRecords,
+    pageIndex: externalPageIndex,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -219,6 +237,14 @@ const Table = <T,>({
         state: {
             sorting,
             rowSelection: rowSelection || {},
+            ...(externalPageIndex !== undefined && pagination
+                ? {
+                      pagination: {
+                          pageIndex: externalPageIndex,
+                          pageSize,
+                      },
+                  }
+                : {}),
         },
         onSortingChange: setSorting,
         onRowSelectionChange: onRowSelectionChange
@@ -242,12 +268,13 @@ const Table = <T,>({
             fuzzy: fuzzyFilter,
         },
         initialState: {
-            pagination: pagination
-                ? {
-                      pageIndex: 0,
-                      pageSize,
-                  }
-                : undefined,
+            pagination:
+                pagination && externalPageIndex === undefined
+                    ? {
+                          pageIndex: 0,
+                          pageSize,
+                      }
+                    : undefined,
         },
         // Prevent page reset when data changes
         autoResetPageIndex: false,
@@ -665,15 +692,16 @@ const Table = <T,>({
                         {Math.min(
                             (table.getState().pagination.pageIndex + 1) *
                                 pageSize,
-                            table.getPrePaginationRowModel().rows.length
+                            externalTotalRecords ?? table.getPrePaginationRowModel().rows.length
                         )}{' '}
-                        of {table.getPrePaginationRowModel().rows.length}{' '}
+                        of {externalTotalRecords ?? table.getPrePaginationRowModel().rows.length}{' '}
                         entries
                     </div>
                     <div className="flex items-center gap-[10px]">
                         {/* Page Numbers */}
                         {(() => {
-                            const totalPages = table.getPageCount()
+                            // Use external totalPages if provided (server-side pagination), otherwise calculate from data
+                            const totalPages = externalTotalPages ?? table.getPageCount()
                             const currentPage =
                                 table.getState().pagination.pageIndex + 1
                             const maxVisiblePages = 3 // Show max 7 page numbers
