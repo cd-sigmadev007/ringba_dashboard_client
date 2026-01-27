@@ -473,11 +473,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                         onRowSelectionChange={setRowSelection}
                         onSelectionChange={handleRowSelectionChange}
                         getRowId={(row) => row.id}
-                        manualPagination={true}
-                        pageCount={graphqlHook.totalPages}
                         pageSize={50}
-                        totalRecords={totalRecords}
-                        pageIndex={graphqlHook.page - 1}
                         customHeader={
                             <div className="relative">
                                 <TableHeader

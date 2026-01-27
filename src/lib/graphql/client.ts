@@ -15,7 +15,7 @@ export function initializeGraphQLAuth(accessTokenGetter: () => string | null) {
 // Create a request function that adds auth headers
 async function createAuthenticatedRequest<
     T = any,
-    TVariables extends Record<string, unknown> = Record<string, unknown>
+    TVariables extends Record<string, unknown> = Record<string, unknown>,
 >(
     query: any, // Can be string or DocumentNode from gql tag
     variables?: TVariables
@@ -52,7 +52,10 @@ async function createAuthenticatedRequest<
 
 // Export a client-like object that uses the authenticated request function
 export const graphqlClient = {
-    request: <T = any, TVariables extends Record<string, unknown> = Record<string, unknown>>(
+    request: <
+        T = any,
+        TVariables extends Record<string, unknown> = Record<string, unknown>,
+    >(
         query: string,
         variables?: TVariables
     ): Promise<T> => {
