@@ -1,6 +1,14 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import type { Caller, CallerFilter, FilterOperator } from '../graphql/types'
 import type { CallData, FilterState } from '../types'
+
+// Extend dayjs with timezone support
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+const EST_TIMEZONE = 'America/New_York'
 
 /**
  * Convert FilterState to GraphQL CallerFilter
@@ -82,11 +90,27 @@ export const convertFilterStateToGraphQLFilter = (
     }
 
     if (filterState.dateRange.from) {
-        filter.dateFrom = dayjs(filterState.dateRange.from).toISOString()
+        // The Date object from the picker represents a calendar date
+        // We need to interpret it as EST start of day
+        // Extract year/month/day and create EST date at start of day
+        const date = dayjs(filterState.dateRange.from)
+        const estDate = dayjs.tz(
+            `${date.year()}-${String(date.month() + 1).padStart(2, '0')}-${String(date.date()).padStart(2, '0')} 00:00:00`,
+            EST_TIMEZONE
+        )
+        filter.dateFrom = estDate.toISOString()
     }
 
     if (filterState.dateRange.to) {
-        filter.dateTo = dayjs(filterState.dateRange.to).toISOString()
+        // The Date object from the picker represents a calendar date
+        // We need to interpret it as EST end of day
+        // Extract year/month/day and create EST date at end of day
+        const date = dayjs(filterState.dateRange.to)
+        const estDate = dayjs.tz(
+            `${date.year()}-${String(date.month() + 1).padStart(2, '0')}-${String(date.date()).padStart(2, '0')} 23:59:59`,
+            EST_TIMEZONE
+        )
+        filter.dateTo = estDate.toISOString()
     }
 
     if (filterState.durationRange.min !== undefined) {
