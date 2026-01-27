@@ -95,6 +95,7 @@ export interface Caller {
     revenue?: number
     ringbaCost?: number
     adCost?: number
+    latestPayout?: string
     targetName?: string
 }
 

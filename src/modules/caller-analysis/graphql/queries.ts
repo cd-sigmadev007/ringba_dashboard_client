@@ -43,6 +43,7 @@ export const GET_CALLERS_QUERY = gql`
                 revenue
                 ringbaCost
                 adCost
+                latestPayout
                 targetName
             }
             pageInfo {

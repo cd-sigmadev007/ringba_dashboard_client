@@ -38,7 +38,7 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
         callerId: caller.callerId,
         lastCall: caller.lastCall,
         duration: caller.duration,
-        lifetimeRevenue: caller.lifetimeRevenue,
+        lifetimeRevenue: caller.lifetimeRevenue, // Will be aggregated from latestPayout
         campaign: caller.campaign,
         action: caller.action,
         status: caller.status || [],
@@ -58,6 +58,7 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
         zip: caller.zip,
         ringbaCost: caller.ringbaCost,
         adCost: caller.adCost,
+        latestPayout: caller.latestPayout || null, // Include latestPayout for aggregation
         call_timestamp: caller.callTimestamp,
         targetName: caller.targetName,
         // Preserve attributes jsonb for dynamic fields access
