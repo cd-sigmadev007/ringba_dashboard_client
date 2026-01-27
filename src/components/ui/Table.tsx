@@ -262,7 +262,12 @@ const Table = <T,>({
         getRowId: getRowId || ((row: any) => row.id),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: pagination ? getPaginationRowModel() : undefined,
+        // Only use pagination row model for client-side pagination (when externalPageIndex is not provided)
+        // For server-side pagination (externalPageIndex provided), data is already paginated
+        getPaginationRowModel:
+            pagination && externalPageIndex === undefined
+                ? getPaginationRowModel()
+                : undefined,
         enablePinning: true,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -293,12 +298,17 @@ const Table = <T,>({
         }
     }, [rowSelection, enableRowSelection, onSelectionChange])
 
-    // Notify parent of pagination changes
+    // Notify parent of pagination changes (only for uncontrolled pagination)
+    // For controlled pagination (externalPageIndex), we call onPaginationChange directly in button handlers
     useEffect(() => {
-        if (pagination && onPaginationChange) {
+        if (
+            pagination &&
+            onPaginationChange &&
+            externalPageIndex === undefined
+        ) {
             const pageIndex = table.getState().pagination.pageIndex
             const currentPageSize = table.getState().pagination.pageSize
-            const totalPages = table.getPageCount()
+            const totalPages = externalTotalPages ?? table.getPageCount()
             onPaginationChange(pageIndex, currentPageSize, totalPages)
         }
     }, [
@@ -307,6 +317,8 @@ const Table = <T,>({
         table.getPageCount(),
         pagination,
         onPaginationChange,
+        externalPageIndex,
+        externalTotalPages,
     ])
 
     // Handle row click
@@ -596,7 +608,10 @@ const Table = <T,>({
                                     </td>
                                 </tr>
                             ) : (
-                                table.getRowModel().rows.map((row) => (
+                                (externalPageIndex !== undefined
+                                    ? table.getCoreRowModel().rows
+                                    : table.getRowModel().rows
+                                ).map((row) => (
                                     <tr
                                         key={row.id}
                                         className={clsx(
@@ -687,23 +702,40 @@ const Table = <T,>({
                         )}
                     >
                         Showing{' '}
-                        {table.getState().pagination.pageIndex * pageSize + 1}{' '}
+                        {externalPageIndex !== undefined
+                            ? externalPageIndex * pageSize + 1
+                            : table.getState().pagination.pageIndex * pageSize +
+                              1}{' '}
                         to{' '}
                         {Math.min(
-                            (table.getState().pagination.pageIndex + 1) *
-                                pageSize,
-                            externalTotalRecords ?? table.getPrePaginationRowModel().rows.length
+                            externalPageIndex !== undefined
+                                ? (externalPageIndex + 1) * pageSize
+                                : (table.getState().pagination.pageIndex + 1) *
+                                      pageSize,
+                            externalTotalRecords ??
+                                (externalPageIndex !== undefined
+                                    ? data.length
+                                    : table.getPrePaginationRowModel().rows
+                                          .length)
                         )}{' '}
-                        of {externalTotalRecords ?? table.getPrePaginationRowModel().rows.length}{' '}
+                        of{' '}
+                        {externalTotalRecords ??
+                            (externalPageIndex !== undefined
+                                ? data.length
+                                : table.getPrePaginationRowModel().rows
+                                      .length)}{' '}
                         entries
                     </div>
                     <div className="flex items-center gap-[10px]">
                         {/* Page Numbers */}
                         {(() => {
                             // Use external totalPages if provided (server-side pagination), otherwise calculate from data
-                            const totalPages = externalTotalPages ?? table.getPageCount()
+                            const totalPagesCount =
+                                externalTotalPages ?? table.getPageCount()
                             const currentPage =
-                                table.getState().pagination.pageIndex + 1
+                                externalPageIndex !== undefined
+                                    ? externalPageIndex + 1
+                                    : table.getState().pagination.pageIndex + 1
                             const maxVisiblePages = 3 // Show max 7 page numbers
 
                             let startPage = Math.max(
@@ -711,7 +743,7 @@ const Table = <T,>({
                                 currentPage - Math.floor(maxVisiblePages / 2)
                             )
                             const endPage = Math.min(
-                                totalPages,
+                                totalPagesCount,
                                 startPage + maxVisiblePages - 1
                             )
 
@@ -731,7 +763,21 @@ const Table = <T,>({
                                     <Button
                                         key="1"
                                         variant="ghost"
-                                        onClick={() => table.setPageIndex(0)}
+                                        onClick={() => {
+                                            if (
+                                                externalPageIndex !==
+                                                    undefined &&
+                                                onPaginationChange
+                                            ) {
+                                                onPaginationChange(
+                                                    0,
+                                                    pageSize,
+                                                    totalPagesCount
+                                                )
+                                            } else {
+                                                table.setPageIndex(0)
+                                            }
+                                        }}
                                         className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
                                     >
                                         1
@@ -765,9 +811,21 @@ const Table = <T,>({
                                                 ? 'primary'
                                                 : 'secondary'
                                         }
-                                        onClick={() =>
-                                            table.setPageIndex(i - 1)
-                                        }
+                                        onClick={() => {
+                                            if (
+                                                externalPageIndex !==
+                                                    undefined &&
+                                                onPaginationChange
+                                            ) {
+                                                onPaginationChange(
+                                                    i - 1,
+                                                    pageSize,
+                                                    totalPagesCount
+                                                )
+                                            } else {
+                                                table.setPageIndex(i - 1)
+                                            }
+                                        }}
                                         className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
                                     >
                                         {i}
@@ -776,8 +834,8 @@ const Table = <T,>({
                             }
 
                             // Last page
-                            if (endPage < totalPages) {
-                                if (endPage < totalPages - 1) {
+                            if (endPage < totalPagesCount) {
+                                if (endPage < totalPagesCount - 1) {
                                     pages.push(
                                         <span
                                             key="dots2"
@@ -795,14 +853,28 @@ const Table = <T,>({
 
                                 pages.push(
                                     <Button
-                                        key={totalPages}
+                                        key={totalPagesCount}
                                         variant="secondary"
-                                        onClick={() =>
-                                            table.setPageIndex(totalPages - 1)
-                                        }
+                                        onClick={() => {
+                                            if (
+                                                externalPageIndex !==
+                                                    undefined &&
+                                                onPaginationChange
+                                            ) {
+                                                onPaginationChange(
+                                                    totalPagesCount - 1,
+                                                    pageSize,
+                                                    totalPagesCount
+                                                )
+                                            } else {
+                                                table.setPageIndex(
+                                                    totalPagesCount - 1
+                                                )
+                                            }
+                                        }}
                                         className="rounded-[10px] px-[15px] py-[7px] text-md font-medium"
                                     >
-                                        {totalPages}
+                                        {totalPagesCount}
                                     </Button>
                                 )
                             }

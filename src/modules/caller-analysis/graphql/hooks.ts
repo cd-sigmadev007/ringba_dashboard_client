@@ -30,6 +30,12 @@ export const useGetCallers = (
     return useQuery({
         queryKey: ['graphql', 'callers', filter, orderBy, page, limit],
         queryFn: async () => {
+            console.log('[useGetCallers] Fetching callers:', {
+                filter,
+                orderBy,
+                page,
+                limit,
+            })
             const data = await graphqlClient.request<{
                 callers: CallerConnection
             }>(GET_CALLERS_QUERY, {
@@ -38,10 +44,16 @@ export const useGetCallers = (
                 page,
                 limit,
             })
+            console.log('[useGetCallers] Received data:', {
+                dataLength: data.callers?.data?.length || 0,
+                totalCount: data.callers?.totalCount || 0,
+                currentPage: data.callers?.pageInfo?.currentPage || 0,
+                totalPages: data.callers?.pageInfo?.totalPages || 0,
+            })
             return data.callers
         },
         enabled: isAuthenticated, // Only run when authenticated
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 0, // Always refetch when query key changes (including page changes)
         gcTime: 10 * 60 * 1000, // 10 minutes
     })
 }
