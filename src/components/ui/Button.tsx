@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { useThemeStore } from '@/store/themeStore'
@@ -15,7 +15,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     tooltipText?: string
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     variant = 'primary',
     className,
     children,
@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({
     hasTooltip = false,
     tooltipText = '',
     ...rest
-}) => {
+}, ref) => {
     const [isVisible, setVisibility] = useState(false)
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -43,6 +43,7 @@ const Button: React.FC<ButtonProps> = ({
 
     return (
         <button
+            ref={ref}
             className={twMerge(
                 clsx(
                     buttonTypes[variant],
@@ -63,6 +64,8 @@ const Button: React.FC<ButtonProps> = ({
             {children}
         </button>
     )
-}
+})
+
+Button.displayName = 'Button'
 
 export default Button

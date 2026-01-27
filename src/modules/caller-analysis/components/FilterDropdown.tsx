@@ -404,12 +404,16 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
         <div
             ref={dropdownRef}
             className={cn(
-                'fixed z-[1000] backdrop-blur-[25px] absolute left-5 backdrop-filter',
+                'fixed z-[10000] backdrop-blur-[25px] backdrop-filter',
                 'bg-[rgba(7,27,47,0.9)] border border-[#132f4c] border-solid',
                 'rounded-[7px] shadow-lg flex flex-col',
                 'w-[650px] max-h-[600px]'
             )}
-            style={position}
+            style={{
+                ...position,
+                // Fallback when triggerRef not set (e.g. initial render)
+                ...(Object.keys(position).length === 0 && { top: 120, left: 24 }),
+            }}
         >
             <div className="flex flex-col gap-[15px] p-[20px] flex-1 overflow-hidden relative min-h-0">
                 {filterContent}

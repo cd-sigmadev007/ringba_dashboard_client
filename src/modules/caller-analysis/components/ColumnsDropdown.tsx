@@ -361,12 +361,12 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         )
     }
 
-    // Desktop: Use dropdown
+    // Desktop: Use dropdown (rendered outside table in container)
     return (
         <div
             ref={dropdownRef}
             className={cn(
-                'fixed z-[1000] absolute right-5 bg-[#002b57] border border-[#132f4c]',
+                'fixed z-[10000] bg-[#002b57] border border-[#132f4c]',
                 'rounded-[7px] shadow-lg',
                 'w-[374px] max-h-[440px] flex flex-col'
             )}

@@ -35,6 +35,8 @@ interface TableHeaderProps {
     onColumnsClick: () => void
     onSelectAll?: (checked: boolean) => void
     selectAllChecked?: boolean
+    filterButtonRef?: React.RefObject<HTMLButtonElement | null>
+    columnsButtonRef?: React.RefObject<HTMLButtonElement | null>
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -45,6 +47,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     onColumnsClick,
     onSelectAll,
     selectAllChecked = false,
+    filterButtonRef,
+    columnsButtonRef,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -104,6 +108,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
                 {/* Filter Button with Badge */}
                 <Button
+                    ref={filterButtonRef}
                     variant="secondary"
                     onClick={onFilterClick}
                     className={cn(
@@ -414,6 +419,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 
             {/* Right side: Columns Button */}
             <Button
+                ref={columnsButtonRef}
                 variant="secondary"
                 onClick={onColumnsClick}
                 className={cn(

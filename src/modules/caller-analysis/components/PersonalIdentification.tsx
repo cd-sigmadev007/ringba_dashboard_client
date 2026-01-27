@@ -7,6 +7,7 @@ import { Priority, STATUS_PRIORITY_MAP } from '../types/priority.types'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import { HistoryTabContent, JSONTabContent } from './tabs'
 import type { CallData } from '../types'
+import type { FrontendCallerData } from '@/types/api'
 import type { TabItem } from '@/components/ui/Tabs'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
@@ -105,8 +106,13 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     )
 
     // Map history API rows to HistoryEntry[] used by tab
+    // Support both { data: [...] } and raw array (some proxies unwrap)
+    const rawList =
+        historyResp != null && Array.isArray(historyResp)
+            ? historyResp
+            : (historyResp as { data?: unknown[] } | undefined)?.data ?? []
     const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
-        historyResp?.data || []
+        Array.isArray(rawList) ? (rawList as FrontendCallerData[]) : []
     )
 
     const tabs: Array<TabItem> = [

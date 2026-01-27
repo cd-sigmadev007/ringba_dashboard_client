@@ -17,6 +17,7 @@ import { formatDuration, parseNumeric } from '@/lib/utils/format'
 export function mapApiDataToHistoryEntries(
     apiData: Array<FrontendCallerData>
 ): Array<HistoryEntry> {
+    if (!Array.isArray(apiData)) return []
     return apiData.map((h: FrontendCallerData) => {
         // Parse lastCall date and time
         const { date: dateStr, time: timeStr } = parseLastCallDateAndTime(
@@ -38,10 +39,19 @@ export function mapApiDataToHistoryEntries(
             ? h.campaign.split(',')[0].trim()
             : undefined
 
+        // Use duration string, or format from callLengthInSeconds when duration is 00:00
+        const rawDuration = h.duration
+        const duration =
+            rawDuration && rawDuration !== '00m 00s'
+                ? formatDuration(rawDuration)
+                : formatDuration(
+                      (h as { callLengthInSeconds?: number }).callLengthInSeconds
+                  )
+
         return {
             date: dateStr,
             time: timeStr,
-            duration: formatDuration(h.duration),
+            duration,
             converted,
             revenue,
             campaignId,

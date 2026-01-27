@@ -499,40 +499,38 @@ export const CallerAnalysisContainer: React.FC = () => {
                                     }
                                     onSelectAll={handleSelectAll}
                                     selectAllChecked={selectAllChecked}
+                                    filterButtonRef={filterButtonRef}
+                                    columnsButtonRef={columnsButtonRef}
                                 />
-                                {filterDropdownOpen && (
-                                    <FilterDropdown
-                                        filters={filters}
-                                        onFiltersChange={updateFilters}
-                                        onClearAll={clearAllFilters}
-                                        onClose={() =>
-                                            setFilterDropdownOpen(false)
-                                        }
-                                        isOpen={filterDropdownOpen}
-                                        triggerRef={filterButtonRef}
-                                        filterType={selectedFilterType}
-                                    />
-                                )}
-                                {columnsDropdownOpen && (
-                                    <ColumnsDropdown
-                                        columns={columnOptions}
-                                        onColumnToggle={handleColumnToggle}
-                                        onClose={() =>
-                                            setColumnsDropdownOpen(false)
-                                        }
-                                        isOpen={columnsDropdownOpen}
-                                        triggerRef={
-                                            isMobile
-                                                ? undefined
-                                                : columnsButtonRef
-                                        }
-                                        isMobile={isMobile}
-                                    />
-                                )}
                             </div>
                         }
                     />
                 </div>
+
+                {/* Filter and Columns dropdowns rendered outside table to avoid z-index/overflow issues */}
+                {filterDropdownOpen && (
+                    <FilterDropdown
+                        filters={filters}
+                        onFiltersChange={updateFilters}
+                        onClearAll={clearAllFilters}
+                        onClose={() => setFilterDropdownOpen(false)}
+                        isOpen={filterDropdownOpen}
+                        triggerRef={filterButtonRef}
+                        filterType={selectedFilterType}
+                    />
+                )}
+                {columnsDropdownOpen && (
+                    <ColumnsDropdown
+                        columns={columnOptions}
+                        onColumnToggle={handleColumnToggle}
+                        onClose={() => setColumnsDropdownOpen(false)}
+                        isOpen={columnsDropdownOpen}
+                        triggerRef={
+                            isMobile ? undefined : columnsButtonRef
+                        }
+                        isMobile={isMobile}
+                    />
+                )}
 
                 {/* Personal Identification Modal */}
                 <Modal
