@@ -15,14 +15,17 @@ import { Tabs } from '@/components/ui'
 
 export interface PersonalIdentificationProps {
     callerData: CallData
+    isOpen: boolean
 }
 
 export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     callerData,
+    isOpen,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
+    const [activeTab, setActiveTab] = React.useState('history')
 
     // Use real data from API, fallback to 0 if not available
     // Ensure numeric values are properly converted
@@ -100,9 +103,12 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
     // Fetch history by phone number
     const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
-    const { data: historyResp } = useGetCallerHistoryByPhone(
-        callerData.callerId
-    )
+    const shouldLoadHistory =
+        isOpen && activeTab === 'history' && !!callerData.callerId
+    const { data: historyResp, isLoading: isHistoryLoading } =
+        useGetCallerHistoryByPhone(callerData.callerId, {
+            enabled: shouldLoadHistory,
+        })
 
     // Map history API rows to HistoryEntry[] used by tab
     const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
@@ -113,7 +119,12 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         {
             id: 'history',
             label: 'History',
-            content: <HistoryTabContent historyData={historyData} />,
+            content: (
+                <HistoryTabContent
+                    historyData={historyData}
+                    isLoading={isHistoryLoading}
+                />
+            ),
         },
         {
             id: 'json',
@@ -275,7 +286,11 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
             {/* Tabs Section */}
             <div className="mt-6">
-                <Tabs tabs={tabs} defaultActiveTab="history" />
+                <Tabs
+                    tabs={tabs}
+                    defaultActiveTab="history"
+                    onChange={setActiveTab}
+                />
             </div>
         </div>
     )

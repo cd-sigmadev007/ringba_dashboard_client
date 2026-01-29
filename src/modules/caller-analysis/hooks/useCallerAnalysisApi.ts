@@ -54,11 +54,14 @@ export const useCallerAnalysisApi = () => {
     }
 
     // Get caller history by phone number
-    const useGetCallerHistoryByPhone = (phoneNumber: string) => {
+    const useGetCallerHistoryByPhone = (
+        phoneNumber: string,
+        options?: { enabled?: boolean }
+    ) => {
         return useQuery({
             queryKey: ['caller', 'phone', 'history', phoneNumber],
             queryFn: () => callerApiService.getHistoryByPhone(phoneNumber),
-            enabled: !!phoneNumber,
+            enabled: options?.enabled ?? !!phoneNumber,
             staleTime: 1 * 60 * 1000,
             gcTime: 5 * 60 * 1000,
         })

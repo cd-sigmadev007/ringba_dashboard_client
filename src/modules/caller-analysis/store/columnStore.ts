@@ -24,6 +24,12 @@ const initialColumnVisibility: ColumnVisibility = {
     campaign: true,
     action: true,
     status: true,
+    // Revenue/cost columns (optional, hidden by default)
+    revenue: false,
+    ringbaCost: false,
+    adCost: false,
+    targetName: false,
+    publisherName: false,
     // Displayable columns from CallerFilter (optional, hidden by default)
     phoneNumber: false,
     callTimestamp: false,

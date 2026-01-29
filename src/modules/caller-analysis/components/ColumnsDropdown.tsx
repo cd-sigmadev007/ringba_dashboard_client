@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useGetAvailableFields } from '../graphql/hooks'
 import { useColumnStore } from '../store/columnStore'
+import type { ColumnVisibility } from '../hooks/useTableColumns'
 import { CheckboxIcon, ChevronDownDark } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { cn, useClickOutside } from '@/lib'
@@ -30,6 +31,8 @@ interface ColumnsDropdownProps {
     isOpen: boolean
     triggerRef?: React.RefObject<HTMLButtonElement | null>
     isMobile: boolean
+    /** Called when user clicks Apply: pass draft visibility, then parent should set store and refetch */
+    onApply?: (visibility: ColumnVisibility) => void
 }
 
 export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
@@ -39,6 +42,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
     isOpen,
     triggerRef,
     isMobile,
+    onApply,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -46,11 +50,26 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
     const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
         new Set(['applied'])
     )
+    // Draft visibility: apply only on Apply button (fixed columns)
+    const [draftVisibility, setDraftVisibility] =
+        useState<ColumnVisibility>({})
     const dropdownRef = useClickOutside<HTMLDivElement>(() => {
         if (isOpen) {
             onClose()
         }
     })
+
+    // Sync draft from current columns when dropdown opens
+    useEffect(() => {
+        if (isOpen && columns.length > 0) {
+            setDraftVisibility(
+                columns.reduce(
+                    (acc, c) => ({ ...acc, [c.id]: c.visible }),
+                    {} as ColumnVisibility
+                )
+            )
+        }
+    }, [isOpen, columns])
 
     // GraphQL field discovery (if enabled)
     const enableDynamicFields = isFeatureEnabled('ENABLE_DYNAMIC_FIELDS_UI')
@@ -284,39 +303,61 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                             {/* Group Items */}
                             {expandedGroups.has(group.id) && (
                                 <div className="box-border flex flex-col items-start px-[16px] py-0 relative shrink-0 w-full">
-                                    {group.columns.map((column) => (
-                                        <Button
-                                            key={column.id}
-                                            variant="ghost"
-                                            onClick={() => {
-                                                if (
-                                                    column.category ===
-                                                    'dynamic'
-                                                ) {
-                                                    toggleDynamicField(
-                                                        column.id
-                                                    )
-                                                } else {
-                                                    onColumnToggle(column.id)
-                                                }
-                                            }}
-                                            className={cn(
-                                                'box-border flex items-center',
-                                                'px-[24px] py-[8px] rounded-[7px]',
-                                                'shrink-0 w-full justify-start',
-                                                'h-auto min-h-0 border-none',
-                                                // Disable hover & selected background
-                                                'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
-                                            )}
-                                        >
-                                            <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
-                                                <div className="relative shrink-0 size-[20px]">
-                                                    <CheckboxIcon
-                                                        checked={column.visible}
-                                                        isDark={isDark}
-                                                        className="w-5 h-5"
-                                                    />
-                                                </div>
+                                    {group.columns.map((column) => {
+                                        const isFixed =
+                                            column.category !== 'dynamic'
+                                        const checked =
+                                            isFixed && onApply
+                                                ? (draftVisibility[column.id] ??
+                                                  column.visible)
+                                                : column.visible
+                                        return (
+                                            <Button
+                                                key={column.id}
+                                                variant="ghost"
+                                                onClick={() => {
+                                                    if (
+                                                        column.category ===
+                                                        'dynamic'
+                                                    ) {
+                                                        toggleDynamicField(
+                                                            column.id
+                                                        )
+                                                    } else if (onApply) {
+                                                        setDraftVisibility(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                [column.id]:
+                                                                    !(prev[
+                                                                        column
+                                                                            .id
+                                                                    ] ??
+                                                                      column.visible),
+                                                            })
+                                                        )
+                                                    } else {
+                                                        onColumnToggle(
+                                                            column.id
+                                                        )
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    'box-border flex items-center',
+                                                    'px-[24px] py-[8px] rounded-[7px]',
+                                                    'shrink-0 w-full justify-start',
+                                                    'h-auto min-h-0 border-none',
+                                                    // Disable hover & selected background
+                                                    'hover:bg-transparent hover:opacity-100 focus:bg-transparent active:bg-transparent'
+                                                )}
+                                            >
+                                                <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+                                                    <div className="relative shrink-0 size-[20px]">
+                                                        <CheckboxIcon
+                                                            checked={checked}
+                                                            isDark={isDark}
+                                                            className="w-5 h-5"
+                                                        />
+                                                    </div>
                                                 <p
                                                     className={cn(
                                                         'font-["Poppins:Regular",sans-serif]',
@@ -332,13 +373,37 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                 </p>
                                             </div>
                                         </Button>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
                             )}
                         </div>
                     )
                 })}
             </div>
+
+            {/* Apply button footer */}
+            {onApply && (
+                <div
+                    className={cn(
+                        'shrink-0 border-t p-3',
+                        isDark
+                            ? 'border-[#1B456F] bg-[#001E3C]'
+                            : 'border-[#E1E5E9] bg-[#F5F8FA]'
+                    )}
+                >
+                    <Button
+                        variant="primary"
+                        className="w-full"
+                        onClick={() => {
+                            onApply(draftVisibility)
+                            onClose()
+                        }}
+                    >
+                        Apply
+                    </Button>
+                </div>
+            )}
         </>
     )
 

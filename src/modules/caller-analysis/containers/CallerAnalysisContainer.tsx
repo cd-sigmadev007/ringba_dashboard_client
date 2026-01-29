@@ -67,7 +67,11 @@ export const CallerAnalysisContainer: React.FC = () => {
     )
 
     // Column visibility state from Zustand store
-    const { columnVisibility, toggleColumn } = useColumnStore()
+    const {
+        columnVisibility,
+        toggleColumn,
+        setColumnVisibility,
+    } = useColumnStore()
 
     // Column options for dropdown
     // Includes all CallerFilter fields for filtering
@@ -96,6 +100,36 @@ export const CallerAnalysisContainer: React.FC = () => {
                 label: 'LTR',
                 category: 'applied',
                 visible: columnVisibility.lifetimeRevenue ?? true,
+            },
+            {
+                id: 'revenue',
+                label: 'Revenue',
+                category: 'caller',
+                visible: columnVisibility.revenue ?? false,
+            },
+            {
+                id: 'ringbaCost',
+                label: 'Ringba Cost',
+                category: 'caller',
+                visible: columnVisibility.ringbaCost ?? false,
+            },
+            {
+                id: 'adCost',
+                label: 'Ad Cost',
+                category: 'caller',
+                visible: columnVisibility.adCost ?? false,
+            },
+            {
+                id: 'targetName',
+                label: 'Target Name',
+                category: 'caller',
+                visible: columnVisibility.targetName ?? false,
+            },
+            {
+                id: 'publisherName',
+                label: 'Publisher',
+                category: 'caller',
+                visible: columnVisibility.publisherName ?? false,
             },
             {
                 id: 'campaign',
@@ -527,6 +561,14 @@ export const CallerAnalysisContainer: React.FC = () => {
                                                 : columnsButtonRef
                                         }
                                         isMobile={isMobile}
+                                        onApply={(visibility) => {
+                                            setColumnVisibility({
+                                                ...columnVisibility,
+                                                ...visibility,
+                                            })
+                                            refetch()
+                                            setColumnsDropdownOpen(false)
+                                        }}
                                     />
                                 )}
                             </div>
@@ -550,6 +592,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                         {selectedCaller && (
                             <PersonalIdentification
                                 callerData={selectedCaller}
+                                isOpen={openModal}
                             />
                         )}
                     </div>

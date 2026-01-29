@@ -228,6 +228,79 @@ export const useTableColumns = (
                 },
             },
             {
+                id: 'revenue',
+                header: 'REVENUE',
+                accessorKey: 'revenue',
+                meta: { width: 100, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as number | null | undefined
+                    const n = val != null ? Number(val) : 0
+                    return (
+                        <span className="text-sm">
+                            {Number.isFinite(n) ? `$${n.toFixed(2)}` : '—'}
+                        </span>
+                    )
+                },
+            },
+            {
+                id: 'ringbaCost',
+                header: 'RINGBA COST',
+                accessorKey: 'ringbaCost',
+                meta: { width: 110, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as number | null | undefined
+                    const n = val != null ? Number(val) : 0
+                    return (
+                        <span className="text-sm">
+                            {Number.isFinite(n) ? `$${n.toFixed(2)}` : '—'}
+                        </span>
+                    )
+                },
+            },
+            {
+                id: 'adCost',
+                header: 'AD COST',
+                accessorKey: 'adCost',
+                meta: { width: 90, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as number | null | undefined
+                    const n = val != null ? Number(val) : 0
+                    return (
+                        <span className="text-sm">
+                            {Number.isFinite(n) ? `$${n.toFixed(2)}` : '—'}
+                        </span>
+                    )
+                },
+            },
+            {
+                id: 'targetName',
+                header: 'TARGET NAME',
+                accessorKey: 'targetName',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    return (
+                        <span className="text-sm">
+                            {val != null && val !== '' ? String(val) : '—'}
+                        </span>
+                    )
+                },
+            },
+            {
+                id: 'publisherName',
+                header: 'PUBLISHER',
+                accessorKey: 'publisherName',
+                meta: { width: 140, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    return (
+                        <span className="text-sm">
+                            {val != null && val !== '' ? String(val) : '—'}
+                        </span>
+                    )
+                },
+            },
+            {
                 id: 'campaign',
                 header: 'CAMPAIGN',
                 accessorKey: 'campaign',
@@ -391,55 +464,32 @@ export const useTableColumns = (
                     accessorKey: fieldName,
                     meta: { width: 150, category: 'dynamic' },
                     cell: ({ row }) => {
-                        // Get value from attributes jsonb
-                        const attributes =
-                            (row.original as any).attributes || {}
-                        // Try the field name first, then try common variations for backward compatibility
-                        let displayValue = attributes[fieldName] ?? null
-
-                        // Backward compatibility: if fieldName is 'publisher' but data has 'publisherName', use that
+                        const raw = row.original as unknown as Record<string, unknown>
+                        const attributes = (raw.attributes as Record<string, unknown>) || {}
+                        // Unified getter: row (fixed/schema field) first, then attributes (dynamic only)
+                        let displayValue =
+                            raw[fieldName] !== undefined && raw[fieldName] !== null
+                                ? raw[fieldName]
+                                : attributes[fieldName] ?? null
                         if (
-                            displayValue === null &&
+                            displayValue == null &&
                             fieldName === 'publisher' &&
-                            attributes.publisherName
+                            attributes.publisherName != null
                         ) {
                             displayValue = attributes.publisherName
                         }
-                        // Reverse: if fieldName is 'publisherName' but data has 'publisher', use that
                         if (
-                            displayValue === null &&
+                            displayValue == null &&
                             fieldName === 'publisherName' &&
-                            attributes.publisher
+                            attributes.publisher != null
                         ) {
                             displayValue = attributes.publisher
                         }
-
-                        // Debug logging
-                        if (
-                            fieldName === 'publisher' ||
-                            fieldName === 'publisherName'
-                        ) {
-                            console.log(
-                                `[useTableColumns] Dynamic field "${fieldName}":`,
-                                {
-                                    fieldName,
-                                    hasAttributes: !!attributes,
-                                    attributesKeys: Object.keys(attributes),
-                                    displayValue,
-                                    rowId: row.original.id,
-                                }
-                            )
-                        }
-
-                        if (
-                            displayValue === null ||
-                            displayValue === undefined
-                        ) {
+                        if (displayValue == null) {
                             return (
                                 <span className="text-sm text-gray-400">—</span>
                             )
                         }
-
                         return (
                             <span className="text-sm">
                                 {typeof displayValue === 'object'

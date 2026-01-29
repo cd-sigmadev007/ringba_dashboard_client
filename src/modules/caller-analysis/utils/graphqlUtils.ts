@@ -18,33 +18,30 @@ const EST_TIMEZONE = 'America/New_York'
  * Convert GraphQL Caller to CallData format
  */
 export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
-    // Debug logging for attributes
-    if (caller.attributes && Object.keys(caller.attributes).length > 0) {
-        console.log(
-            '[convertGraphQLCallerToCallData] Converting caller with attributes:',
-            {
-                id: caller.id,
-                attributesKeys: Object.keys(caller.attributes),
-                hasPublisher: 'publisher' in caller.attributes,
-                hasPublisherName: 'publisherName' in caller.attributes,
-                publisherValue: caller.attributes.publisher,
-                publisherNameValue: caller.attributes.publisherName,
-            }
-        )
-    }
+    // Backend sends revenue = latestPayout when revenue not set
+    const revenue =
+        caller.revenue != null
+            ? (typeof caller.revenue === 'number'
+                  ? caller.revenue
+                  : Number(caller.revenue))
+            : caller.latestPayout != null
+              ? (typeof caller.latestPayout === 'string'
+                    ? Number(caller.latestPayout)
+                    : Number(caller.latestPayout))
+              : null
 
     return {
         id: caller.id,
         callerId: caller.callerId,
         lastCall: caller.lastCall,
         duration: caller.duration,
-        lifetimeRevenue: caller.lifetimeRevenue, // Will be aggregated from latestPayout
+        lifetimeRevenue: caller.lifetimeRevenue,
         campaign: caller.campaign,
         action: caller.action,
         status: caller.status || [],
         audioUrl: caller.audioUrl,
         transcript: caller.transcript,
-        revenue: caller.revenue,
+        revenue: Number.isFinite(revenue as number) ? (revenue as number) : null,
         firstName: caller.firstName,
         lastName: caller.lastName,
         email: caller.email,
@@ -58,13 +55,12 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
         zip: caller.zip,
         ringbaCost: caller.ringbaCost,
         adCost: caller.adCost,
-        latestPayout: caller.latestPayout || null, // Include latestPayout for aggregation
+        latestPayout: caller.latestPayout ?? null,
         call_timestamp: caller.callTimestamp,
-        targetName: caller.targetName,
-        // Preserve attributes jsonb for dynamic fields access
+        targetName: caller.targetName ?? null,
+        publisherName: caller.publisherName ?? null,
+        // Only dynamic (non-fixed) fields; fixed fields are top-level
         attributes: caller.attributes || {},
-        // Also spread attributes for backward compatibility (if needed)
-        ...(caller.attributes || {}),
     }
 }
 

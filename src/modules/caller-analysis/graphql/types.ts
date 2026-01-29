@@ -97,6 +97,7 @@ export interface Caller {
     adCost?: number
     latestPayout?: string
     targetName?: string
+    publisherName?: string
 }
 
 export interface PageInfo {

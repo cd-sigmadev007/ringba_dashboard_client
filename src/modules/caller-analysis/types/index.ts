@@ -35,10 +35,11 @@ export interface CallData {
     adjustment_amount?: number | null
     call_timestamp?: string | Date | null
     targetName?: string | null
+    publisherName?: string | null
     ai_processed?: boolean
     summary?: string | null
     publisher?: string | null
-    attributes?: Record<string, any> // Full attributes jsonb for dynamic fields
+    attributes?: Record<string, any> // Dynamic-only fields (column-backed fields are top-level)
 }
 
 export interface FilterState {

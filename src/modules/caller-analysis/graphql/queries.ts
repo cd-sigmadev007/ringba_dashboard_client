@@ -45,6 +45,7 @@ export const GET_CALLERS_QUERY = gql`
                 adCost
                 latestPayout
                 targetName
+                publisherName
             }
             pageInfo {
                 hasNextPage
@@ -132,6 +133,7 @@ export const GET_CALLER_BY_ID_QUERY = gql`
             ringbaCost
             adCost
             targetName
+            publisherName
         }
     }
 `
@@ -169,6 +171,7 @@ export const GET_CALLER_BY_PHONE_QUERY = gql`
             ringbaCost
             adCost
             targetName
+            publisherName
         }
     }
 `

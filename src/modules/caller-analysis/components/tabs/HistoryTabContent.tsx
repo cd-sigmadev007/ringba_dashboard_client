@@ -4,7 +4,6 @@ import { TranscriptContent } from '../TranscriptContent'
 import { parseTranscriptToEntries } from '../../utils/transcriptUtils'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
-import { mockHistoryData } from '@/data/caller-tabs-data'
 import {
     ConvertedIcon,
     NotConvertedIcon,
@@ -16,6 +15,7 @@ import { WaveformAudioPlayer } from '@/components/ui/WaveformAudioPlayer'
 export interface HistoryTabContentProps {
     historyData?: Array<HistoryEntry>
     className?: string
+    isLoading?: boolean
 }
 
 const ChevronIcon: React.FC<{ isDark: boolean }> = ({ isDark }) => (
@@ -43,8 +43,9 @@ interface GroupedHistoryEntry {
 }
 
 export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
-    historyData = mockHistoryData,
+    historyData = [],
     className,
+    isLoading = false,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -121,6 +122,40 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
 
         return grouped
     }, [historyData])
+
+    if (isLoading) {
+        return (
+            <div className={cn('flex flex-col gap-3 pt-[16px]', className)}>
+                <div
+                    className={cn(
+                        'rounded-[7px] border p-4 animate-pulse',
+                        isDark ? 'border-[#1B456F]' : 'border-[#E1E5E9]'
+                    )}
+                >
+                    <div className="h-4 w-32 rounded bg-current opacity-20" />
+                    <div className="mt-4 space-y-3">
+                        <div className="h-4 w-2/3 rounded bg-current opacity-20" />
+                        <div className="h-4 w-1/2 rounded bg-current opacity-20" />
+                        <div className="h-4 w-3/4 rounded bg-current opacity-20" />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (groupedEntries.length === 0) {
+        return (
+            <div
+                className={cn(
+                    'pt-[16px] text-sm',
+                    isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]',
+                    className
+                )}
+            >
+                No history found.
+            </div>
+        )
+    }
 
     return (
         <div className={cn('flex flex-col gap-4 pt-[16px]', className)}>
