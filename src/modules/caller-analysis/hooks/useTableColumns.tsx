@@ -375,6 +375,115 @@ export const useTableColumns = (
                     )
                 },
             },
+            // Custom field columns with truncation
+            {
+                id: 'firstName',
+                header: 'FIRST NAME',
+                accessorKey: 'firstName',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
+                    return (
+                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
+                            <span className="text-sm">{truncated}</span>
+                        </Tooltip>
+                    )
+                },
+            },
+            {
+                id: 'lastName',
+                header: 'LAST NAME',
+                accessorKey: 'lastName',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
+                    return (
+                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
+                            <span className="text-sm">{truncated}</span>
+                        </Tooltip>
+                    )
+                },
+            },
+            {
+                id: 'email',
+                header: 'EMAIL',
+                accessorKey: 'email',
+                meta: { width: 180, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
+                    return (
+                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
+                            <span className="text-sm">{truncated}</span>
+                        </Tooltip>
+                    )
+                },
+            },
+            {
+                id: 'type',
+                header: 'TYPE',
+                accessorKey: 'type',
+                meta: { width: 100, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
+            {
+                id: 'address',
+                header: 'ADDRESS',
+                accessorKey: 'address',
+                meta: { width: 200, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
+                    return (
+                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
+                            <span className="text-sm">{truncated}</span>
+                        </Tooltip>
+                    )
+                },
+            },
+            {
+                id: 'city',
+                header: 'CITY',
+                accessorKey: 'city',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
+            {
+                id: 'state',
+                header: 'STATE',
+                accessorKey: 'state',
+                meta: { width: 80, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
+            {
+                id: 'zip',
+                header: 'ZIP',
+                accessorKey: 'zip',
+                meta: { width: 100, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
             {
                 id: 'action',
                 header: 'ACTION',
@@ -392,7 +501,7 @@ export const useTableColumns = (
                             <Tooltip
                                 tooltipText={
                                     currentPlayingRow === row.original.id &&
-                                    isPlaying
+                                        isPlaying
                                         ? 'Pause Call Recording'
                                         : 'Play Call Recording'
                                 }
@@ -408,7 +517,7 @@ export const useTableColumns = (
                                     }}
                                 >
                                     {currentPlayingRow === row.original.id &&
-                                    isPlaying ? (
+                                        isPlaying ? (
                                         <PauseIcon />
                                     ) : (
                                         <PlayIcon />

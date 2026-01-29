@@ -168,6 +168,55 @@ export const CallerAnalysisContainer: React.FC = () => {
                 category: 'caller',
                 visible: columnVisibility.callLengthInSeconds ?? false,
             },
+            // Custom fields from caller data
+            {
+                id: 'firstName',
+                label: 'First Name',
+                category: 'caller',
+                visible: columnVisibility.firstName ?? false,
+            },
+            {
+                id: 'lastName',
+                label: 'Last Name',
+                category: 'caller',
+                visible: columnVisibility.lastName ?? false,
+            },
+            {
+                id: 'email',
+                label: 'Email',
+                category: 'caller',
+                visible: columnVisibility.email ?? false,
+            },
+            {
+                id: 'type',
+                label: 'Type',
+                category: 'caller',
+                visible: columnVisibility.type ?? false,
+            },
+            {
+                id: 'address',
+                label: 'Address',
+                category: 'caller',
+                visible: columnVisibility.address ?? false,
+            },
+            {
+                id: 'city',
+                label: 'City',
+                category: 'caller',
+                visible: columnVisibility.city ?? false,
+            },
+            {
+                id: 'state',
+                label: 'State',
+                category: 'caller',
+                visible: columnVisibility.state ?? false,
+            },
+            {
+                id: 'zip',
+                label: 'ZIP Code',
+                category: 'caller',
+                visible: columnVisibility.zip ?? false,
+            },
             // Note: dateFrom, dateTo, durationMin, durationMax, and search are filter parameters only,
             // not displayable columns, so they are not included in columnOptions
         ],
