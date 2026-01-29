@@ -439,13 +439,22 @@ export const useTableColumns = (
                 id: 'address',
                 header: 'ADDRESS',
                 accessorKey: 'address',
-                meta: { width: 200, category: 'caller' },
-                cell: ({ getValue }) => {
-                    const val = getValue() as string | null | undefined
-                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
-                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
+                meta: { width: 250, category: 'caller' },
+                cell: ({ row }) => {
+                    // Aggregate address from components or use address field
+                    const streetNumber = row.original.streetNumber || ''
+                    const streetName = row.original.streetName || ''
+                    const streetType = row.original.streetType || ''
+                    const address = row.original.address || ''
+
+                    // Build address from components if available
+                    const parts = [streetNumber, streetName, streetType].filter(p => p && p.trim())
+                    const aggregated = parts.length > 0 ? parts.join(' ') : address
+
+                    if (!aggregated || aggregated === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = aggregated.length > 50 ? aggregated.substring(0, 50) + '...' : aggregated
                     return (
-                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
+                        <Tooltip tooltipText={aggregated.length > 50 ? aggregated : ''}>
                             <span className="text-sm">{truncated}</span>
                         </Tooltip>
                     )
@@ -478,8 +487,9 @@ export const useTableColumns = (
                 header: 'ZIP',
                 accessorKey: 'zip',
                 meta: { width: 100, category: 'caller' },
-                cell: ({ getValue }) => {
-                    const val = getValue() as string | null | undefined
+                cell: ({ row }) => {
+                    // Use g_zip field from database
+                    const val = (row.original as any).zip || (row.original as any).g_zip || ''
                     if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
                     return <span className="text-sm">{val}</span>
                 },
@@ -625,8 +635,26 @@ export const useTableColumns = (
         // Filter columns based on visibility
         if (visibleColumns) {
             return allColumns.filter((col) => {
-                const colId = col.id || (col as any).accessorKey
-                return visibleColumns[colId as string] !== false
+                const colId = (col.id || (col as any).accessorKey) as string
+                const isVisibleInStore = visibleColumns[colId]
+
+                if (isVisibleInStore !== undefined) {
+                    return isVisibleInStore === true
+                }
+
+                // Define which columns are visible by default
+                const defaultVisibleColumns = [
+                    'select',
+                    'callerId',
+                    'lastCall',
+                    'duration',
+                    'lifetimeRevenue',
+                    'campaign',
+                    'status',
+                    'action'
+                ]
+
+                return defaultVisibleColumns.includes(colId)
             })
         }
 
