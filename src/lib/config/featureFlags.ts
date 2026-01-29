@@ -5,10 +5,13 @@
 
 export const FEATURE_FLAGS = {
     /**
-     * Enable dynamic fields UI
+     * Enable dynamic fields UI.
+     * In production, default to true so call data fields show; set to 'false' to disable.
      */
     ENABLE_DYNAMIC_FIELDS_UI:
-        import.meta.env.VITE_ENABLE_DYNAMIC_FIELDS_UI === 'true',
+        import.meta.env.MODE === 'production'
+            ? import.meta.env.VITE_ENABLE_DYNAMIC_FIELDS_UI !== 'false'
+            : import.meta.env.VITE_ENABLE_DYNAMIC_FIELDS_UI === 'true',
 
     /**
      * Enable GraphQL API usage (always enabled for caller analysis)
