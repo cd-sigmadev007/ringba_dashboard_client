@@ -200,6 +200,24 @@ export const CallerAnalysisContainer: React.FC = () => {
                 visible: columnVisibility.address ?? false,
             },
             {
+                id: 'streetNumber',
+                label: 'Street Number',
+                category: 'caller',
+                visible: columnVisibility.streetNumber ?? false,
+            },
+            {
+                id: 'streetName',
+                label: 'Street Name',
+                category: 'caller',
+                visible: columnVisibility.streetName ?? false,
+            },
+            {
+                id: 'streetType',
+                label: 'Street Type',
+                category: 'caller',
+                visible: columnVisibility.streetType ?? false,
+            },
+            {
                 id: 'city',
                 label: 'City',
                 category: 'caller',
@@ -212,10 +230,10 @@ export const CallerAnalysisContainer: React.FC = () => {
                 visible: columnVisibility.state ?? false,
             },
             {
-                id: 'zip',
+                id: 'g_zip',
                 label: 'ZIP Code',
                 category: 'caller',
-                visible: columnVisibility.zip ?? false,
+                visible: columnVisibility.g_zip ?? false,
             },
             // Note: dateFrom, dateTo, durationMin, durationMax, and search are filter parameters only,
             // not displayable columns, so they are not included in columnOptions

@@ -440,24 +440,48 @@ export const useTableColumns = (
                 header: 'ADDRESS',
                 accessorKey: 'address',
                 meta: { width: 250, category: 'caller' },
-                cell: ({ row }) => {
-                    // Aggregate address from components or use address field
-                    const streetNumber = row.original.streetNumber || ''
-                    const streetName = row.original.streetName || ''
-                    const streetType = row.original.streetType || ''
-                    const address = row.original.address || ''
-
-                    // Build address from components if available
-                    const parts = [streetNumber, streetName, streetType].filter(p => p && p.trim())
-                    const aggregated = parts.length > 0 ? parts.join(' ') : address
-
-                    if (!aggregated || aggregated === '') return <span className="text-sm text-gray-400">—</span>
-                    const truncated = aggregated.length > 50 ? aggregated.substring(0, 50) + '...' : aggregated
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    const truncated = val.length > 50 ? val.substring(0, 50) + '...' : val
                     return (
-                        <Tooltip tooltipText={aggregated.length > 50 ? aggregated : ''}>
+                        <Tooltip tooltipText={val.length > 50 ? val : ''}>
                             <span className="text-sm">{truncated}</span>
                         </Tooltip>
                     )
+                },
+            },
+            {
+                id: 'streetNumber',
+                header: 'STREET NUMBER',
+                accessorKey: 'streetNumber',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
+            {
+                id: 'streetName',
+                header: 'STREET NAME',
+                accessorKey: 'streetName',
+                meta: { width: 150, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
+                },
+            },
+            {
+                id: 'streetType',
+                header: 'STREET TYPE',
+                accessorKey: 'streetType',
+                meta: { width: 120, category: 'caller' },
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
+                    if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
+                    return <span className="text-sm">{val}</span>
                 },
             },
             {
@@ -483,13 +507,12 @@ export const useTableColumns = (
                 },
             },
             {
-                id: 'zip',
+                id: 'g_zip',
                 header: 'ZIP',
-                accessorKey: 'zip',
+                accessorKey: 'g_zip',
                 meta: { width: 100, category: 'caller' },
-                cell: ({ row }) => {
-                    // Use g_zip field from database
-                    const val = (row.original as any).zip || (row.original as any).g_zip || ''
+                cell: ({ getValue }) => {
+                    const val = getValue() as string | null | undefined
                     if (!val || val === '') return <span className="text-sm text-gray-400">—</span>
                     return <span className="text-sm">{val}</span>
                 },

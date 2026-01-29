@@ -39,7 +39,7 @@ export const GET_CALLERS_QUERY = gql`
                 streetType
                 city
                 state
-                zip
+                g_zip
                 revenue
                 ringbaCost
                 adCost
