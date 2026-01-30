@@ -34,9 +34,9 @@ export const GET_CALLERS_QUERY = gql`
                 email
                 type
                 address
-                streetNumber
-                streetName
-                streetType
+                street_number
+                street_name
+                street_type
                 city
                 state
                 g_zip
@@ -123,12 +123,12 @@ export const GET_CALLER_BY_ID_QUERY = gql`
             email
             type
             address
-            streetNumber
-            streetName
-            streetType
+            street_number
+            street_name
+            street_type
             city
             state
-            zip
+            g_zip
             revenue
             ringbaCost
             adCost
@@ -161,12 +161,12 @@ export const GET_CALLER_BY_PHONE_QUERY = gql`
             email
             type
             address
-            streetNumber
-            streetName
-            streetType
+            street_number
+            street_name
+            street_type
             city
             state
-            zip
+            g_zip
             revenue
             ringbaCost
             adCost

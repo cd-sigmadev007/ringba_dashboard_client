@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useGetAvailableFields } from '../graphql/hooks'
-import { useColumnStore } from '../store/columnStore'
 import type { ColumnVisibility } from '../hooks/useTableColumns'
 import { CheckboxIcon, ChevronDownDark } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
@@ -8,7 +6,6 @@ import { cn, useClickOutside } from '@/lib'
 import { Search } from '@/components/common'
 import Button from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
-import { isFeatureEnabled } from '@/lib/config/featureFlags'
 
 export interface ColumnOption {
     id: string
@@ -51,8 +48,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         new Set(['applied'])
     )
     // Draft visibility: apply only on Apply button (fixed columns)
-    const [draftVisibility, setDraftVisibility] =
-        useState<ColumnVisibility>({})
+    const [draftVisibility, setDraftVisibility] = useState<ColumnVisibility>({})
     const dropdownRef = useClickOutside<HTMLDivElement>(() => {
         if (isOpen) {
             onClose()
@@ -71,86 +67,32 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
         }
     }, [isOpen, columns])
 
-    // GraphQL field discovery (if enabled)
-    const enableDynamicFields = isFeatureEnabled('ENABLE_DYNAMIC_FIELDS_UI')
-    const {
-        data: availableFields,
-        isLoading: loadingFields,
-        error: fieldsError,
-    } = useGetAvailableFields()
-    const { selectedDynamicFields, toggleDynamicField } = useColumnStore()
-
-    // Log for debugging
-    React.useEffect(() => {
-        if (enableDynamicFields) {
-            console.log('[ColumnsDropdown] Dynamic fields enabled')
-            console.log('[ColumnsDropdown] Available fields:', availableFields)
-            console.log('[ColumnsDropdown] Loading:', loadingFields)
-            if (fieldsError) {
-                console.error(
-                    '[ColumnsDropdown] Error loading fields:',
-                    fieldsError
-                )
-            }
-        }
-    }, [enableDynamicFields, availableFields, loadingFields, fieldsError])
-
-    // Add dynamic fields to columns if enabled
-    const allColumns =
-        enableDynamicFields && availableFields
-            ? [
-                  ...columns,
-                  ...availableFields
-                      .filter((f) => f.source === 'DYNAMIC')
-                      .map((f) => ({
-                          id: f.name,
-                          label: f.name
-                              .replace(/_/g, ' ')
-                              .replace(/\b\w/g, (l) => l.toUpperCase()),
-                          category: 'dynamic' as const,
-                          visible: selectedDynamicFields.includes(f.name),
-                      })),
-              ]
-            : columns
-
     // Group columns by category
     const groupedColumns: Array<ColumnGroup> = [
         {
             id: 'applied',
             label: 'Applied',
-            columns: allColumns.filter((c) => c.category === 'applied'),
+            columns: columns.filter((c) => c.category === 'applied'),
             expanded: expandedGroups.has('applied'),
         },
         {
             id: 'caller',
             label: 'Caller',
-            columns: allColumns.filter((c) => c.category === 'caller'),
+            columns: columns.filter((c) => c.category === 'caller'),
             expanded: expandedGroups.has('caller'),
         },
         {
             id: 'adjustment',
             label: 'Adjustment',
-            columns: allColumns.filter((c) => c.category === 'adjustment'),
+            columns: columns.filter((c) => c.category === 'adjustment'),
             expanded: expandedGroups.has('adjustment'),
         },
         {
             id: 'dispute',
             label: 'Dispute',
-            columns: allColumns.filter((c) => c.category === 'dispute'),
+            columns: columns.filter((c) => c.category === 'dispute'),
             expanded: expandedGroups.has('dispute'),
         },
-        ...(enableDynamicFields && availableFields
-            ? [
-                  {
-                      id: 'dynamic',
-                      label: 'Dynamic Fields',
-                      columns: allColumns.filter(
-                          (c) => c.category === 'dynamic'
-                      ),
-                      expanded: expandedGroups.has('dynamic'),
-                  },
-              ]
-            : []),
     ]
 
     // Filter columns based on search
@@ -274,18 +216,69 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                         )}
                                     />
                                 </div>
-                                {/* Per Figma: section header checkbox for non-Applied groups */}
-                                {group.id !== 'applied' && (
-                                    <div className="relative shrink-0 size-[20px]">
-                                        <CheckboxIcon
-                                            checked={group.columns.every(
-                                                (c) => c.visible
-                                            )}
-                                            isDark={isDark}
-                                            className="w-5 h-5"
-                                        />
-                                    </div>
-                                )}
+                                {/* Per Figma: section header checkbox for non-Applied groups; clickable to select/deselect all */}
+                                {group.id !== 'applied' &&
+                                    (() => {
+                                        const getVisible = (c: ColumnOption) =>
+                                            onApply
+                                                ? (draftVisibility[c.id] ??
+                                                  c.visible)
+                                                : c.visible
+                                        const allChecked =
+                                            group.columns.every(getVisible)
+                                        const someChecked =
+                                            group.columns.some(getVisible)
+                                        const indeterminate =
+                                            someChecked && !allChecked
+                                        return (
+                                            <Button
+                                                variant="ghost"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    const newVal = !allChecked
+                                                    if (onApply) {
+                                                        setDraftVisibility(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ...Object.fromEntries(
+                                                                    group.columns.map(
+                                                                        (c) => [
+                                                                            c.id,
+                                                                            newVal,
+                                                                        ]
+                                                                    )
+                                                                ),
+                                                            })
+                                                        )
+                                                    } else {
+                                                        group.columns.forEach(
+                                                            (c) => {
+                                                                if (
+                                                                    getVisible(
+                                                                        c
+                                                                    ) !== newVal
+                                                                ) {
+                                                                    onColumnToggle(
+                                                                        c.id
+                                                                    )
+                                                                }
+                                                            }
+                                                        )
+                                                    }
+                                                }}
+                                                className="p-0 h-5 w-5 flex items-center justify-center border-none shrink-0 hover:bg-transparent hover:opacity-100"
+                                            >
+                                                <CheckboxIcon
+                                                    checked={allChecked}
+                                                    indeterminate={
+                                                        indeterminate
+                                                    }
+                                                    isDark={isDark}
+                                                    className="w-5 h-5"
+                                                />
+                                            </Button>
+                                        )
+                                    })()}
                                 <p
                                     className={cn(
                                         'font-["Poppins:Regular",sans-serif]',
@@ -304,35 +297,26 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                             {expandedGroups.has(group.id) && (
                                 <div className="box-border flex flex-col items-start px-[16px] py-0 relative shrink-0 w-full">
                                     {group.columns.map((column) => {
-                                        const isFixed =
-                                            column.category !== 'dynamic'
-                                        const checked =
-                                            isFixed && onApply
-                                                ? (draftVisibility[column.id] ??
-                                                  column.visible)
-                                                : column.visible
+                                        const checked = onApply
+                                            ? (draftVisibility[column.id] ??
+                                              column.visible)
+                                            : column.visible
                                         return (
                                             <Button
                                                 key={column.id}
                                                 variant="ghost"
                                                 onClick={() => {
-                                                    if (
-                                                        column.category ===
-                                                        'dynamic'
-                                                    ) {
-                                                        toggleDynamicField(
-                                                            column.id
-                                                        )
-                                                    } else if (onApply) {
+                                                    if (onApply) {
                                                         setDraftVisibility(
                                                             (prev) => ({
                                                                 ...prev,
-                                                                [column.id]:
-                                                                    !(prev[
+                                                                [column.id]: !(
+                                                                    prev[
                                                                         column
                                                                             .id
                                                                     ] ??
-                                                                      column.visible),
+                                                                    column.visible
+                                                                ),
                                                             })
                                                         )
                                                     } else {
@@ -358,21 +342,21 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                             className="w-5 h-5"
                                                         />
                                                     </div>
-                                                <p
-                                                    className={cn(
-                                                        'font-["Poppins:Regular",sans-serif]',
-                                                        'leading-[normal] not-italic',
-                                                        'relative shrink-0 text-[#f5f8fa] text-[14px]',
-                                                        'text-center text-nowrap',
-                                                        isDark
-                                                            ? 'text-[#F5F8FA]'
-                                                            : 'text-[#3F4254]'
-                                                    )}
-                                                >
-                                                    {column.label}
-                                                </p>
-                                            </div>
-                                        </Button>
+                                                    <p
+                                                        className={cn(
+                                                            'font-["Poppins:Regular",sans-serif]',
+                                                            'leading-[normal] not-italic',
+                                                            'relative shrink-0 text-[#f5f8fa] text-[14px]',
+                                                            'text-center text-nowrap',
+                                                            isDark
+                                                                ? 'text-[#F5F8FA]'
+                                                                : 'text-[#3F4254]'
+                                                        )}
+                                                    >
+                                                        {column.label}
+                                                    </p>
+                                                </div>
+                                            </Button>
                                         )
                                     })}
                                 </div>
