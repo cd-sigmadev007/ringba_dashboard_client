@@ -415,7 +415,8 @@ export const useTableColumns = (
                             accessorKey: fieldId,
                             accessorFn: (row: CallData) => {
                                 const r = row as any
-                                const val = r[fieldId] ?? r.attributes?.[fieldId]
+                                const val =
+                                    r[fieldId] ?? r.attributes?.[fieldId]
                                 if (val != null && val !== '') return val
                                 const aliasMap: Record<string, string> = {
                                     callTimestamp: 'call_timestamp',

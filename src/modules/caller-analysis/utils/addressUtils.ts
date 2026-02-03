@@ -7,7 +7,9 @@ import type { CallData } from '../types'
 
 /** Get string from CallData using camelCase or snake_case key (GraphQL uses snake_case) */
 function getStr(data: CallData, camel: string, snake: string): string | null {
-    const raw = (data as Record<string, unknown>)[camel] ?? (data as Record<string, unknown>)[snake]
+    const raw =
+        (data as unknown as Record<string, unknown>)[camel] ??
+        (data as unknown as Record<string, unknown>)[snake]
     if (raw == null || raw === '') return null
     const s = String(raw).trim()
     return s !== 'NA' ? s : null
