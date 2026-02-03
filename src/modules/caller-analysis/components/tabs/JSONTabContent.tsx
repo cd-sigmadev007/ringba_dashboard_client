@@ -31,10 +31,12 @@ export const JSONTabContent: React.FC<JSONTabContentProps> = ({
     const [copied, setCopied] = useState(false)
 
     // Merge top-level + attributes so JSON shows everything we have in the table (one flat object)
-    const data = jsonData || (() => {
-        const { attributes = {}, ...rest } = callerData
-        return { ...attributes, ...rest }
-    })()
+    const data =
+        jsonData ||
+        (() => {
+            const { attributes = {}, ...rest } = callerData
+            return { ...attributes, ...rest }
+        })()
     const jsonString = JSON.stringify(data, null, 2)
 
     const handleCopy = async () => {

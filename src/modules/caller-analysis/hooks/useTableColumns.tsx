@@ -415,14 +415,19 @@ export const useTableColumns = (
                             accessorKey: fieldId,
                             accessorFn: (row: CallData) => {
                                 const r = row as any
-                                let val = r[fieldId] ?? r.attributes?.[fieldId]
+                                const val = r[fieldId] ?? r.attributes?.[fieldId]
                                 if (val != null && val !== '') return val
                                 const aliasMap: Record<string, string> = {
                                     callTimestamp: 'call_timestamp',
                                     call_timestamp: 'callTimestamp',
                                 }
                                 const altKey = aliasMap[fieldId]
-                                if (altKey) return r[altKey] ?? r.attributes?.[altKey] ?? null
+                                if (altKey)
+                                    return (
+                                        r[altKey] ??
+                                        r.attributes?.[altKey] ??
+                                        null
+                                    )
                                 return val
                             },
                             meta: { width: 150, category: 'caller' },

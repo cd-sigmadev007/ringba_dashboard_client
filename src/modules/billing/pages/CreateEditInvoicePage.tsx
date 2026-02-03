@@ -20,13 +20,13 @@ import { InvoicePreview } from '../components/InvoicePreview'
 import { InvoiceActionsMenu } from '../components/InvoiceActionsMenu'
 import { useOrganizations } from '../hooks/useOrganizations'
 import { useCustomers } from '../hooks/useCustomers'
+import { downloadInvoicePdf } from '../pdf/InvoicePdf'
 import type { CreateInvoiceRequest } from '../types'
 import Button from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { SendIcon } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { usePermissions } from '@/hooks/usePermissions'
-import { downloadInvoicePdf } from '../pdf/InvoicePdf'
 import { cn } from '@/lib'
 
 export default function CreateEditInvoicePage() {
@@ -480,14 +480,13 @@ export default function CreateEditInvoicePage() {
         saveDraftMutation.isPending ||
         deleteMutation.isPending
 
-    const sendStepLabel =
-        createMutation.isPending
-            ? 'Saving invoice…'
-            : updateMutation.isPending
-              ? 'Updating invoice…'
-              : sendMutation.isPending
-                ? 'Sending invoice…'
-                : null
+    const sendStepLabel = createMutation.isPending
+        ? 'Saving invoice…'
+        : updateMutation.isPending
+          ? 'Updating invoice…'
+          : sendMutation.isPending
+            ? 'Sending invoice…'
+            : null
 
     if (!canAccess) {
         return null
@@ -549,8 +548,8 @@ export default function CreateEditInvoicePage() {
                             isDark ? 'text-[#E4E6EF]' : 'text-[#5E6278]'
                         )}
                     >
-                        Are you sure you want to send this invoice? The recipient
-                        will receive it by email.
+                        Are you sure you want to send this invoice? The
+                        recipient will receive it by email.
                     </p>
                     <div className="flex justify-end gap-3">
                         <Button

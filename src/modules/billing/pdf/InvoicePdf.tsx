@@ -4,15 +4,12 @@
  * Consumes the same InvoicePreviewData as the UI preview.
  */
 
-import {
-    Document,
-    Page,
-    View,
-    Text,
-    pdf,
-} from '@react-pdf/renderer'
-import type { InvoicePreviewData, InvoicePreviewItem } from '../types/invoice.types'
+import { Document, Page, Text, View, pdf } from '@react-pdf/renderer'
 import { invoicePdfStyles as s } from './styles'
+import type {
+    InvoicePreviewData,
+    InvoicePreviewItem,
+} from '../types/invoice.types'
 
 const ROWS_FIRST_PAGE = 12
 
@@ -28,8 +25,8 @@ function formatCurrency(amount: number, symbol: string): string {
     return `${symbol}${amount.toFixed(2)}`
 }
 
-function chunk<T>(arr: T[], size: number): T[][] {
-    const out: T[][] = []
+function chunk<T>(arr: Array<T>, size: number): Array<Array<T>> {
+    const out: Array<Array<T>> = []
     for (let i = 0; i < arr.length; i += size) {
         out.push(arr.slice(i, i + size))
     }
@@ -60,7 +57,10 @@ function TableRow({
     isLast: boolean
 }) {
     return (
-        <View style={isLast ? [s.tableRow, s.tableRowLast] : s.tableRow} wrap={false}>
+        <View
+            style={isLast ? [s.tableRow, s.tableRowLast] : s.tableRow}
+            wrap={false}
+        >
             <Text style={s.tableCellDesc}>{item.description}</Text>
             <Text style={s.tableCellQty}>{String(item.quantity)}</Text>
             <Text style={s.tableCellUnit}>
@@ -97,8 +97,7 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
     const items = invoice.items ?? []
     const hasItems = items.length > 0
 
-    const billedByName =
-        invoice.billed_by_name ?? 'Clickdee Mediashare OÜ'
+    const billedByName = invoice.billed_by_name ?? 'Clickdee Mediashare OÜ'
     const billedByVatId = invoice.billed_by_vat_id ?? 'EE102168578'
     const billedByRegNo = invoice.billed_by_reg_no ?? '14587434'
     const billedByAddress =
@@ -109,7 +108,10 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
 
     const addressFromLines = billedByAddress.split('\n').filter(Boolean)
     const addressToLines = billedToAddress
-        ? billedToAddress.split(',').map((l) => l.trim()).filter(Boolean)
+        ? billedToAddress
+              .split(',')
+              .map((l) => l.trim())
+              .filter(Boolean)
         : []
 
     const itemChunks = chunk(items, ROWS_FIRST_PAGE)
@@ -208,9 +210,7 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
                 </View>
 
                 {/* Footnote after table on first page */}
-                <Text style={s.footnote}>
-                    Value-Added Tax Act § 15 s 4(1).
-                </Text>
+                <Text style={s.footnote}>Value-Added Tax Act § 15 s 4(1).</Text>
 
                 {/* Spacer pushes footer (totals, notes, payment) to end of page */}
                 {restChunks.length === 0 ? (
@@ -257,12 +257,7 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
                                             : formatCurrency(0, symbol)}
                                     </Text>
                                 </View>
-                                <View
-                                    style={[
-                                        s.totalsRow,
-                                        s.totalsDivider,
-                                    ]}
-                                >
+                                <View style={[s.totalsRow, s.totalsDivider]}>
                                     <Text style={s.totalsTotalLabel}>
                                         Invoice total:
                                     </Text>
@@ -278,9 +273,7 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
 
                         {invoice.notes ? (
                             <View style={s.notesSection}>
-                                <Text style={s.notesText}>
-                                    {invoice.notes}
-                                </Text>
+                                <Text style={s.notesText}>{invoice.notes}</Text>
                             </View>
                         ) : null}
 
@@ -356,17 +349,15 @@ export function InvoicePdf({ invoice }: InvoicePdfProps) {
                                         <Text style={s.totalsValue}>
                                             {(invoice.discount_amount ?? 0) > 0
                                                 ? `-${formatCurrency(
-                                                      invoice.discount_amount ?? 0,
+                                                      invoice.discount_amount ??
+                                                          0,
                                                       symbol
                                                   )}`
                                                 : formatCurrency(0, symbol)}
                                         </Text>
                                     </View>
                                     <View
-                                        style={[
-                                            s.totalsRow,
-                                            s.totalsDivider,
-                                        ]}
+                                        style={[s.totalsRow, s.totalsDivider]}
                                     >
                                         <Text style={s.totalsTotalLabel}>
                                             Invoice total:
