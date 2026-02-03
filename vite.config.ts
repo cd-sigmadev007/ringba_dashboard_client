@@ -9,6 +9,11 @@ export default defineConfig({
         alias: {
             '@': resolve(__dirname, './src'),
             public: resolve(__dirname, 'public'),
+            // @react-pdf/pdfkit browser build imports pako subpaths; ensure Rollup resolves them
+            'pako/lib/zlib/zstream.js': resolve(__dirname, 'node_modules/pako/lib/zlib/zstream.js'),
+            'pako/lib/zlib/deflate.js': resolve(__dirname, 'node_modules/pako/lib/zlib/deflate.js'),
+            'pako/lib/zlib/inflate.js': resolve(__dirname, 'node_modules/pako/lib/zlib/inflate.js'),
+            'pako/lib/zlib/constants.js': resolve(__dirname, 'node_modules/pako/lib/zlib/constants.js'),
         },
     },
     server: {
