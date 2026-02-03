@@ -6,7 +6,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import clsx from 'clsx'
-import html2pdf from 'html2pdf.js'
 import { toast } from 'react-hot-toast'
 import {
     useCreateInvoice,
@@ -23,9 +22,12 @@ import { useOrganizations } from '../hooks/useOrganizations'
 import { useCustomers } from '../hooks/useCustomers'
 import type { CreateInvoiceRequest } from '../types'
 import Button from '@/components/ui/Button'
+import { Modal } from '@/components/ui/Modal'
 import { SendIcon } from '@/assets/svg'
 import { useThemeStore } from '@/store/themeStore'
 import { usePermissions } from '@/hooks/usePermissions'
+import { downloadInvoicePdf } from '../pdf/InvoicePdf'
+import { cn } from '@/lib'
 
 export default function CreateEditInvoicePage() {
     const { theme } = useThemeStore()
@@ -62,6 +64,10 @@ export default function CreateEditInvoicePage() {
     const [logoPreview, setLogoPreview] = useState<string | undefined>(
         undefined
     )
+
+    // Send invoice: confirmation modal and flow state for overlay
+    const [sendConfirmOpen, setSendConfirmOpen] = useState(false)
+    const [sendFlowActive, setSendFlowActive] = useState(false)
 
     const getApiBaseUrl = useMemo(() => {
         const baseUrl =
@@ -308,66 +314,46 @@ export default function CreateEditInvoicePage() {
         }
     }
 
-    const handleSend = async () => {
-        console.log('handleSend called')
+    const handleSendClick = () => {
         const validatedData = getValidatedFormData()
-        console.log('Validated data:', validatedData)
-        console.log('isEditMode:', isEditMode, 'id:', id)
-
-        // Validate required fields
         if (!validatedData.billed_by_id || !validatedData.billed_to_id) {
-            console.log(
-                'Validation failed: missing billed_by_id or billed_to_id'
-            )
             toast.error('Please select both "Billed By" and "Billed To"')
             return
         }
-
         if (validatedData.items.length === 0) {
-            console.log('Validation failed: no items')
             toast.error('Please add at least one invoice item')
             return
         }
+        setSendConfirmOpen(true)
+    }
 
-        console.log('Validation passed, proceeding with send')
-
-        if (!isEditMode || !id) {
-            // Save first, then send
-            console.log('Creating new invoice first')
-            try {
+    const proceedWithSend = async () => {
+        const validatedData = getValidatedFormData()
+        setSendConfirmOpen(false)
+        setSendFlowActive(true)
+        try {
+            if (!isEditMode || !id) {
                 const invoice = await createMutation.mutateAsync({
                     data: validatedData,
                     logoFile,
                 })
-                console.log('Invoice created:', invoice.id)
-                // Wait a bit for the invoice to be fully saved
                 await new Promise((resolve) => setTimeout(resolve, 500))
-                console.log('Sending invoice:', invoice.id)
                 await sendMutation.mutateAsync(invoice.id)
                 navigate({ to: '/billing/invoices' })
-            } catch (error) {
-                console.error('Error in handleSend (create):', error)
-                // Error handling is done in the mutation hook
-            }
-        } else {
-            // For existing invoice, update first to ensure latest data, then send
-            console.log('Updating existing invoice first:', id)
-            try {
+            } else {
                 await updateMutation.mutateAsync({
                     id,
                     data: validatedData,
                     logoFile,
                 })
-                console.log('Invoice updated, now sending')
-                // Wait a bit for the update to complete
                 await new Promise((resolve) => setTimeout(resolve, 500))
-                console.log('Sending invoice:', id)
                 await sendMutation.mutateAsync(id)
                 navigate({ to: '/billing/invoices' })
-            } catch (error) {
-                console.error('Error in handleSend (update):', error)
-                // Error handling is done in the mutation hook
             }
+        } catch (error) {
+            // Error handling is done in the mutation hook
+        } finally {
+            setSendFlowActive(false)
         }
     }
 
@@ -413,49 +399,11 @@ export default function CreateEditInvoicePage() {
             }
         }
 
-        // Generate PDF from preview component
-        if (!previewRef.current) {
-            toast.error('Preview not available')
-            return
-        }
-
         try {
-            // Get the inner content div (the white invoice card)
-            const element = previewRef.current
-
-            // Wait a bit for any pending renders
-            await new Promise((resolve) => setTimeout(resolve, 100))
-
-            // Configure html2pdf options for pixel-perfect PDF
-            const opt = {
-                margin: [0, 0, 0, 0] as [number, number, number, number],
-                filename: `invoice-${validatedData.invoice_number || invoiceId}.pdf`,
-                image: { type: 'jpeg' as const, quality: 1.0 },
-                html2canvas: {
-                    scale: 2, // Higher scale for better quality
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff',
-                    width: element.offsetWidth,
-                    height: element.scrollHeight,
-                    windowWidth: element.scrollWidth,
-                    windowHeight: element.scrollHeight,
-                },
-                jsPDF: {
-                    unit: 'px' as const,
-                    format: [element.offsetWidth, element.scrollHeight] as [
-                        number,
-                        number,
-                    ],
-                    orientation:
-                        element.scrollHeight > element.offsetWidth
-                            ? ('portrait' as const)
-                            : ('landscape' as const),
-                },
-            }
-
-            // Generate and download PDF
-            await html2pdf().set(opt).from(element).save()
+            await downloadInvoicePdf(
+                previewData,
+                `invoice-${validatedData.invoice_number || invoiceId}.pdf`
+            )
             toast.success('Invoice PDF downloaded')
         } catch (error) {
             console.error('Error generating PDF:', error)
@@ -532,12 +480,103 @@ export default function CreateEditInvoicePage() {
         saveDraftMutation.isPending ||
         deleteMutation.isPending
 
+    const sendStepLabel =
+        createMutation.isPending
+            ? 'Saving invoice…'
+            : updateMutation.isPending
+              ? 'Updating invoice…'
+              : sendMutation.isPending
+                ? 'Sending invoice…'
+                : null
+
     if (!canAccess) {
         return null
     }
 
     return (
-        <div className="min-h-screen content">
+        <div className="min-h-screen content relative">
+            {/* Send flow overlay: updating then sending */}
+            {sendFlowActive && sendStepLabel && (
+                <div
+                    className={cn(
+                        'fixed inset-0 z-[9998] flex flex-col items-center justify-center gap-5',
+                        isDark ? 'bg-[#071B2F]/95' : 'bg-white/95',
+                        'backdrop-blur-sm'
+                    )}
+                    role="status"
+                    aria-live="polite"
+                    aria-label={sendStepLabel}
+                >
+                    <span
+                        className="w-12 h-12 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0"
+                        aria-hidden
+                    />
+                    <p
+                        className={cn(
+                            'text-lg font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
+                        {sendStepLabel}
+                    </p>
+                    <p
+                        className={cn(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#7E8299]'
+                        )}
+                    >
+                        {sendMutation.isPending
+                            ? 'Email will be sent to the recipient shortly.'
+                            : 'Please wait…'}
+                    </p>
+                </div>
+            )}
+
+            {/* Send confirmation modal */}
+            <Modal
+                open={sendConfirmOpen}
+                onClose={() => setSendConfirmOpen(false)}
+                title="Send invoice?"
+                size="sm"
+                showCloseButton
+                closeOnBackdropClick
+                showSeparator
+            >
+                <div className="flex flex-col gap-6">
+                    <p
+                        className={cn(
+                            'text-[15px] leading-relaxed',
+                            isDark ? 'text-[#E4E6EF]' : 'text-[#5E6278]'
+                        )}
+                    >
+                        Are you sure you want to send this invoice? The recipient
+                        will receive it by email.
+                    </p>
+                    <div className="flex justify-end gap-3">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setSendConfirmOpen(false)}
+                            disabled={isLoading}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="primary"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                proceedWithSend()
+                            }}
+                            disabled={isLoading}
+                            className="bg-[#007FFF] hover:bg-[#0254A5] text-white"
+                        >
+                            Yes, send invoice
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
+
             <div className="p-3 sm:p-4 lg:p-8">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -556,21 +595,34 @@ export default function CreateEditInvoicePage() {
                             onClick={(e) => {
                                 e.preventDefault()
                                 e.stopPropagation()
-                                console.log('Send Invoice button clicked')
-                                handleSend()
+                                handleSendClick()
                             }}
                             disabled={isLoading}
                             className={clsx(
-                                'flex items-center gap-[4px] h-[44px] px-[14px] py-[7px] rounded-[10px]',
+                                'flex items-center gap-[10px] h-[44px] px-[18px] py-[7px] rounded-[10px] min-w-[140px] justify-center',
                                 isDark
-                                    ? 'bg-[#132f4c] text-[#F5F8FA]'
-                                    : 'bg-[#132f4c] text-[#F5F8FA]'
+                                    ? 'bg-[#132f4c] text-[#F5F8FA] hover:bg-[#1B456F]'
+                                    : 'bg-[#132f4c] text-[#F5F8FA] hover:bg-[#1B456F]'
                             )}
                         >
-                            <span className="font-medium text-[16px]">
-                                Send Invoice
-                            </span>
-                            <SendIcon className="w-[22px] h-[22px]" />
+                            {sendStepLabel ? (
+                                <>
+                                    <span
+                                        className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0"
+                                        aria-hidden
+                                    />
+                                    <span className="font-medium text-[16px]">
+                                        {sendStepLabel}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="font-medium text-[16px]">
+                                        Send Invoice
+                                    </span>
+                                    <SendIcon className="w-[22px] h-[22px]" />
+                                </>
+                            )}
                         </Button>
                         <InvoiceActionsMenu
                             onSaveDraft={handleSaveDraft}

@@ -1,37 +1,15 @@
 /**
  * Invoice Preview Component
- * Live preview of invoice with flow-based layout to prevent overlap
+ * Live preview of invoice with flow-based layout to prevent overlap.
+ * Consumes the same InvoicePreviewData as the PDF renderer.
  */
 
 import React from 'react'
-import type { InvoiceItem } from '../types'
+import type { InvoicePreviewData } from '../types/invoice.types'
 import { CopyIcon, LightLogo } from '@/assets/svg'
 
 interface InvoicePreviewProps {
-    invoice: {
-        invoice_number: string
-        invoice_date: string
-        due_date: string
-        billed_by_name?: string
-        billed_by_email?: string
-        billed_by_address?: string
-        billed_by_vat_id?: string
-        billed_by_reg_no?: string
-        billed_to_name?: string
-        billed_to_email?: string
-        billed_to_address?: string
-        currency_symbol: string
-        subtotal: number
-        tax_rate: number
-        tax_amount: number
-        discount_rate: number
-        discount_amount: number
-        total_amount: number
-        payment_instructions?: string | null
-        notes?: string | null
-        logo_url?: string | null
-        items?: Array<InvoiceItem>
-    }
+    invoice: InvoicePreviewData
     pdfRef?: React.RefObject<HTMLDivElement | null>
 }
 
