@@ -2,6 +2,15 @@
  * Billing Module Types
  */
 
+export type {
+    InvoicePreviewData,
+    InvoicePreviewItem,
+    InvoiceCompanyInfo,
+    InvoiceClientInfo,
+    InvoiceMeta,
+    InvoiceTotals,
+} from './invoice.types'
+
 export interface Organization {
     id: string
     name: string

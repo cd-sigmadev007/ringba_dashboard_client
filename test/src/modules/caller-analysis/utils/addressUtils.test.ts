@@ -12,7 +12,7 @@ describe('addressUtils', () => {
                 city: 'New York',
                 state: 'NY',
                 zip: '10001',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('123 Main St, New York, NY, 10001')
@@ -26,7 +26,7 @@ describe('addressUtils', () => {
                 city: 'New York',
                 state: 'NA',
                 zip: '10001',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('123 St, New York, 10001')
@@ -40,7 +40,7 @@ describe('addressUtils', () => {
                 city: 'New York',
                 state: 'NY',
                 zip: '',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('123 St, New York, NY')
@@ -54,7 +54,7 @@ describe('addressUtils', () => {
                 city: '  New York  ',
                 state: '  NY  ',
                 zip: '  10001  ',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('123 Main St, New York, NY, 10001')
@@ -63,14 +63,14 @@ describe('addressUtils', () => {
         it('should use fallback address when no parts available', () => {
             const callerData: CallData = {
                 address: 'Fallback Address',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('Fallback Address')
         })
 
         it('should return "-" when no address parts and no fallback', () => {
-            const callerData: CallData = {} as CallData
+            const callerData: CallData = {} as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('-')
@@ -81,7 +81,7 @@ describe('addressUtils', () => {
                 city: 'New York',
                 state: 'NY',
                 zip: '10001',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('New York, NY, 10001')
@@ -91,7 +91,7 @@ describe('addressUtils', () => {
             const callerData: CallData = {
                 city: 'Los Angeles',
                 state: 'CA',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('Los Angeles, CA')
@@ -105,7 +105,7 @@ describe('addressUtils', () => {
                 city: 'Chicago',
                 state: 'IL',
                 zip: '60601',
-            } as CallData
+            } as unknown as CallData
 
             const result = buildAddressFromCallData(callerData)
             expect(result).toBe('456 Oak Avenue, Chicago, IL, 60601')

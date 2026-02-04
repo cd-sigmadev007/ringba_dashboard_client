@@ -5,6 +5,8 @@ interface SVGRProps {
     titleId?: string
     className?: string
     checked?: boolean
+    /** When true, shows minus/dash (partially selected). Takes precedence over checked for display. */
+    indeterminate?: boolean
     isDark?: boolean
 }
 
@@ -15,6 +17,7 @@ export const CheckboxIcon: React.FC<
     titleId,
     className,
     checked = false,
+    indeterminate = false,
     isDark = false,
     ...props
 }) => (
@@ -26,10 +29,28 @@ export const CheckboxIcon: React.FC<
         xmlns="http://www.w3.org/2000/svg"
         className={className}
         aria-labelledby={titleId}
+        aria-checked={indeterminate ? 'mixed' : checked}
         {...props}
     >
         {title ? <title id={titleId}>{title}</title> : null}
-        {checked ? (
+        {indeterminate ? (
+            <>
+                <rect
+                    x="2.5"
+                    y="2.5"
+                    width="15"
+                    height="15"
+                    rx="2.5"
+                    fill={isDark ? '#F5F8FA' : '#007FFF'}
+                />
+                <path
+                    d="M5 10h10"
+                    stroke={isDark ? '#001E3C' : 'white'}
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                />
+            </>
+        ) : checked ? (
             <>
                 <rect
                     x="2.5"

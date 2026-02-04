@@ -49,6 +49,7 @@ describe('csvExport', () => {
     it('should create CSV with headers and data', () => {
         const data: Array<CallData> = [
             {
+                id: 'test-id',
                 callerId: '+1234567890',
                 lastCall: 'Nov 07, 2025, 08:08:30 PM ET',
                 duration: '2m 30s',
@@ -63,7 +64,7 @@ describe('csvExport', () => {
                 address: '123 Main St',
                 city: 'New York',
                 state: 'NY',
-                zip: '10001',
+                g_zip: '10001',
             } as CallData,
         ]
 

@@ -3,7 +3,6 @@ import Button from '../../../components/ui/Button'
 import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
 import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
-import { useColumnStore } from '../store/columnStore'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
@@ -79,7 +78,6 @@ export const useTableColumns = (
 ) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { selectedDynamicFields } = useColumnStore()
 
     return useMemo<Array<ColumnDef<CallData>>>(() => {
         const allColumns: Array<ColumnDef<CallData>> = []
@@ -88,26 +86,31 @@ export const useTableColumns = (
         if (enableRowSelection) {
             allColumns.push({
                 id: 'select',
-                header: ({ table }) => (
-                    <div className="flex items-center justify-center">
-                        <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                table.toggleAllPageRowsSelected(
-                                    !table.getIsAllPageRowsSelected()
-                                )
-                            }}
-                            className="p-0 h-5 w-5 flex items-center justify-center border-none"
-                        >
-                            <CheckboxIcon
-                                checked={table.getIsAllPageRowsSelected()}
-                                isDark={isDark}
-                                className="w-5 h-5"
-                            />
-                        </Button>
-                    </div>
-                ),
+                header: ({ table }) => {
+                    const allSelected = table.getIsAllPageRowsSelected()
+                    const someSelected = table.getIsSomePageRowsSelected()
+                    return (
+                        <div className="flex items-center justify-center">
+                            <Button
+                                variant="ghost"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    table.toggleAllPageRowsSelected(
+                                        !allSelected
+                                    )
+                                }}
+                                className="p-0 h-5 w-5 flex items-center justify-center border-none"
+                            >
+                                <CheckboxIcon
+                                    checked={allSelected}
+                                    indeterminate={someSelected && !allSelected}
+                                    isDark={isDark}
+                                    className="w-5 h-5"
+                                />
+                            </Button>
+                        </div>
+                    )
+                },
                 cell: ({ row }) => (
                     <div className="flex items-center justify-center">
                         <Button
@@ -374,150 +377,194 @@ export const useTableColumns = (
                         </div>
                     )
                 },
-            },
-            {
-                id: 'action',
-                header: 'ACTION',
-                accessorKey: 'action',
-                enableSorting: false,
-                meta: {
-                    width: 120,
-                    sticky: 'right',
-                    category: 'applied',
-                } as any,
-                cell: ({ row }) => {
-                    return (
-                        <div className="flex items-center gap-[5px]">
-                            {/* Play Button */}
-                            <Tooltip
-                                tooltipText={
-                                    currentPlayingRow === row.original.id &&
-                                    isPlaying
-                                        ? 'Pause Call Recording'
-                                        : 'Play Call Recording'
-                                }
-                            >
-                                <Button
-                                    variant="ghost"
-                                    className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        const audioUrl =
-                                            (row.original as any).audioUrl || ''
-                                        onPlayAudio(audioUrl, row.original.id)
-                                    }}
-                                >
-                                    {currentPlayingRow === row.original.id &&
-                                    isPlaying ? (
-                                        <PauseIcon />
-                                    ) : (
-                                        <PlayIcon />
-                                    )}
-                                </Button>
-                            </Tooltip>
+            }
+        )
 
-                            {/* Document/Transcript Button */}
-                            <Tooltip tooltipText="View Call Transcript">
-                                <Button
-                                    variant="ghost"
-                                    className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        onTranscriptClick(row.original)
-                                    }}
-                                >
-                                    <DocumentIcon />
-                                </Button>
-                            </Tooltip>
+        // Only ids that have an explicit column definition above (don't add them again as dynamic)
+        const coreFieldIds = [
+            'select',
+            'callerId',
+            'lastCall',
+            'duration',
+            'lifetimeRevenue',
+            'revenue',
+            'ringbaCost',
+            'adCost',
+            'targetName',
+            'publisherName',
+            'campaign',
+            'status',
+            'action',
+        ]
 
-                            {/* Warning Button */}
-                            <Tooltip tooltipText="View Warning Details">
-                                <Button
-                                    variant="ghost"
-                                    className="p-1 flex items-center justify-center w-[24px] h-[25px]"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <WarningIcon />
-                                </Button>
-                            </Tooltip>
-                        </div>
+        // All other fields (fixed or attributes): show value and heading as-is, no tooltip
+        if (visibleColumns) {
+            Object.keys(visibleColumns).forEach((fieldId) => {
+                if (
+                    visibleColumns[fieldId] === true &&
+                    !coreFieldIds.includes(fieldId)
+                ) {
+                    const exists = allColumns.some(
+                        (col) =>
+                            (col.id || (col as any).accessorKey) === fieldId
                     )
-                },
-            }
-        )
-
-        // Add dynamic columns from store
-        const dynamicColumns: Array<ColumnDef<CallData>> = []
-
-        selectedDynamicFields.forEach((fieldName) => {
-            // Skip if already a fixed column
-            const isFixedColumn = allColumns.some(
-                (col) => (col.id || (col as any).accessorKey) === fieldName
-            )
-
-            if (!isFixedColumn) {
-                dynamicColumns.push({
-                    id: fieldName,
-                    header: fieldName
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (l) => l.toUpperCase()),
-                    accessorKey: fieldName,
-                    meta: { width: 150, category: 'dynamic' },
-                    cell: ({ row }) => {
-                        const raw = row.original as unknown as Record<string, unknown>
-                        const attributes = (raw.attributes as Record<string, unknown>) || {}
-                        // Unified getter: row (fixed/schema field) first, then attributes (dynamic only)
-                        let displayValue =
-                            raw[fieldName] !== undefined && raw[fieldName] !== null
-                                ? raw[fieldName]
-                                : attributes[fieldName] ?? null
-                        if (
-                            displayValue == null &&
-                            fieldName === 'publisher' &&
-                            attributes.publisherName != null
-                        ) {
-                            displayValue = attributes.publisherName
-                        }
-                        if (
-                            displayValue == null &&
-                            fieldName === 'publisherName' &&
-                            attributes.publisher != null
-                        ) {
-                            displayValue = attributes.publisher
-                        }
-                        if (displayValue == null) {
-                            return (
-                                <span className="text-sm text-gray-400">—</span>
-                            )
-                        }
-                        return (
-                            <span className="text-sm">
-                                {typeof displayValue === 'object'
-                                    ? JSON.stringify(displayValue)
-                                    : String(displayValue)}
-                            </span>
-                        )
-                    },
-                })
-            }
-        })
-
-        // Insert dynamic columns before action column
-        const actionColumnIndex = allColumns.findIndex(
-            (col) => col.id === 'action'
-        )
-        if (actionColumnIndex !== -1 && dynamicColumns.length > 0) {
-            allColumns.splice(actionColumnIndex, 0, ...dynamicColumns)
-        } else if (dynamicColumns.length > 0) {
-            // If no action column, append dynamic columns
-            allColumns.push(...dynamicColumns)
+                    if (!exists) {
+                        allColumns.push({
+                            id: fieldId,
+                            header: fieldId,
+                            accessorKey: fieldId,
+                            accessorFn: (row: CallData) => {
+                                const r = row as any
+                                const val =
+                                    r[fieldId] ?? r.attributes?.[fieldId]
+                                if (val != null && val !== '') return val
+                                const aliasMap: Record<string, string> = {
+                                    callTimestamp: 'call_timestamp',
+                                    call_timestamp: 'callTimestamp',
+                                }
+                                const altKey = aliasMap[fieldId]
+                                if (altKey)
+                                    return (
+                                        r[altKey] ??
+                                        r.attributes?.[altKey] ??
+                                        null
+                                    )
+                                return val
+                            },
+                            meta: { width: 150, category: 'caller' },
+                            cell: ({ getValue }) => {
+                                const val = getValue() as any
+                                if (
+                                    val === null ||
+                                    val === undefined ||
+                                    val === ''
+                                )
+                                    return (
+                                        <span className="text-sm text-gray-400">
+                                            —
+                                        </span>
+                                    )
+                                const display =
+                                    typeof val === 'object'
+                                        ? JSON.stringify(val)
+                                        : String(val)
+                                const maxLen = 50
+                                const truncated =
+                                    display.length > maxLen
+                                        ? display.substring(0, maxLen) + '...'
+                                        : display
+                                return (
+                                    <span className="text-sm break-words">
+                                        {truncated}
+                                    </span>
+                                )
+                            },
+                        })
+                    }
+                }
+            })
         }
+
+        allColumns.push({
+            id: 'action',
+            header: 'ACTION',
+            accessorKey: 'action',
+            enableSorting: false,
+            meta: {
+                width: 120,
+                sticky: 'right',
+                category: 'applied',
+            } as any,
+            cell: ({ row }) => {
+                return (
+                    <div className="flex items-center gap-[5px]">
+                        {/* Play Button */}
+                        <Tooltip
+                            tooltipText={
+                                currentPlayingRow === row.original.id &&
+                                isPlaying
+                                    ? 'Pause Call Recording'
+                                    : 'Play Call Recording'
+                            }
+                        >
+                            <Button
+                                variant="ghost"
+                                className="p-1 flex items-center justify-center h-auto w-[24px] h-[25px]"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    const audioUrl =
+                                        (row.original as any).audioUrl || ''
+                                    onPlayAudio(audioUrl, row.original.id)
+                                }}
+                            >
+                                {currentPlayingRow === row.original.id &&
+                                isPlaying ? (
+                                    <PauseIcon />
+                                ) : (
+                                    <PlayIcon />
+                                )}
+                            </Button>
+                        </Tooltip>
+
+                        {/* Document/Transcript Button */}
+                        <Tooltip tooltipText="View Call Transcript">
+                            <Button
+                                variant="ghost"
+                                className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    onTranscriptClick(row.original)
+                                }}
+                            >
+                                <DocumentIcon />
+                            </Button>
+                        </Tooltip>
+
+                        {/* Warning Button */}
+                        <Tooltip tooltipText="View Warning Details">
+                            <Button
+                                variant="ghost"
+                                className="p-1 flex items-center justify-center w-[24px] h-[25px]"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <WarningIcon />
+                            </Button>
+                        </Tooltip>
+                    </div>
+                )
+            },
+        })
 
         // Filter columns based on visibility
         if (visibleColumns) {
             return allColumns.filter((col) => {
-                const colId = col.id || (col as any).accessorKey
-                return visibleColumns[colId as string] !== false
+                const colId = (col.id || (col as any).accessorKey) as string
+                const category = (col as any).meta?.category
+
+                // Dynamic columns should always be visible if they are in the list
+                // (as they are only added if they are in the visibility store as true)
+                if (category === 'dynamic' || category === 'custom') {
+                    return true
+                }
+
+                const isVisibleInStore = visibleColumns[colId]
+                if (isVisibleInStore !== undefined) {
+                    return isVisibleInStore === true
+                }
+
+                // Define which columns are visible by default
+                const defaultVisibleColumns = [
+                    'select',
+                    'callerId',
+                    'lastCall',
+                    'duration',
+                    'lifetimeRevenue',
+                    'campaign',
+                    'status',
+                    'action',
+                ]
+
+                return defaultVisibleColumns.includes(colId)
             })
         }
 
@@ -531,6 +578,5 @@ export const useTableColumns = (
         isPlaying,
         visibleColumns,
         enableRowSelection,
-        selectedDynamicFields,
     ])
 }

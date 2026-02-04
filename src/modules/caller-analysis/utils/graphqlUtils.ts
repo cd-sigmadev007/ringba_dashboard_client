@@ -21,18 +21,19 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
     // Backend sends revenue = latestPayout when revenue not set
     const revenue =
         caller.revenue != null
-            ? (typeof caller.revenue === 'number'
-                  ? caller.revenue
-                  : Number(caller.revenue))
+            ? typeof caller.revenue === 'number'
+                ? caller.revenue
+                : Number(caller.revenue)
             : caller.latestPayout != null
-              ? (typeof caller.latestPayout === 'string'
-                    ? Number(caller.latestPayout)
-                    : Number(caller.latestPayout))
+              ? typeof caller.latestPayout === 'string'
+                  ? Number(caller.latestPayout)
+                  : Number(caller.latestPayout)
               : null
 
     return {
         id: caller.id,
         callerId: caller.callerId,
+        phoneNumber: caller.phoneNumber ?? caller.callerId,
         lastCall: caller.lastCall,
         duration: caller.duration,
         lifetimeRevenue: caller.lifetimeRevenue,
@@ -41,22 +42,26 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
         status: caller.status || [],
         audioUrl: caller.audioUrl,
         transcript: caller.transcript,
-        revenue: Number.isFinite(revenue as number) ? (revenue as number) : null,
+        revenue: Number.isFinite(revenue as number)
+            ? (revenue as number)
+            : null,
         firstName: caller.firstName,
         lastName: caller.lastName,
         email: caller.email,
         type: caller.type,
         address: caller.address,
-        streetNumber: caller.streetNumber,
-        streetName: caller.streetName,
-        streetType: caller.streetType,
+        street_number: caller.street_number,
+        street_name: caller.street_name,
+        street_type: caller.street_type,
         city: caller.city,
         state: caller.state,
-        zip: caller.zip,
+        g_zip: caller.g_zip,
         ringbaCost: caller.ringbaCost,
         adCost: caller.adCost,
         latestPayout: caller.latestPayout ?? null,
         call_timestamp: caller.callTimestamp,
+        callTimestamp: caller.callTimestamp ?? null,
+        callLengthInSeconds: caller.callLengthInSeconds ?? null,
         targetName: caller.targetName ?? null,
         publisherName: caller.publisherName ?? null,
         // Only dynamic (non-fixed) fields; fixed fields are top-level

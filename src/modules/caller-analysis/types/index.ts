@@ -7,6 +7,8 @@ export * from './priority.types'
 export interface CallData {
     id: string
     callerId: string
+    /** Phone number (for history API); may equal callerId */
+    phoneNumber?: string
     lastCall: string
     duration: string
     lifetimeRevenue: number
@@ -21,12 +23,12 @@ export interface CallData {
     email?: string | null
     type?: string | null
     address?: string | null
-    streetNumber?: string | null
-    streetName?: string | null
-    streetType?: string | null
+    street_number?: string | null
+    street_name?: string | null
+    street_type?: string | null
     city?: string | null
     state?: string | null
-    zip?: string | null
+    g_zip?: string | null
     billed?: string | null
     latestPayout?: string | null
     ringbaCost?: number | null
@@ -34,6 +36,10 @@ export interface CallData {
     is_adjusted?: boolean
     adjustment_amount?: number | null
     call_timestamp?: string | Date | null
+    /** Same as call_timestamp (for dynamic column id callTimestamp) */
+    callTimestamp?: string | null
+    /** Call length in seconds (for dynamic column) */
+    callLengthInSeconds?: number | null
     targetName?: string | null
     publisherName?: string | null
     ai_processed?: boolean
