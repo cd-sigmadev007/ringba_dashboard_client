@@ -1,6 +1,10 @@
 import React from 'react'
 import clsx from 'clsx'
-import { useCallerAnalysisGraphQL, useTableColumns } from '../hooks'
+import {
+    useCallerAnalysisGraphQL,
+    useGetAvailableFields,
+    useTableColumns,
+} from '../hooks'
 import { PersonalIdentification } from '../components/PersonalIdentification'
 import { StatusModal } from '../components/StatusModal'
 import { CallDetailsModal } from '../components/CallDetailsModal'
@@ -67,16 +71,16 @@ export const CallerAnalysisContainer: React.FC = () => {
     )
 
     // Column visibility state from Zustand store
-    const {
-        columnVisibility,
-        toggleColumn,
-        setColumnVisibility,
-    } = useColumnStore()
+    const { columnVisibility, toggleColumn, setColumnVisibility } =
+        useColumnStore()
+
+    // GraphQL field discovery
+    const { data: availableFields } = useGetAvailableFields()
 
     // Column options for dropdown
     // Includes all CallerFilter fields for filtering
-    const columnOptions: Array<ColumnOption> = React.useMemo(
-        () => [
+    const columnOptions: Array<ColumnOption> = React.useMemo(() => {
+        const coreOptions: Array<ColumnOption> = [
             {
                 id: 'callerId',
                 label: 'Caller ID',
@@ -100,6 +104,82 @@ export const CallerAnalysisContainer: React.FC = () => {
                 label: 'LTR',
                 category: 'applied',
                 visible: columnVisibility.lifetimeRevenue ?? true,
+            },
+            {
+                id: 'campaign',
+                label: 'Campaign',
+                category: 'applied',
+                visible: columnVisibility.campaign ?? true,
+            },
+            {
+                id: 'status',
+                label: 'Status',
+                category: 'applied',
+                visible: columnVisibility.status ?? true,
+            },
+            {
+                id: 'action',
+                label: 'Action',
+                category: 'applied',
+                visible: columnVisibility.action ?? true,
+            },
+        ]
+
+        // Core fields that are not in the "applied" group
+        const coreCallerOptions: Array<ColumnOption> = [
+            {
+                id: 'firstName',
+                label: 'First Name',
+                category: 'caller',
+                visible: columnVisibility.firstName ?? false,
+            },
+            {
+                id: 'lastName',
+                label: 'Last Name',
+                category: 'caller',
+                visible: columnVisibility.lastName ?? false,
+            },
+            {
+                id: 'email',
+                label: 'Email',
+                category: 'caller',
+                visible: columnVisibility.email ?? false,
+            },
+            {
+                id: 'city',
+                label: 'City',
+                category: 'caller',
+                visible: columnVisibility.city ?? false,
+            },
+            {
+                id: 'state',
+                label: 'State',
+                category: 'caller',
+                visible: columnVisibility.state ?? false,
+            },
+            {
+                id: 'g_zip',
+                label: 'Zip Code',
+                category: 'caller',
+                visible: columnVisibility.g_zip ?? false,
+            },
+            {
+                id: 'street_number',
+                label: 'Street Number',
+                category: 'caller',
+                visible: columnVisibility.street_number ?? false,
+            },
+            {
+                id: 'street_name',
+                label: 'Street Name',
+                category: 'caller',
+                visible: columnVisibility.street_name ?? false,
+            },
+            {
+                id: 'street_type',
+                label: 'Street Type',
+                category: 'caller',
+                visible: columnVisibility.street_type ?? false,
             },
             {
                 id: 'revenue',
@@ -132,25 +212,6 @@ export const CallerAnalysisContainer: React.FC = () => {
                 visible: columnVisibility.publisherName ?? false,
             },
             {
-                id: 'campaign',
-                label: 'Campaign',
-                category: 'applied',
-                visible: columnVisibility.campaign ?? true,
-            },
-            {
-                id: 'status',
-                label: 'Status',
-                category: 'applied',
-                visible: columnVisibility.status ?? true,
-            },
-            {
-                id: 'action',
-                label: 'Action',
-                category: 'applied',
-                visible: columnVisibility.action ?? true,
-            },
-            // CallerFilter fields - these can be used for filtering
-            {
                 id: 'phoneNumber',
                 label: 'Phone Number',
                 category: 'caller',
@@ -168,11 +229,31 @@ export const CallerAnalysisContainer: React.FC = () => {
                 category: 'caller',
                 visible: columnVisibility.callLengthInSeconds ?? false,
             },
-            // Note: dateFrom, dateTo, durationMin, durationMax, and search are filter parameters only,
-            // not displayable columns, so they are not included in columnOptions
-        ],
-        [columnVisibility]
-    )
+        ]
+
+        // Dynamic fields from database discovery
+        const discoveredOptions: Array<ColumnOption> = (availableFields || [])
+            .filter(
+                (f) =>
+                    f.source === 'DYNAMIC' &&
+                    !coreOptions.some(
+                        (opt: ColumnOption) => opt.id === f.name
+                    ) &&
+                    !coreCallerOptions.some(
+                        (opt: ColumnOption) => opt.id === f.name
+                    )
+            )
+            .map((f: any) => ({
+                id: f.name,
+                label: f.name
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+                category: 'caller',
+                visible: columnVisibility[f.name] ?? false,
+            }))
+
+        return [...coreOptions, ...coreCallerOptions, ...discoveredOptions]
+    }, [columnVisibility, availableFields])
 
     // Use GraphQL hook for caller analysis
     const graphqlHook = useCallerAnalysisGraphQL()
@@ -533,6 +614,15 @@ export const CallerAnalysisContainer: React.FC = () => {
                                     }
                                     onSelectAll={handleSelectAll}
                                     selectAllChecked={selectAllChecked}
+                                    selectAllIndeterminate={
+                                        filteredData.length > 0 &&
+                                        filteredData.some((row) =>
+                                            selectedRowIds.has(row.id)
+                                        ) &&
+                                        !filteredData.every((row) =>
+                                            selectedRowIds.has(row.id)
+                                        )
+                                    }
                                 />
                                 {filterDropdownOpen && (
                                     <FilterDropdown

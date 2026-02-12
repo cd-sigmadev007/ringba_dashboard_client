@@ -2,9 +2,16 @@ name: Client CI/CD
 
 on:
     push:
-        branches: [main]
+        branches: [main, develop]
     pull_request:
-        branches: [main]
+        branches: [main, develop]
+
+# main -> new server (129.146.50.104), develop -> old server (34.42.4.142)
+env:
+    SERVER_HOST: ${{ github.ref == 'refs/heads/main' && secrets.SERVER_HOST_MAIN || secrets.SERVER_HOST_DEVELOP }}
+    SERVER_USER: ${{ github.ref == 'refs/heads/main' && secrets.SERVER_USER_MAIN || secrets.SERVER_USER_DEVELOP }}
+    SERVER_SSH_KEY: ${{ github.ref == 'refs/heads/main' && secrets.SERVER_SSH_KEY_MAIN || secrets.SERVER_SSH_KEY_DEVELOP }}
+    VITE_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.VITE_API_BASE_URL_MAIN || secrets.VITE_API_BASE_URL_DEVELOP }}
 
 jobs:
     build-and-test:
@@ -41,7 +48,7 @@ jobs:
                   VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
                   VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
                   VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
-                  VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+                  VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://insidefi.co/api' }}
                   VITE_ENABLE_DYNAMIC_FIELDS_UI: ${{ secrets.VITE_ENABLE_DYNAMIC_FIELDS_UI }}
               run: npm run build
 
@@ -76,7 +83,7 @@ jobs:
                   VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
                   VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
                   VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
-                  VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+                  VITE_API_BASE_URL: ${{ env.VITE_API_BASE_URL }}
                   # Default to 'true' in deploy so prod shows call data fields; set secret to 'false' to disable
                   VITE_ENABLE_DYNAMIC_FIELDS_UI: ${{ secrets.VITE_ENABLE_DYNAMIC_FIELDS_UI || 'true' }}
               run: npm run build
@@ -84,30 +91,30 @@ jobs:
             - name: Add server to known hosts
               run: |
                   mkdir -p ~/.ssh
-                  ssh-keyscan -p ${{ secrets.SERVER_SSH_PORT || 22 }} ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+                  ssh-keyscan -p ${{ secrets.SERVER_SSH_PORT || 22 }} ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
                   chmod 600 ~/.ssh/known_hosts
 
             - name: Clean deployment directory
               uses: appleboy/ssh-action@master
               with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_SSH_PORT || 22 }}
                   command_timeout: 60s
                   script: |
                       sudo rm -rf /var/www/ringba/client/dist/*
                       sudo rm -rf /var/www/ringba/client/dist/.* 2>/dev/null || true
                       sudo mkdir -p /var/www/ringba/client/dist
-                      sudo chown -R adityaharsh:adityaharsh /var/www/ringba/client/dist
+                      sudo chown -R ${{ env.SERVER_USER }}:${{ env.SERVER_USER }} /var/www/ringba/client/dist
                       echo "Directory cleaned and ready for deployment"
 
             - name: Deploy to server
               uses: appleboy/scp-action@master
               with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_SSH_PORT || 22 }}
                   source: 'dist/*'
                   target: '/var/www/ringba/client/dist/'
@@ -119,9 +126,9 @@ jobs:
             - name: Restart Nginx
               uses: appleboy/ssh-action@master
               with:
-                  host: ${{ secrets.SERVER_HOST }}
-                  username: ${{ secrets.SERVER_USER }}
-                  key: ${{ secrets.SERVER_SSH_KEY }}
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_SSH_KEY }}
                   port: ${{ secrets.SERVER_SSH_PORT || 22 }}
                   command_timeout: 60s
                   debug: true

@@ -86,12 +86,12 @@ export interface Caller {
     email?: string
     type?: string
     address?: string
-    streetNumber?: string
-    streetName?: string
-    streetType?: string
+    street_number?: string
+    street_name?: string
+    street_type?: string
     city?: string
     state?: string
-    zip?: string
+    g_zip?: string
     revenue?: number
     ringbaCost?: number
     adCost?: number

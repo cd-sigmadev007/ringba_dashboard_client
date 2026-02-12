@@ -30,7 +30,12 @@ export const useGetCallers = (
     return useQuery({
         queryKey: ['graphql', 'callers', filter, orderBy, page, limit],
         queryFn: async () => {
-            console.log('[useGetCallers] Fetching callers:', { filter, orderBy, page, limit })
+            console.log('[useGetCallers] Fetching callers:', {
+                filter,
+                orderBy,
+                page,
+                limit,
+            })
             const data = await graphqlClient.request<{
                 callers: CallerConnection
             }>(GET_CALLERS_QUERY, {

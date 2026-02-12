@@ -35,6 +35,8 @@ interface TableHeaderProps {
     onColumnsClick: () => void
     onSelectAll?: (checked: boolean) => void
     selectAllChecked?: boolean
+    /** Some but not all rows selected (shows minus/dash on header checkbox) */
+    selectAllIndeterminate?: boolean
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -45,6 +47,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     onColumnsClick,
     onSelectAll,
     selectAllChecked = false,
+    selectAllIndeterminate = false,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -96,6 +99,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                     >
                         <CheckboxIcon
                             checked={selectAllChecked}
+                            indeterminate={selectAllIndeterminate}
                             isDark={isDark}
                             className="w-5 h-5"
                         />

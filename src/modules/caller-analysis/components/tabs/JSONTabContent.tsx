@@ -30,8 +30,13 @@ export const JSONTabContent: React.FC<JSONTabContentProps> = ({
     const isDark = theme === 'dark'
     const [copied, setCopied] = useState(false)
 
-    // Use actual callerData instead of mock data
-    const data = jsonData || callerData
+    // Merge top-level + attributes so JSON shows everything we have in the table (one flat object)
+    const data =
+        jsonData ||
+        (() => {
+            const { attributes = {}, ...rest } = callerData
+            return { ...attributes, ...rest }
+        })()
     const jsonString = JSON.stringify(data, null, 2)
 
     const handleCopy = async () => {

@@ -47,7 +47,7 @@ export function exportToCSV(data: Array<CallData>, filename?: string): void {
             row.address || '',
             row.city || '',
             row.state || '',
-            row.zip || '',
+            (row as CallData & { zip?: string }).zip ?? row.g_zip ?? '',
         ]
     })
 

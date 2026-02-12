@@ -101,19 +101,22 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
 
     const containerBgClass = clsx(isDark ? 'bg-transparent' : 'bg-[#FFFFFF]')
 
-    // Fetch history by phone number
+    // Fetch history by phone number (use phoneNumber when available for exact DB match)
+    const phoneForHistory = callerData.phoneNumber ?? callerData.callerId
     const { useGetCallerHistoryByPhone } = useCallerAnalysisApi()
     const shouldLoadHistory =
-        isOpen && activeTab === 'history' && !!callerData.callerId
+        isOpen && activeTab === 'history' && !!phoneForHistory
     const { data: historyResp, isLoading: isHistoryLoading } =
-        useGetCallerHistoryByPhone(callerData.callerId, {
+        useGetCallerHistoryByPhone(phoneForHistory, {
             enabled: shouldLoadHistory,
         })
 
-    // Map history API rows to HistoryEntry[] used by tab
-    const historyData: Array<HistoryEntry> = mapApiDataToHistoryEntries(
-        historyResp?.data || []
-    )
+    // Map history API rows to HistoryEntry[] (handle both { data: [] } and raw array response)
+    const rawHistory = Array.isArray(historyResp)
+        ? historyResp
+        : (historyResp?.data ?? [])
+    const historyData: Array<HistoryEntry> =
+        mapApiDataToHistoryEntries(rawHistory)
 
     const tabs: Array<TabItem> = [
         {
