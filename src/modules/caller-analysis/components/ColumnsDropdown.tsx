@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/Modal'
 export interface ColumnOption {
     id: string
     label: string
-    category: 'applied' | 'caller' | 'adjustment' | 'dispute' | 'dynamic'
+    category: 'applied' | 'caller' | 'dispute' | 'dynamic'
     visible: boolean
 }
 
@@ -80,12 +80,6 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
             label: 'Caller',
             columns: columns.filter((c) => c.category === 'caller'),
             expanded: expandedGroups.has('caller'),
-        },
-        {
-            id: 'adjustment',
-            label: 'Adjustment',
-            columns: columns.filter((c) => c.category === 'adjustment'),
-            expanded: expandedGroups.has('adjustment'),
         },
         {
             id: 'dispute',
@@ -231,8 +225,9 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                         const indeterminate =
                                             someChecked && !allChecked
                                         return (
-                                            <Button
-                                                variant="ghost"
+                                            <div
+                                                role="button"
+                                                tabIndex={0}
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     const newVal = !allChecked
@@ -266,7 +261,50 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                         )
                                                     }
                                                 }}
-                                                className="p-0 h-5 w-5 flex items-center justify-center border-none shrink-0 hover:bg-transparent hover:opacity-100"
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        e.key === 'Enter' ||
+                                                        e.key === ' '
+                                                    ) {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        const newVal =
+                                                            !allChecked
+                                                        if (onApply) {
+                                                            setDraftVisibility(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    ...Object.fromEntries(
+                                                                        group.columns.map(
+                                                                            (
+                                                                                c
+                                                                            ) => [
+                                                                                c.id,
+                                                                                newVal,
+                                                                            ]
+                                                                        )
+                                                                    ),
+                                                                })
+                                                            )
+                                                        } else {
+                                                            group.columns.forEach(
+                                                                (c) => {
+                                                                    if (
+                                                                        getVisible(
+                                                                            c
+                                                                        ) !==
+                                                                        newVal
+                                                                    ) {
+                                                                        onColumnToggle(
+                                                                            c.id
+                                                                        )
+                                                                    }
+                                                                }
+                                                            )
+                                                        }
+                                                    }
+                                                }}
+                                                className="p-0 h-5 w-5 flex items-center justify-center border-none shrink-0 hover:bg-transparent hover:opacity-100 cursor-pointer"
                                             >
                                                 <CheckboxIcon
                                                     checked={allChecked}
@@ -276,7 +314,7 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
                                                     isDark={isDark}
                                                     className="w-5 h-5"
                                                 />
-                                            </Button>
+                                            </div>
                                         )
                                     })()}
                                 <p

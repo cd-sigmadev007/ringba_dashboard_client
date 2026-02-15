@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import OrgHeader from '../components/OrgHeader'
 import OrgProfileForm from '../components/OrgForm'
 import { ApiKeysTab } from '../components/ApiKeysTab'
+import { FieldsTab } from '../components/FieldsTab'
 import type { TabItem } from '@/components/ui/Tabs'
 import { Tabs } from '@/components/ui/Tabs'
 
@@ -27,6 +28,15 @@ const OrgProfilePage: React.FC = () => {
             content: (
                 <div className="p-5 md:p-6">
                     <ApiKeysTab />
+                </div>
+            ),
+        },
+        {
+            id: 'fields',
+            label: 'Fields',
+            content: (
+                <div className="p-5 md:p-6">
+                    <FieldsTab />
                 </div>
             ),
         },

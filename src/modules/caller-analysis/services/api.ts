@@ -193,9 +193,12 @@ class CallerApiService {
             email: apiData.email || null,
             type: apiData.type || null,
             address: apiData.address || null,
-            street_number: apiData.streetNumber ?? (apiData as any).street_number ?? null,
-            street_name: apiData.streetName ?? (apiData as any).street_name ?? null,
-            street_type: apiData.streetType ?? (apiData as any).street_type ?? null,
+            street_number:
+                apiData.streetNumber ?? (apiData as any).street_number ?? null,
+            street_name:
+                apiData.streetName ?? (apiData as any).street_name ?? null,
+            street_type:
+                apiData.streetType ?? (apiData as any).street_type ?? null,
             city: apiData.city || null,
             state: apiData.state || null,
             g_zip: apiData.zip ?? (apiData as any).g_zip ?? null,
@@ -203,42 +206,11 @@ class CallerApiService {
             latestPayout: apiData.latestPayout || null, // IMPORTANT: Include latestPayout for aggregation
             ringbaCost,
             adCost,
-            is_adjusted: apiData.is_adjusted ?? false,
-            adjustment_amount: apiData.adjustment_amount ?? null,
             call_timestamp: apiData.call_timestamp ?? null,
             targetName: apiData.targetName ?? null,
             ai_processed: apiData.ai_processed ?? undefined,
             summary: apiData.summary ?? null,
         }
-    }
-
-    /**
-     * Create an adjustment for a call
-     * POST /api/callers/:id/adjustments
-     */
-    async createAdjustment(
-        callId: string,
-        adjustmentData: {
-            adjustment_amount: number
-            adjustment_reason?: string
-            adjusted_by?: string
-        }
-    ): Promise<any> {
-        return this.makeRequest<any>(`/callers/${callId}/adjustments`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(adjustmentData),
-        })
-    }
-
-    /**
-     * Get adjustments for a call
-     * GET /api/callers/:id/adjustments
-     */
-    async getAdjustments(callId: string): Promise<Array<any>> {
-        return this.makeRequest<Array<any>>(`/callers/${callId}/adjustments`)
     }
 
     /**

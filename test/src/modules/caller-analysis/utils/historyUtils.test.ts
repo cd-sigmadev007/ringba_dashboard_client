@@ -140,8 +140,8 @@ describe('historyUtils', () => {
 
             const result = mapApiDataToHistoryEntries(apiData)
 
-            expect(result[0].revenue).toBe(0)
-            expect(result[1].revenue).toBe(0)
+            expect(result[0].revenue).toBeNull()
+            expect(result[1].revenue).toBeNull()
         })
 
         it('should handle empty array', () => {

@@ -43,8 +43,6 @@ export interface FrontendCallerData {
     latestPayout?: string | null
     ringbaCost?: number | null
     adCost?: number | null
-    is_adjusted?: boolean
-    adjustment_amount?: number | null
     call_timestamp?: string | Date | null
     targetName?: string | null
     ai_processed?: boolean

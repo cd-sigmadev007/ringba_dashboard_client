@@ -40,7 +40,9 @@ export function exportToCSV(data: Array<CallData>, filename?: string): void {
                 ? row.status.join('; ')
                 : row.status || '',
             row.action || '',
-            (row.revenue || '').toString(),
+            row.revenue != null && Number.isFinite(Number(row.revenue))
+                ? Number(row.revenue).toFixed(2)
+                : 'Pending',
             row.firstName || '',
             row.lastName || '',
             row.email || '',

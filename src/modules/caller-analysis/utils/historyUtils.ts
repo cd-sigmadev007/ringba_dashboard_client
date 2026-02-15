@@ -23,9 +23,12 @@ export function mapApiDataToHistoryEntries(
             h.lastCall
         )
 
-        // Get revenue
-        const rev = Number((h as any).revenue)
-        const revenue = Number.isFinite(rev) ? rev : 0
+        // Get revenue (from elocal); null when not yet available
+        const raw = (h as any).revenue
+        const revenue =
+            raw != null && raw !== '' && Number.isFinite(Number(raw))
+                ? Number(raw)
+                : null
 
         // Parse latestPayout and determine converted status
         // User is shown as converted when payout > 0

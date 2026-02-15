@@ -237,10 +237,12 @@ export const useTableColumns = (
                 meta: { width: 100, category: 'caller' },
                 cell: ({ getValue }) => {
                     const val = getValue() as number | null | undefined
-                    const n = val != null ? Number(val) : 0
+                    const n = val != null ? Number(val) : NaN
                     return (
                         <span className="text-sm">
-                            {Number.isFinite(n) ? `$${n.toFixed(2)}` : '—'}
+                            {Number.isFinite(n)
+                                ? `$${n.toFixed(2)}`
+                                : 'Pending'}
                         </span>
                     )
                 },
