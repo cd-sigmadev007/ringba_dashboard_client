@@ -324,7 +324,9 @@ export const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
                                                         : 'text-[#3F4254]'
                                                 )}
                                             >
-                                                ${entry.revenue.toFixed(2)}
+                                                {entry.revenue != null
+                                                    ? `$${entry.revenue.toFixed(2)}`
+                                                    : 'Pending'}
                                             </p>
                                         </div>
                                     </div>

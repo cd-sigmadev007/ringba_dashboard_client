@@ -189,12 +189,23 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                         {option?.title || filter}
                                     </p>
                                 </div>
-                                <button
+                                <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         onRemoveFilter.campaign(filter)
                                     }}
-                                    className="relative shrink-0 size-[20px] flex items-center justify-center ml-1"
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault()
+                                            onRemoveFilter.campaign(filter)
+                                        }
+                                    }}
+                                    className="relative shrink-0 size-[20px] flex items-center justify-center ml-1 cursor-pointer"
                                 >
                                     <CancelIcon
                                         className={cn(
@@ -204,7 +215,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                                 : 'text-[#3F4254]'
                                         )}
                                     />
-                                </button>
+                                </span>
                             </Button>
                         )
                     })}
@@ -253,12 +264,23 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                         {option?.title || filter}
                                     </p>
                                 </div>
-                                <button
+                                <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         onRemoveFilter.status(filter)
                                     }}
-                                    className="relative shrink-0 size-[20px] flex items-center justify-center ml-1"
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault()
+                                            onRemoveFilter.status(filter)
+                                        }
+                                    }}
+                                    className="relative shrink-0 size-[20px] flex items-center justify-center ml-1 cursor-pointer"
                                 >
                                     <CancelIcon
                                         className={cn(
@@ -268,7 +290,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                                 : 'text-[#3F4254]'
                                         )}
                                     />
-                                </button>
+                                </span>
                             </Button>
                         )
                     })}
@@ -313,12 +335,20 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                     {formatDurationRange(filters.durationRange)}
                                 </p>
                             </div>
-                            <button
+                            <span
+                                role="button"
+                                tabIndex={0}
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     onRemoveFilter.durationRange()
                                 }}
-                                className="relative shrink-0 size-[20px] flex items-center justify-center ml-1"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        onRemoveFilter.durationRange()
+                                    }
+                                }}
+                                className="relative shrink-0 size-[20px] flex items-center justify-center ml-1 cursor-pointer"
                             >
                                 <CancelIcon
                                     className={cn(
@@ -328,7 +358,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                             : 'text-[#3F4254]'
                                     )}
                                 />
-                            </button>
+                            </span>
                         </Button>
                     )}
 
@@ -395,12 +425,20 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                     })()}
                                 </p>
                             </div>
-                            <button
+                            <span
+                                role="button"
+                                tabIndex={0}
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     onRemoveFilter.dateRange()
                                 }}
-                                className="relative shrink-0 size-[20px] flex items-center justify-center ml-1"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        onRemoveFilter.dateRange()
+                                    }
+                                }}
+                                className="relative shrink-0 size-[20px] flex items-center justify-center ml-1 cursor-pointer"
                             >
                                 <CancelIcon
                                     className={cn(
@@ -410,7 +448,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                                             : 'text-[#3F4254]'
                                     )}
                                 />
-                            </button>
+                            </span>
                         </Button>
                     )}
                 </div>

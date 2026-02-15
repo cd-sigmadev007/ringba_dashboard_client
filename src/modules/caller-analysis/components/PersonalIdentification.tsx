@@ -53,7 +53,7 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
         type: callerData.type || 'Inbound',
         address: buildAddressFromCallData(callerData),
         billed: callerData.billed || 'No',
-        latestPayout: callerData.latestPayout || '-',
+        latestPayout: callerData.latestPayout || 'Pending',
         totalCost: Number.isFinite(totalCostValue) ? totalCostValue : 0,
         ringbaCost: Number.isFinite(ringbaCostValue) ? ringbaCostValue : 0,
         adCost: Number.isFinite(adCostValue) ? adCostValue : 0,

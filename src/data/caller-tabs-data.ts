@@ -11,7 +11,7 @@ export interface HistoryEntry {
     time: string // Time in format "08:08:30 PM ET"
     duration: string // Duration in format "03m 15s"
     converted: boolean // true for "Converted", false for "Not Converted"
-    revenue: number // Revenue amount
+    revenue: number | null // Revenue amount; null = Pending (from elocal)
     campaignId?: string // Campaign ID for badge
     campaignName?: string // Campaign name for badge (fallback)
     audioUrl?: string // Audio URL for this history entry
