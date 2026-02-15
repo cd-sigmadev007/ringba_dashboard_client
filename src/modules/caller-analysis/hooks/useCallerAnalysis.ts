@@ -63,46 +63,9 @@ export const useCallerAnalysis = () => {
         }
     }
 
-    // Helper function to process and aggregate LTR data
-    const processCallData = (
-        convertedData: Array<CallData>
-    ): Array<CallData> => {
-        // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
-        const callerIdLtrMap = new Map<string, number>()
-
-        // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
-        const parseLatestPayout = (
-            value: string | number | null | undefined
-        ): number => {
-            if (value === null || value === undefined) return 0
-            if (typeof value === 'number') return isNaN(value) ? 0 : value
-            if (typeof value === 'string') {
-                // Remove currency symbols, commas, and whitespace
-                const cleaned = value.replace(/[$,\s]/g, '')
-                const parsed = parseFloat(cleaned)
-                return isNaN(parsed) ? 0 : parsed
-            }
-            return 0
-        }
-
-        // First pass: sum all latestPayout values for each callerId
-        convertedData.forEach((call: CallData) => {
-            const callerId = call.callerId
-            const latestPayout = parseLatestPayout(call.latestPayout)
-
-            if (latestPayout > 0) {
-                const currentSum = callerIdLtrMap.get(callerId) || 0
-                const newSum = currentSum + latestPayout
-                callerIdLtrMap.set(callerId, newSum)
-            }
-        })
-
-        // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-        return convertedData.map((call: CallData) => ({
-            ...call,
-            lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
-        }))
-    }
+    // Helper: pass through data (lifetimeRevenue comes from backend as sum of elocal_payout per caller_id)
+    const processCallData = (convertedData: Array<CallData>): Array<CallData> =>
+        convertedData
 
     // Load next batch when user reaches last page
     const loadNextBatch = async () => {

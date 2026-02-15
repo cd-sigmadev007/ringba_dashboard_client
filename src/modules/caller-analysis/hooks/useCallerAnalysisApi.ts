@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { callerApiService } from '../services/api'
 import type { CallData, FilterState } from '../types'
 import type { CallerQueryParams, FrontendCallerData } from '../../../types/api'
+import { callerAnalysisApi } from '@/services/api/callerAnalysis'
 
 export const useCallerAnalysisApi = () => {
     const queryClient = useQueryClient()
@@ -53,14 +54,14 @@ export const useCallerAnalysisApi = () => {
         })
     }
 
-    // Get caller history by phone number
+    // Get caller history by phone number (uses authenticated apiClient)
     const useGetCallerHistoryByPhone = (
         phoneNumber: string,
         options?: { enabled?: boolean }
     ) => {
         return useQuery({
             queryKey: ['caller', 'phone', 'history', phoneNumber],
-            queryFn: () => callerApiService.getHistoryByPhone(phoneNumber),
+            queryFn: () => callerAnalysisApi.getHistoryByPhone(phoneNumber),
             enabled: options?.enabled ?? !!phoneNumber,
             staleTime: 1 * 60 * 1000,
             gcTime: 5 * 60 * 1000,

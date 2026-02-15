@@ -5,7 +5,7 @@ import {
     convertGraphQLCallerToCallData,
 } from '../utils/graphqlUtils'
 import { CallerOrderField, OrderDirection } from '../graphql/types'
-import type { CallData, FilterState } from '../types'
+import type { FilterState } from '../types'
 import type { CallerOrderBy, FilterOperator } from '../graphql/types'
 
 export const useCallerAnalysisGraphQL = () => {
@@ -78,55 +78,18 @@ export const useCallerAnalysisGraphQL = () => {
             return []
         }
 
-        // First, convert all callers to CallData format
+        // Convert all callers to CallData format (lifetimeRevenue comes from backend)
         const convertedData = callerConnection.data.map((caller) =>
             convertGraphQLCallerToCallData(caller)
         )
 
-        // Helper function to parse latestPayout (handles currency strings, numbers, etc.)
-        const parseLatestPayout = (
-            value: string | number | null | undefined
-        ): number => {
-            if (value === null || value === undefined) return 0
-            if (typeof value === 'number') return isNaN(value) ? 0 : value
-            if (typeof value === 'string') {
-                // Remove currency symbols, commas, and whitespace
-                const cleaned = value.replace(/[$,\s]/g, '')
-                const parsed = parseFloat(cleaned)
-                return isNaN(parsed) ? 0 : parsed
-            }
-            return 0
-        }
-
-        // Calculate LTR for each callerId (sum of all latestPayout for same callerId)
-        const callerIdLtrMap = new Map<string, number>()
-
-        // First pass: sum all latestPayout values for each callerId
-        convertedData.forEach((call: CallData) => {
-            const callerId = call.callerId
-            const latestPayout = parseLatestPayout(call.latestPayout)
-
-            if (latestPayout > 0) {
-                const currentSum = callerIdLtrMap.get(callerId) || 0
-                const newSum = currentSum + latestPayout
-                callerIdLtrMap.set(callerId, newSum)
-            }
-        })
-
-        // Second pass: update lifetimeRevenue for each call with the aggregated LTR
-        const dataWithLtr = convertedData.map((call: CallData) => ({
-            ...call,
-            lifetimeRevenue: callerIdLtrMap.get(call.callerId) || 0,
-        }))
-
         console.log('[useCallerAnalysisGraphQL] Converting data:', {
             page,
             dataLength: convertedData.length,
-            uniqueCallerIds: callerIdLtrMap.size,
             firstCallerId: convertedData[0]?.callerId,
         })
 
-        return dataWithLtr
+        return convertedData
     }, [callerConnection, page])
 
     const totalRecords = callerConnection?.totalCount || 0

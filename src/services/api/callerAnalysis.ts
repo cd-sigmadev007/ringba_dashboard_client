@@ -10,6 +10,7 @@ export const CALLER_ANALYSIS_ENDPOINTS = {
     GET_ALL: '/api/callers',
     GET_BY_ID: '/api/callers/:id',
     GET_BY_PHONE: '/api/callers/phone/:phone',
+    GET_HISTORY: '/api/callers/phone/:phone/history',
     GET_SCHEMA: '/api/callers/schema',
     GET_TAGS: '/api/callers/tags',
     HEALTH_CHECK: '/health',
@@ -143,10 +144,26 @@ export class CallerAnalysisApiService {
     ): Promise<CallData> {
         const url = CALLER_ANALYSIS_ENDPOINTS.GET_BY_PHONE.replace(
             ':phone',
-            request.phone
+            encodeURIComponent(request.phone)
         )
         const response = await apiClient.get<{ data: FrontendCallerData }>(url)
         return callerApiService.convertApiResponseToCallData(response.data)
+    }
+
+    /**
+     * Get caller history by phone number (uses authenticated apiClient)
+     */
+    static async getHistoryByPhone(
+        phone: string
+    ): Promise<{ success: boolean; data: Array<FrontendCallerData> }> {
+        const url = CALLER_ANALYSIS_ENDPOINTS.GET_HISTORY.replace(
+            ':phone',
+            encodeURIComponent(phone)
+        )
+        return apiClient.get<{
+            success: boolean
+            data: Array<FrontendCallerData>
+        }>(url)
     }
 
     /**

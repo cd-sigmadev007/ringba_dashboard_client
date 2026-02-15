@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import toast from 'react-hot-toast'
-import {  fieldsApi } from '../services/fieldsApi'
-import type {CallDataField} from '../services/fieldsApi';
+import { fieldsApi } from '../services/fieldsApi'
+import type { CallDataField } from '../services/fieldsApi'
 import { useThemeStore } from '@/store/themeStore'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Modal, Table } from '@/components/ui'
