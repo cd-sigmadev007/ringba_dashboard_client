@@ -66,6 +66,7 @@ interface AuthContextValue extends AuthState {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
+const AUTH_TOKEN_KEY = 'ringba_access_token'
 
 /**
  * Categorize and format error messages for user display
@@ -114,10 +115,28 @@ function getErrorMessage(error: any): string {
     return 'An unexpected error occurred. Please try again.'
 }
 
+function getStoredToken(): string | null {
+    try {
+        return localStorage.getItem(AUTH_TOKEN_KEY)
+    } catch {
+        return null
+    }
+}
+
+function setStoredToken(token: string | null): void {
+    try {
+        if (token) {
+            localStorage.setItem(AUTH_TOKEN_KEY, token)
+        } else {
+            localStorage.removeItem(AUTH_TOKEN_KEY)
+        }
+    } catch (_) {}
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [state, setState] = useState<AuthState>({
         user: null,
-        accessToken: null,
+        accessToken: getStoredToken(),
         loading: true,
         error: null,
         pendingLogin: null,
@@ -140,11 +159,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 (res as any)?.data?.accessToken ??
                 null
             if (token) {
+                setStoredToken(token)
                 setState((s) => ({ ...s, accessToken: token }))
                 return token
             }
             return null
         } catch {
+            setStoredToken(null)
             setState((s) => ({ ...s, accessToken: null, user: null }))
             return null
         }
@@ -154,12 +175,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let cancelled = false
         ;(async () => {
             try {
-                const res = await apiClient.get<{ data?: { user?: AuthUser } }>(
-                    '/api/auth/me'
-                )
-                const u = (res as any)?.data?.user
+                const res = await apiClient.get<{
+                    data?: { user?: AuthUser; accessToken?: string }
+                }>('/api/auth/me')
+                const d = (res as any)?.data ?? res
+                const u = d?.user
+                const token = d?.accessToken ?? null
                 if (cancelled) return
                 if (u) {
+                    if (token) setStoredToken(token)
                     setState((s) => ({
                         ...s,
                         user: {
@@ -176,16 +200,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             onboardingCompletedAt:
                                 u.onboardingCompletedAt ?? null,
                         },
-                        accessToken: state.accessToken,
+                        accessToken: token ?? s.accessToken,
                         loading: false,
                         error: null,
                     }))
                 } else {
-                    setState((s) => ({ ...s, user: null, loading: false }))
+                    setStoredToken(null)
+                    setState((s) => ({
+                        ...s,
+                        user: null,
+                        accessToken: null,
+                        loading: false,
+                    }))
                 }
             } catch {
-                if (!cancelled)
-                    setState((s) => ({ ...s, user: null, loading: false }))
+                if (!cancelled) {
+                    setStoredToken(null)
+                    setState((s) => ({
+                        ...s,
+                        user: null,
+                        accessToken: null,
+                        loading: false,
+                    }))
+                }
             }
         })()
         return () => {
@@ -195,11 +232,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const refetchMe = useCallback(async () => {
         try {
-            const res = await apiClient.get<{ data?: { user?: AuthUser } }>(
-                '/api/auth/me'
-            )
-            const u = (res as any)?.data?.user
+            const res = await apiClient.get<{
+                data?: { user?: AuthUser; accessToken?: string }
+            }>('/api/auth/me')
+            const d = (res as any)?.data ?? res
+            const u = d?.user
+            const token = d?.accessToken ?? null
             if (u) {
+                if (token) setStoredToken(token)
                 setState((s) => ({
                     ...s,
                     user: {
@@ -215,6 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         profilePictureUrl: u.profilePictureUrl ?? null,
                         onboardingCompletedAt: u.onboardingCompletedAt ?? null,
                     },
+                    ...(token ? { accessToken: token } : {}),
                 }))
             }
         } catch (_) {}
@@ -243,6 +284,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     return { requiresOtp: true }
                 }
                 if (d?.accessToken && d?.user) {
+                    setStoredToken(d.accessToken)
                     setState((s) => ({
                         ...s,
                         user: d.user,
@@ -281,6 +323,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const u = data?.user
             const token = data?.accessToken
             if (u && token) {
+                setStoredToken(token)
                 setState((s) => ({
                     ...s,
                     user: u,
@@ -330,6 +373,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const u = data?.user
                 const token = data?.accessToken
                 if (u && token) {
+                    setStoredToken(token)
                     setState((s) => ({
                         ...s,
                         user: u,
@@ -362,6 +406,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 { withCredentials: true }
             )
         } catch (_) {}
+        setStoredToken(null)
         setState({
             user: null,
             accessToken: null,

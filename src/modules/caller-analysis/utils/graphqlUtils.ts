@@ -36,7 +36,8 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
         phoneNumber: caller.phoneNumber ?? caller.callerId,
         lastCall: caller.lastCall,
         duration: caller.duration,
-        lifetimeRevenue: caller.lifetimeRevenue,
+        lifetimeRevenue:
+            caller.lifetimeRevenue != null ? Number(caller.lifetimeRevenue) : 0,
         campaign: caller.campaign,
         action: caller.action,
         status: caller.status || [],

@@ -171,16 +171,19 @@ class CallerApiService {
         const ringbaCost = parseNumeric(apiData.ringbaCost)
         const adCost = parseNumeric(apiData.adCost)
 
-        // Set lifetimeRevenue to 0 initially - it will be aggregated from latestPayout in the hook
-        // The hook will sum all latestPayout values for the same callerId to calculate LTR
-        const lifetimeRevenue = 0
+        // lifetimeRevenue comes from backend (sum of elocal_payout per caller_id)
+        const lifetimeRevenue =
+            apiData.lifetimeRevenue != null &&
+            Number.isFinite(Number(apiData.lifetimeRevenue))
+                ? Number(apiData.lifetimeRevenue)
+                : 0
 
         return {
             id: apiData.id,
             callerId: apiData.callerId,
             lastCall: apiData.lastCall,
             duration: formatDuration(apiData.duration),
-            lifetimeRevenue, // Will be aggregated from latestPayout in useCallerAnalysis hook
+            lifetimeRevenue,
             campaign: apiData.campaign,
             action: apiData.action,
             status: apiData.status,
