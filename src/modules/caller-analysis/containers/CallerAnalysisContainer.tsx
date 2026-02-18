@@ -469,8 +469,8 @@ export const CallerAnalysisContainer: React.FC = () => {
         const selectedData = filteredData.filter((row) =>
             selectedRowIds.has(row.id)
         )
-        exportToCSV(selectedData)
-    }, [selectedRowIds, filteredData])
+        exportToCSV(selectedData, columnVisibility)
+    }, [selectedRowIds, filteredData, columnVisibility])
 
     // Raise dispute handler (UI only)
     const handleRaiseDispute = React.useCallback(() => {
