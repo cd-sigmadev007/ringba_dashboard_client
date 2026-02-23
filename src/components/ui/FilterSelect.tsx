@@ -67,9 +67,9 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
             return
         }
 
-        const searchLower = searchText.toLowerCase()
+        const searchLower = (searchText ?? '').toLowerCase()
         const filtered = filterList.filter((option) =>
-            option.title.toLowerCase().includes(searchLower)
+            (option.title ?? '').toLowerCase().includes(searchLower)
         )
         setFilteredList(filtered)
 

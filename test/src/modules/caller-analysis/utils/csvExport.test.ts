@@ -2,6 +2,31 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CallData } from '@/modules/caller-analysis/types'
 import { exportToCSV } from '@/modules/caller-analysis/utils/csvExport'
 
+/** Default visible columns for tests (matches default table visibility) */
+const defaultColumnVisibility = {
+    callerId: true,
+    lastCall: true,
+    duration: true,
+    lifetimeRevenue: true,
+    campaign: true,
+    status: true,
+    action: true,
+    revenue: false,
+    ringbaCost: false,
+    adCost: false,
+    targetName: false,
+    publisherName: false,
+    phoneNumber: false,
+    callTimestamp: false,
+    callLengthInSeconds: false,
+    street_number: false,
+    street_name: false,
+    street_type: false,
+    city: false,
+    state: false,
+    g_zip: false,
+}
+
 describe('csvExport', () => {
     let createElementSpy: any
     let appendChildSpy: any
@@ -40,7 +65,7 @@ describe('csvExport', () => {
         const consoleWarnSpy = vi
             .spyOn(console, 'warn')
             .mockImplementation(() => {})
-        exportToCSV([])
+        exportToCSV([], defaultColumnVisibility)
         expect(consoleWarnSpy).toHaveBeenCalledWith('No data to export')
         expect(createElementSpy).not.toHaveBeenCalled()
         consoleWarnSpy.mockRestore()
@@ -68,7 +93,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalledWith('a')
         expect(mockLink.setAttribute).toHaveBeenCalledWith(
@@ -99,7 +124,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
@@ -119,7 +144,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
@@ -133,7 +158,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
@@ -146,7 +171,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data, 'custom-export.csv')
+        exportToCSV(data, defaultColumnVisibility, 'custom-export.csv')
 
         expect(mockLink.setAttribute).toHaveBeenCalledWith(
             'download',
@@ -162,7 +187,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
@@ -176,7 +201,7 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
@@ -191,8 +216,41 @@ describe('csvExport', () => {
             } as CallData,
         ]
 
-        exportToCSV(data)
+        exportToCSV(data, defaultColumnVisibility)
 
+        expect(createElementSpy).toHaveBeenCalled()
+        expect(clickSpy).toHaveBeenCalled()
+    })
+
+    it('should export only visible columns', () => {
+        const data: Array<CallData> = [
+            {
+                id: '1',
+                callerId: '+1234567890',
+                lastCall: 'Nov 07, 2025',
+                duration: '2m 30s',
+                lifetimeRevenue: 100,
+                campaign: 'Test',
+                status: ['converted'],
+                action: 'call',
+                revenue: 50,
+                city: 'New York',
+                g_zip: '10001',
+            } as CallData,
+        ]
+        const visibility = {
+            ...defaultColumnVisibility,
+            callerId: true,
+            lastCall: true,
+            campaign: true,
+            status: true,
+            city: true,
+            g_zip: true,
+            revenue: false,
+            duration: false,
+            lifetimeRevenue: false,
+        }
+        exportToCSV(data, visibility)
         expect(createElementSpy).toHaveBeenCalled()
         expect(clickSpy).toHaveBeenCalled()
     })
