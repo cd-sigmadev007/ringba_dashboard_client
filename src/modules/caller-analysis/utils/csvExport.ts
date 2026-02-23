@@ -58,7 +58,9 @@ const COLUMN_CSV_CONFIG: Record<
     status: {
         header: 'Status',
         getValue: (r) =>
-            Array.isArray(r.status) ? r.status.join('; ') : String(r.status ?? ''),
+            Array.isArray(r.status)
+                ? r.status.join('; ')
+                : String(r.status ?? ''),
     },
     phoneNumber: {
         header: 'Phone Number',
@@ -67,16 +69,14 @@ const COLUMN_CSV_CONFIG: Record<
     callTimestamp: {
         header: 'Call Timestamp',
         getValue: (r) =>
-            r.callTimestamp ?? r.call_timestamp
+            (r.callTimestamp ?? r.call_timestamp)
                 ? String(r.callTimestamp ?? r.call_timestamp)
                 : '',
     },
     callLengthInSeconds: {
         header: 'Call Length (s)',
         getValue: (r) =>
-            r.callLengthInSeconds != null
-                ? String(r.callLengthInSeconds)
-                : '',
+            r.callLengthInSeconds != null ? String(r.callLengthInSeconds) : '',
     },
     street_number: {
         header: 'Street Number',
@@ -193,9 +193,7 @@ export function exportToCSV(
     }
 
     const headers = visibleCols.map(getHeader)
-    const rows = data.map((row) =>
-        visibleCols.map((id) => getValue(id)(row))
-    )
+    const rows = data.map((row) => visibleCols.map((id) => getValue(id)(row)))
 
     // Escape CSV values (handle commas, quotes, and newlines)
     const escapeCSV = (value: string): string => {

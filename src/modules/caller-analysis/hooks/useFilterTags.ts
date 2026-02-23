@@ -15,12 +15,15 @@ export function useFilterTags(isOpen: boolean) {
             try {
                 setIsLoadingTags(true)
                 const tags = await callerAnalysisApi.getTags()
-                const options: Array<SelectOption> = tags.map(
-                    (tag: { tag_name: string; priority: string }) => ({
+                const options: Array<SelectOption> = tags
+                    .filter(
+                        (tag: { tag_name?: string | null }) =>
+                            tag?.tag_name != null
+                    )
+                    .map((tag: { tag_name: string; priority: string }) => ({
                         title: tag.tag_name,
                         value: tag.tag_name,
-                    })
-                )
+                    }))
                 setStatusOptions(options)
             } catch (error) {
                 console.error('Failed to fetch tags:', error)

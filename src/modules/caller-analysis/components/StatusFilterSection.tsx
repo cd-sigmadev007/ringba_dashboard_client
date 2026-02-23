@@ -24,7 +24,9 @@ export const StatusFilterSection: React.FC<StatusFilterSectionProps> = ({
     const { statusOptions, isLoadingTags } = useFilterTags(isOpen)
 
     const filteredStatuses = statusOptions.filter((option) =>
-        option.title.toLowerCase().includes(searchQuery.toLowerCase())
+        (option.title ?? '')
+            .toLowerCase()
+            .includes((searchQuery ?? '').toLowerCase())
     )
 
     return (
