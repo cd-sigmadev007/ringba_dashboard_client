@@ -1,12 +1,13 @@
 import React from 'react'
 import clsx from 'clsx'
+import type { StatusItem } from '@/modules'
 import { useThemeStore } from '@/store/themeStore'
 import { Status } from '@/modules'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 
 export interface PriorityStatusSectionProps {
     title: string
-    statuses: Array<string>
+    statuses: Array<string> | Array<StatusItem>
     className?: string
     enablePillOverflow?: boolean
 }

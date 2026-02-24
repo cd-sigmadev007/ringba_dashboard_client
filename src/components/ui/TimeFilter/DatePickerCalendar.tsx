@@ -25,7 +25,7 @@ export const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
     onSelect,
 }) => {
     return (
-        <div className={cn('p-0')}>
+        <div className={cn('rdp-wrapper p-0')}>
             <DayPicker
                 mode="range"
                 timeZone={EST_TIMEZONE}

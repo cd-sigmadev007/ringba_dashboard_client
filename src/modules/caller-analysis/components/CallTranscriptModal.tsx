@@ -85,7 +85,12 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
         {
             id: 'summary',
             label: 'Summary',
-            content: <SummaryTabContent callerData={callerData} />,
+            content: (
+                <SummaryTabContent
+                    callerData={callerData}
+                    ringbaRowId={callerData.ringbaRowId}
+                />
+            ),
         },
         {
             id: 'transcription',
@@ -105,7 +110,7 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
         <Modal
             open={isOpen}
             onClose={onClose}
-            border={true}
+            border={false}
             title={
                 <Tabs
                     tabs={tabs}
@@ -119,16 +124,19 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
             position={isMobile ? 'bottom' : 'center'}
             size={isMobile ? 'full' : 'lg'}
             className={clsx(
-                isMobile ? 'max-w-full max-h-[75vh]' : 'min-w-[672px] h-[65vh]'
+                isMobile
+                    ? 'mx-6 max-w-full max-h-[75vh]'
+                    : 'min-w-[720px] h-[70vh]'
             )}
             animation={isMobile ? 'slide' : 'fade'}
             titleClassName="px-6 pt-6 pb-0"
-            contentClassName="mx-6"
+            // contentClassName="px-6 pb-6 flex-1 min-h-0 mx-6"
         >
-            <div className="flex flex-col h-full min-h-0">
+            <div className="flex flex-col h-full min-h-0 p-[20px]">
                 {/* Fixed height content area with border to prevent size changes */}
                 <div
                     className={clsx(
+                        'flex-1 min-h-0 overflow-y-auto px-6 rounded-lg border',
                         isDark
                             ? 'bg-transparent border-[#1B456F]'
                             : 'bg-[#FFFFFF] border-[#E1E5E9]'

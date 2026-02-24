@@ -20,9 +20,28 @@ export const navLinks: Array<NavLinkItem> = [
     {
         id: 1212351233,
         title: 'Caller Analysis',
-        path: '/caller-analysis',
         disable: false,
         icon: <PhoneIcon />,
+        submenu: [
+            {
+                id: 'caller-analysis-list',
+                title: 'Call List',
+                path: '/caller-analysis',
+                disable: false,
+            },
+            {
+                id: 'caller-analysis-tagging',
+                title: 'Tagging Dashboard',
+                path: '/caller-analysis/tagging',
+                disable: false,
+            },
+            {
+                id: 'caller-analysis-visualizer',
+                title: 'Query Builder',
+                path: '/visualizer',
+                disable: false,
+            },
+        ],
     },
     {
         id: 99887766,

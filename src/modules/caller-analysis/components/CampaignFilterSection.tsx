@@ -27,7 +27,9 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
     const campaignStore = useCampaignStore((s) => s.campaigns)
 
     const filteredCampaigns = campaigns.filter((campaign) =>
-        campaign.title.toLowerCase().includes(searchQuery.toLowerCase())
+        (campaign.title ?? '')
+            .toLowerCase()
+            .includes((searchQuery ?? '').toLowerCase())
     )
 
     const getCampaignLogo = (campaign: SelectOption) => {
@@ -61,11 +63,12 @@ export const CampaignFilterSection: React.FC<CampaignFilterSectionProps> = ({
             )
         }
 
-        const initial = campaign.title.toUpperCase().charAt(0)
+        const title = campaign.title ?? ''
+        const initial = title.toUpperCase().charAt(0)
         const bgColor = (() => {
             let hash = 0
-            for (let i = 0; i < campaign.title.length; i++) {
-                hash = campaign.title.charCodeAt(i) + ((hash << 5) - hash)
+            for (let i = 0; i < title.length; i++) {
+                hash = title.charCodeAt(i) + ((hash << 5) - hash)
             }
             const hue = Math.abs(hash) % 360
             const saturation = 30 + (Math.abs(hash) % 21)

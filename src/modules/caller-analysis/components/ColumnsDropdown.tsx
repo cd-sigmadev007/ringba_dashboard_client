@@ -93,7 +93,9 @@ export const ColumnsDropdown: React.FC<ColumnsDropdownProps> = ({
     const filteredGroups = groupedColumns.map((group) => ({
         ...group,
         columns: group.columns.filter((col) =>
-            col.label.toLowerCase().includes(searchQuery.toLowerCase())
+            (col.label ?? '')
+                .toLowerCase()
+                .includes((searchQuery ?? '').toLowerCase())
         ),
     }))
 

@@ -68,6 +68,7 @@ export interface CallerOrderBy {
 
 export interface Caller {
     id: string
+    ringbaRowId?: string
     callerId: string
     lastCall: string
     duration: string
@@ -77,6 +78,7 @@ export interface Caller {
     status: Array<string>
     audioUrl?: string
     transcript?: string
+    summary?: string
     phoneNumber: string
     callTimestamp: string
     callLengthInSeconds: number

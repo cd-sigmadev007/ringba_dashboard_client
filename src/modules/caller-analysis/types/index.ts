@@ -6,6 +6,7 @@ export * from './priority.types'
 
 export interface CallData {
     id: string
+    ringbaRowId?: string
     callerId: string
     /** Phone number (for history API); may equal callerId */
     phoneNumber?: string

@@ -9,7 +9,7 @@ interface StatusFilterSectionProps {
     onStatusToggle: (statusValue: string) => void
     searchQuery: string
     onSearchChange: (query: string) => void
-    isOpen: boolean
+    isOpen?: boolean
 }
 
 export const StatusFilterSection: React.FC<StatusFilterSectionProps> = ({
@@ -17,14 +17,15 @@ export const StatusFilterSection: React.FC<StatusFilterSectionProps> = ({
     onStatusToggle,
     searchQuery,
     onSearchChange,
-    isOpen,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
-    const { statusOptions, isLoadingTags } = useFilterTags(isOpen)
+    const { statusOptions, isLoadingTags } = useFilterTags()
 
     const filteredStatuses = statusOptions.filter((option) =>
-        option.title.toLowerCase().includes(searchQuery.toLowerCase())
+        (option.title ?? '')
+            .toLowerCase()
+            .includes((searchQuery ?? '').toLowerCase())
     )
 
     return (
