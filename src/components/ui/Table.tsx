@@ -127,6 +127,10 @@ interface TableProps<T = any> {
      * If provided, overrides internal pagination state
      */
     pageIndex?: number
+    /**
+     * When true, removes card background for a cleaner/minimal look
+     */
+    bare?: boolean
 }
 
 const Table = <T,>({
@@ -154,6 +158,7 @@ const Table = <T,>({
     totalPages: externalTotalPages,
     totalRecords: externalTotalRecords,
     pageIndex: externalPageIndex,
+    bare = false,
 }: TableProps<T>) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -337,7 +342,12 @@ const Table = <T,>({
     if (!loading && data.length === 0) {
         return (
             <div className={cn('w-full', className)}>
-                <div className="card rounded-[10px] overflow-hidden">
+                <div
+                    className={cn(
+                        'rounded-[10px] overflow-hidden table-container',
+                        bare ? '' : 'card'
+                    )}
+                >
                     {/* Custom header (e.g., TableHeader with filters) - always show even with no data */}
                     {customHeader && (
                         <div
@@ -375,7 +385,10 @@ const Table = <T,>({
     return (
         <div className={cn('w-full', className)}>
             <div
-                className="card rounded-[10px] overflow-hidden table-container"
+                className={cn(
+                    'rounded-[10px] overflow-hidden table-container',
+                    bare ? '' : 'card'
+                )}
                 ref={containerRef}
             >
                 {/* Custom header (e.g., TableHeader with filters) */}

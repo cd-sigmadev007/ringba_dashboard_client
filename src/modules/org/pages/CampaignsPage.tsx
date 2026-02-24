@@ -199,7 +199,7 @@ const CampaignsPage: React.FC = () => {
                     data={data}
                     columns={columns as any}
                     pagination={true}
-                    loading={loading}
+                    loading={loading || authLoading}
                     className={clsx(theme === 'dark' ? 'dark' : '')}
                 />
             </div>
@@ -244,7 +244,7 @@ const CampaignsPage: React.FC = () => {
                                 } catch (error: any) {
                                     toast.error(
                                         error?.message ||
-                                            'Failed to delete campaign'
+                                        'Failed to delete campaign'
                                     )
                                 } finally {
                                     setDeleting(false)

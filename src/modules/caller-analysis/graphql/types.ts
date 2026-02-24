@@ -68,6 +68,7 @@ export interface CallerOrderBy {
 
 export interface Caller {
     id: string
+    ringbaRowId?: string
     callerId: string
     lastCall: string
     duration: string

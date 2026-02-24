@@ -177,6 +177,13 @@ const Index: React.FC<IndexProps> = ({ openMenu, setOpenMenu }) => {
         }
     }, [location.pathname])
 
+    // Auto-expand Caller Analysis menu if on caller-analysis route
+    useEffect(() => {
+        if (location.pathname.startsWith('/caller-analysis')) {
+            setExpandedItems((prev) => new Set(prev).add(1212351233))
+        }
+    }, [location.pathname])
+
     const toggleExpanded = (id: string | number) => {
         setExpandedItems((prev) => {
             const newSet = new Set(prev)

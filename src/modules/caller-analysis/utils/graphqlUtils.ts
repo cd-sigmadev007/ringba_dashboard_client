@@ -32,6 +32,7 @@ export const convertGraphQLCallerToCallData = (caller: Caller): CallData => {
 
     return {
         id: caller.id,
+        ringbaRowId: caller.ringbaRowId ?? undefined,
         callerId: caller.callerId,
         phoneNumber: caller.phoneNumber ?? caller.callerId,
         lastCall: caller.lastCall,

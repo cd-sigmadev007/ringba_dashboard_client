@@ -19,7 +19,7 @@ export const TranscriptContent: React.FC<TranscriptContentProps> = ({
     const isDark = theme === 'dark'
 
     return (
-        <div className={clsx('space-y-4', className)}>
+        <div className={clsx('space-y-4 min-h-0', className)}>
             {/* Transcript Content */}
             <div
                 className={clsx(
