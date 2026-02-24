@@ -169,7 +169,8 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
         isDark ? 'border-[#1B456F]' : 'border-slate-200'
     )
 
-    const summaryText = callerData.summary || 'No summary available'
+    const summaryText =
+        analysis?.callSummary || callerData.summary || 'No summary available'
     const confidenceColor =
         analysis?.confidenceScore != null
             ? analysis.confidenceScore < 0.5

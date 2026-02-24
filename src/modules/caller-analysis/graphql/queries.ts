@@ -26,6 +26,7 @@ export const GET_CALLERS_QUERY = gql`
                 status
                 audioUrl
                 transcript
+                summary
                 phoneNumber
                 callTimestamp
                 callLengthInSeconds
@@ -116,6 +117,7 @@ export const GET_CALLER_BY_ID_QUERY = gql`
             status
             audioUrl
             transcript
+            summary
             phoneNumber
             callTimestamp
             callLengthInSeconds
@@ -289,6 +291,7 @@ export const GET_CALLER_BY_PHONE_QUERY = gql`
             status
             audioUrl
             transcript
+            summary
             phoneNumber
             callTimestamp
             callLengthInSeconds

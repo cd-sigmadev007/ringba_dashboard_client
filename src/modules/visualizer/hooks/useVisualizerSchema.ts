@@ -5,17 +5,10 @@
  */
 import { useQuery } from '@tanstack/react-query'
 import type { VisualizerSchema } from '../types'
-
-const BASE_URL = (
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-).replace(/\/$/, '')
+import { apiClient } from '@/services/api'
 
 async function fetchSchema(): Promise<VisualizerSchema> {
-    const res = await fetch(`${BASE_URL}/api/visualizer/schema`, {
-        credentials: 'include',
-    })
-    if (!res.ok) throw new Error('Failed to fetch visualizer schema')
-    const json = await res.json()
+    const json = await apiClient.get('/api/visualizer/schema')
     return json.data as VisualizerSchema
 }
 

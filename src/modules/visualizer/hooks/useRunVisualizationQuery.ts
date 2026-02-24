@@ -6,25 +6,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { VisualizerQueryRequest, VisualizerQueryResult } from '../types'
-
-const BASE_URL = (
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-).replace(/\/$/, '')
+import { apiClient } from '@/services/api'
 
 async function executeQuery(
     req: VisualizerQueryRequest
 ): Promise<VisualizerQueryResult> {
-    const res = await fetch(`${BASE_URL}/api/visualizer/query`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req),
-    })
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: res.statusText }))
-        throw new Error(err.message || 'Query failed')
-    }
-    const json = await res.json()
+    const json = await apiClient.post('/api/visualizer/query', req)
     return json.data as VisualizerQueryResult
 }
 

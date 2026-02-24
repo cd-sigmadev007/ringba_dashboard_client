@@ -78,6 +78,7 @@ export interface Caller {
     status: Array<string>
     audioUrl?: string
     transcript?: string
+    summary?: string
     phoneNumber: string
     callTimestamp: string
     callLengthInSeconds: number
