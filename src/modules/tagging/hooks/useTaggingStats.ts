@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
+import type {
+    PriorityTagCount,
+    TagUsageStats,
+    TaggingDashboard,
+    TierTagCount,
+} from '../types'
 import {
-    GET_TAG_USAGE_STATS_QUERY,
-    GET_TAG_COUNT_BY_TIER_QUERY,
-    GET_TAG_COUNT_BY_PRIORITY_QUERY,
     GET_TAGGING_DASHBOARD_QUERY,
+    GET_TAG_COUNT_BY_PRIORITY_QUERY,
+    GET_TAG_COUNT_BY_TIER_QUERY,
+    GET_TAG_USAGE_STATS_QUERY,
 } from '@/modules/caller-analysis/graphql/queries'
 import { graphqlClient } from '@/lib/graphql/client'
 import { useAuth } from '@/contexts/AuthContext'
-import type {
-    TagUsageStats,
-    TierTagCount,
-    PriorityTagCount,
-    TaggingDashboard,
-} from '../types'
 
 export function useTagUsageStats(dateFrom?: string, dateTo?: string) {
     const { user, loading: authLoading } = useAuth()
@@ -40,7 +40,7 @@ export function useTagCountByTier(dateFrom?: string, dateTo?: string) {
         queryKey: ['graphql', 'tagCountByTier', dateFrom, dateTo],
         queryFn: async () => {
             const data = await graphqlClient.request<{
-                tagCountByTier: TierTagCount[]
+                tagCountByTier: Array<TierTagCount>
             }>(GET_TAG_COUNT_BY_TIER_QUERY, { dateFrom, dateTo })
             return data.tagCountByTier
         },
@@ -58,7 +58,7 @@ export function useTagCountByPriority(dateFrom?: string, dateTo?: string) {
         queryKey: ['graphql', 'tagCountByPriority', dateFrom, dateTo],
         queryFn: async () => {
             const data = await graphqlClient.request<{
-                tagCountByPriority: PriorityTagCount[]
+                tagCountByPriority: Array<PriorityTagCount>
             }>(GET_TAG_COUNT_BY_PRIORITY_QUERY, { dateFrom, dateTo })
             return data.tagCountByPriority
         },

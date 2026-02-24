@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 import clsx from 'clsx'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
 import { useIsMobile } from '@/lib'
 import { Modal } from '@/components/ui'
-import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 
 export interface StatusModalProps {
     callerData: CallData

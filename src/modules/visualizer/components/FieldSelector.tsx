@@ -4,15 +4,15 @@
  * Uses a portal + position:fixed so the dropdown is never clipped by
  * overflow:hidden / overflow:auto parent containers.
  */
-import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import clsx from 'clsx'
+import { SOURCE_COLORS, SOURCE_LABELS } from '../types'
+import type { FieldDef, FieldSource } from '../types'
 import { useThemeStore } from '@/store/themeStore'
-import type { FieldDef } from '../types'
-import { SOURCE_LABELS, SOURCE_COLORS } from '../types'
 
 interface Props {
-    fields: FieldDef[]
+    fields: Array<FieldDef>
     value: string
     onChange: (key: string) => void
     placeholder?: string
@@ -27,7 +27,12 @@ const SOURCE_BADGE_CLASSES: Record<string, string> = {
 }
 
 export const FieldSelector: React.FC<Props> = ({
-    fields, value, onChange, placeholder = 'Select field…', filterFn, disabled,
+    fields,
+    value,
+    onChange,
+    placeholder = 'Select field…',
+    filterFn,
+    disabled,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -44,7 +49,8 @@ export const FieldSelector: React.FC<Props> = ({
         const rect = buttonRef.current.getBoundingClientRect()
         const spaceBelow = window.innerHeight - rect.bottom
         const dropdownHeight = 320 // max expected height
-        const openUpward = spaceBelow < dropdownHeight && rect.top > dropdownHeight
+        const openUpward =
+            spaceBelow < dropdownHeight && rect.top > dropdownHeight
 
         setDropdownStyle({
             position: 'fixed',
@@ -83,7 +89,8 @@ export const FieldSelector: React.FC<Props> = ({
             if (
                 buttonRef.current?.contains(e.target as Node) ||
                 dropdownRef.current?.contains(e.target as Node)
-            ) return
+            )
+                return
             setOpen(false)
             setSearch('')
         }
@@ -95,13 +102,17 @@ export const FieldSelector: React.FC<Props> = ({
         let list = filterFn ? fields.filter(filterFn) : fields
         if (search.trim()) {
             const q = search.toLowerCase()
-            list = list.filter((f) => f.label.toLowerCase().includes(q) || f.key.toLowerCase().includes(q))
+            list = list.filter(
+                (f) =>
+                    f.label.toLowerCase().includes(q) ||
+                    f.key.toLowerCase().includes(q)
+            )
         }
         return list
     }, [fields, filterFn, search])
 
     const grouped = useMemo(() => {
-        const m: Record<string, FieldDef[]> = {}
+        const m: Record<string, Array<FieldDef>> = {}
         for (const f of filtered) {
             if (!m[f.source]) m[f.source] = []
             m[f.source].push(f)
@@ -123,11 +134,18 @@ export const FieldSelector: React.FC<Props> = ({
             style={dropdownStyle}
             className={clsx(
                 'rounded-xl border shadow-2xl overflow-hidden',
-                isDark ? 'bg-[#0D2137] border-[#1E3A5F]' : 'bg-white border-gray-200',
+                isDark
+                    ? 'bg-[#0D2137] border-[#1E3A5F]'
+                    : 'bg-white border-gray-200'
             )}
         >
             {/* Search */}
-            <div className={clsx('p-2 border-b', isDark ? 'border-[#1E3A5F]' : 'border-gray-100')}>
+            <div
+                className={clsx(
+                    'p-2 border-b',
+                    isDark ? 'border-[#1E3A5F]' : 'border-gray-100'
+                )}
+            >
                 <input
                     ref={inputRef}
                     value={search}
@@ -137,7 +155,7 @@ export const FieldSelector: React.FC<Props> = ({
                         'w-full rounded-lg px-3 py-1.5 text-sm outline-none border',
                         isDark
                             ? 'bg-[#0A1929] border-[#1E3A5F] text-[#F5F8FA] placeholder:text-[#4A6080]'
-                            : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400',
+                            : 'bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400'
                     )}
                 />
             </div>
@@ -145,10 +163,13 @@ export const FieldSelector: React.FC<Props> = ({
             <div className="max-h-64 overflow-y-auto">
                 {Object.entries(grouped).map(([source, sourceFields]) => (
                     <div key={source}>
-                        <div className={clsx('px-3 py-1.5 text-xs font-semibold uppercase tracking-wider',
-                            isDark ? 'text-[#4A6080]' : 'text-gray-400',
-                        )}>
-                            {SOURCE_LABELS[source as import('../types').FieldSource] ?? source}
+                        <div
+                            className={clsx(
+                                'px-3 py-1.5 text-xs font-semibold uppercase tracking-wider',
+                                isDark ? 'text-[#4A6080]' : 'text-gray-400'
+                            )}
+                        >
+                            {SOURCE_LABELS[source as FieldSource] ?? source}
                         </div>
                         {sourceFields.map((f) => (
                             <button
@@ -158,13 +179,22 @@ export const FieldSelector: React.FC<Props> = ({
                                 className={clsx(
                                     'flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition-colors',
                                     value === f.key
-                                        ? isDark ? 'bg-[#007FFF]/20 text-blue-300' : 'bg-blue-50 text-blue-700'
-                                        : isDark ? 'hover:bg-[#1E3A5F]/60 text-[#B0C4DE]' : 'hover:bg-gray-50 text-gray-700',
+                                        ? isDark
+                                            ? 'bg-[#007FFF]/20 text-blue-300'
+                                            : 'bg-blue-50 text-blue-700'
+                                        : isDark
+                                          ? 'hover:bg-[#1E3A5F]/60 text-[#B0C4DE]'
+                                          : 'hover:bg-gray-50 text-gray-700'
                                 )}
                             >
-                                <span className={clsx('text-xs px-1 py-0.5 rounded font-medium',
-                                    SOURCE_BADGE_CLASSES[SOURCE_COLORS[f.source]]
-                                )}>
+                                <span
+                                    className={clsx(
+                                        'text-xs px-1 py-0.5 rounded font-medium',
+                                        SOURCE_BADGE_CLASSES[
+                                            SOURCE_COLORS[f.source]
+                                        ]
+                                    )}
+                                >
                                     {f.type}
                                 </span>
                                 {f.label}
@@ -173,7 +203,12 @@ export const FieldSelector: React.FC<Props> = ({
                     </div>
                 ))}
                 {filtered.length === 0 && (
-                    <p className={clsx('px-4 py-6 text-center text-sm', isDark ? 'text-[#4A6080]' : 'text-gray-400')}>
+                    <p
+                        className={clsx(
+                            'px-4 py-6 text-center text-sm',
+                            isDark ? 'text-[#4A6080]' : 'text-gray-400'
+                        )}
+                    >
                         No fields match "{search}"
                     </p>
                 )}
@@ -193,15 +228,20 @@ export const FieldSelector: React.FC<Props> = ({
                     isDark
                         ? 'bg-[#0A1929] border-[#1E3A5F] text-[#F5F8FA] hover:border-[#007FFF]/60'
                         : 'bg-white border-gray-200 text-[#3F4254] hover:border-blue-400',
-                    disabled && 'opacity-50 cursor-not-allowed',
+                    disabled && 'opacity-50 cursor-not-allowed'
                 )}
             >
                 <span className="truncate">
                     {selectedDef ? (
                         <span className="flex items-center gap-2">
-                            <span className={clsx('text-xs px-1.5 py-0.5 rounded font-medium',
-                                SOURCE_BADGE_CLASSES[SOURCE_COLORS[selectedDef.source]]
-                            )}>
+                            <span
+                                className={clsx(
+                                    'text-xs px-1.5 py-0.5 rounded font-medium',
+                                    SOURCE_BADGE_CLASSES[
+                                        SOURCE_COLORS[selectedDef.source]
+                                    ]
+                                )}
+                            >
                                 {SOURCE_LABELS[selectedDef.source]}
                             </span>
                             {selectedDef.label}
@@ -210,8 +250,21 @@ export const FieldSelector: React.FC<Props> = ({
                         <span className="opacity-50">{placeholder}</span>
                     )}
                 </span>
-                <svg className={clsx('w-4 h-4 flex-shrink-0 transition-transform', open && 'rotate-180')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                    className={clsx(
+                        'w-4 h-4 flex-shrink-0 transition-transform',
+                        open && 'rotate-180'
+                    )}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                    />
                 </svg>
             </button>
 

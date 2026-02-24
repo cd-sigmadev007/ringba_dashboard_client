@@ -8,7 +8,10 @@ import type { AggDef, VizConfig, VizType } from '../types'
 
 const DEFAULTS: VizConfig = { type: 'table' }
 
-export function useVisualizationConfig(aggregations: AggDef[], groupBy: string[]) {
+export function useVisualizationConfig(
+    aggregations: Array<AggDef>,
+    groupBy: Array<string>
+) {
     const [config, setConfig] = useState<VizConfig>(DEFAULTS)
 
     // Auto-suggest axis mappings when aggregations / groupBy change
@@ -20,7 +23,8 @@ export function useVisualizationConfig(aggregations: AggDef[], groupBy: string[]
         setConfig((prev) => {
             const next: VizConfig = { ...prev }
             if (firstGroup && !prev.xField) next.xField = firstGroup
-            if (firstAgg && (!prev.yFields || prev.yFields.length === 0)) next.yFields = [firstAgg]
+            if (firstAgg && (!prev.yFields || prev.yFields.length === 0))
+                next.yFields = [firstAgg]
             return next
         })
     }, [groupBy, aggregations])
@@ -33,7 +37,7 @@ export function useVisualizationConfig(aggregations: AggDef[], groupBy: string[]
         setConfig((prev) => ({ ...prev, xField: field }))
     }, [])
 
-    const setYFields = useCallback((fields: string[]) => {
+    const setYFields = useCallback((fields: Array<string>) => {
         setConfig((prev) => ({ ...prev, yFields: fields }))
     }, [])
 

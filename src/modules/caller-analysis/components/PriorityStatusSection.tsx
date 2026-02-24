@@ -1,8 +1,8 @@
 import React from 'react'
 import clsx from 'clsx'
+import type { StatusItem } from '@/modules'
 import { useThemeStore } from '@/store/themeStore'
 import { Status } from '@/modules'
-import type { StatusItem } from '@/modules'
 import { useIsMobile } from '@/lib/hooks/useMediaQuery'
 
 export interface PriorityStatusSectionProps {

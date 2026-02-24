@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import type { SelectOption } from '@/components/ui/FilterSelect'
 import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
+import type { SelectOption } from '@/components/ui/FilterSelect'
 
 /** Uses tag definitions from Zustand store (single fetch, shared with table + modals) */
 export function useFilterTags() {

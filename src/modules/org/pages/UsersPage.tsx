@@ -122,9 +122,9 @@ const UsersPage: React.FC = () => {
                         firstName && lastName
                             ? `${firstName} ${lastName}`.trim()
                             : firstName ||
-                            lastName ||
-                            email.split('@')[0] ||
-                            email
+                              lastName ||
+                              email.split('@')[0] ||
+                              email
                     const url = toAbsoluteLogoUrl(row?.original?.logo_url)
                     return (
                         <div className="flex items-center gap-2">

@@ -5,10 +5,10 @@
  */
 import React from 'react'
 import clsx from 'clsx'
-import { useThemeStore } from '@/store/themeStore'
-import type { VizConfig } from '../types'
 import { VizSelect } from './VizSelect'
+import type { VizConfig } from '../types'
 import type { VizSelectOption } from './VizSelect'
+import { useThemeStore } from '@/store/themeStore'
 
 interface ColumnOption {
     key: string
@@ -17,33 +17,42 @@ interface ColumnOption {
 
 interface Props {
     config: VizConfig
-    columns: ColumnOption[]
+    columns: Array<ColumnOption>
     onSetXField: (f: string) => void
-    onSetYFields: (f: string[]) => void
+    onSetYFields: (f: Array<string>) => void
     onSetSeriesField: (f: string) => void
     onSetValueFormat: (f: VizConfig['valueFormat']) => void
 }
 
 const fieldLabel = (text: string, isDark: boolean) => (
-    <label className={clsx('block text-xs font-medium mb-1.5', isDark ? 'text-[#B0C4DE]' : 'text-gray-600')}>
+    <label
+        className={clsx(
+            'block text-xs font-medium mb-1.5',
+            isDark ? 'text-[#B0C4DE]' : 'text-gray-600'
+        )}
+    >
         {text}
     </label>
 )
 
-const FORMAT_OPTIONS: VizSelectOption[] = [
+const FORMAT_OPTIONS: Array<VizSelectOption> = [
     { label: 'Number', value: 'number' },
     { label: 'Percent (%)', value: 'percent' },
 ]
 
 export const VisualizationConfigPanel: React.FC<Props> = ({
-    config, columns,
-    onSetXField, onSetYFields, onSetSeriesField, onSetValueFormat,
+    config,
+    columns,
+    onSetXField,
+    onSetYFields,
+    onSetSeriesField,
+    onSetValueFormat,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const { type } = config
 
-    const colOptions: VizSelectOption[] = [
+    const colOptions: Array<VizSelectOption> = [
         { label: '— none —', value: '' },
         ...columns.map((c) => ({ label: c.label, value: c.key })),
     ]
@@ -51,7 +60,10 @@ export const VisualizationConfigPanel: React.FC<Props> = ({
     return (
         <div className="space-y-4">
             {/* X-Axis / Label field */}
-            {(type === 'bar' || type === 'stacked_bar' || type === 'line' || type === 'area') && (
+            {(type === 'bar' ||
+                type === 'stacked_bar' ||
+                type === 'line' ||
+                type === 'area') && (
                 <div>
                     {fieldLabel('X-Axis field', isDark)}
                     <VizSelect
@@ -74,24 +86,50 @@ export const VisualizationConfigPanel: React.FC<Props> = ({
             )}
 
             {/* Y-Axis checkboxes */}
-            {(type === 'bar' || type === 'stacked_bar' || type === 'line' || type === 'area') && (
+            {(type === 'bar' ||
+                type === 'stacked_bar' ||
+                type === 'line' ||
+                type === 'area') && (
                 <div>
                     {fieldLabel('Y-Axis field(s)', isDark)}
                     <div className="space-y-1 max-h-36 overflow-y-auto">
                         {columns.map((c) => (
-                            <label key={c.key} className={clsx('flex items-center gap-2 px-2 py-1 rounded cursor-pointer',
-                                isDark ? 'hover:bg-[#1E3A5F]' : 'hover:bg-gray-50',
-                            )}>
+                            <label
+                                key={c.key}
+                                className={clsx(
+                                    'flex items-center gap-2 px-2 py-1 rounded cursor-pointer',
+                                    isDark
+                                        ? 'hover:bg-[#1E3A5F]'
+                                        : 'hover:bg-gray-50'
+                                )}
+                            >
                                 <input
                                     type="checkbox"
-                                    checked={config.yFields?.includes(c.key) ?? false}
+                                    checked={
+                                        config.yFields?.includes(c.key) ?? false
+                                    }
                                     onChange={(e) => {
                                         const current = config.yFields ?? []
-                                        onSetYFields(e.target.checked ? [...current, c.key] : current.filter((k) => k !== c.key))
+                                        onSetYFields(
+                                            e.target.checked
+                                                ? [...current, c.key]
+                                                : current.filter(
+                                                      (k) => k !== c.key
+                                                  )
+                                        )
                                     }}
                                     className="accent-blue-500"
                                 />
-                                <span className={clsx('text-sm', isDark ? 'text-[#B0C4DE]' : 'text-gray-700')}>{c.label}</span>
+                                <span
+                                    className={clsx(
+                                        'text-sm',
+                                        isDark
+                                            ? 'text-[#B0C4DE]'
+                                            : 'text-gray-700'
+                                    )}
+                                >
+                                    {c.label}
+                                </span>
                             </label>
                         ))}
                     </div>
@@ -117,7 +155,9 @@ export const VisualizationConfigPanel: React.FC<Props> = ({
                     <VizSelect
                         options={FORMAT_OPTIONS}
                         value={config.valueFormat ?? 'number'}
-                        onChange={(v) => onSetValueFormat(v as VizConfig['valueFormat'])}
+                        onChange={(v) =>
+                            onSetValueFormat(v as VizConfig['valueFormat'])
+                        }
                     />
                 </div>
             )}

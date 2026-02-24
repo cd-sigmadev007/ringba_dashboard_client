@@ -244,7 +244,7 @@ const CampaignsPage: React.FC = () => {
                                 } catch (error: any) {
                                     toast.error(
                                         error?.message ||
-                                        'Failed to delete campaign'
+                                            'Failed to delete campaign'
                                     )
                                 } finally {
                                     setDeleting(false)

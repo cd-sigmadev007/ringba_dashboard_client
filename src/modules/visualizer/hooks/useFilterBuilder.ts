@@ -21,13 +21,14 @@ function makeEmptyRule(): FilterRule {
 function mutateTree(
     node: FilterGroup,
     matchId: string,
-    mutateFn: (group: FilterGroup) => FilterGroup,
+    mutateFn: (group: FilterGroup) => FilterGroup
 ): FilterGroup {
-    if (node.id === matchId) return mutateFn({ ...node, rules: [...node.rules] })
+    if (node.id === matchId)
+        return mutateFn({ ...node, rules: [...node.rules] })
     return {
         ...node,
         rules: node.rules.map((r) =>
-            r.type === 'group' ? mutateTree(r as FilterGroup, matchId, mutateFn) : r,
+            r.type === 'group' ? mutateTree(r, matchId, mutateFn) : r
         ),
     }
 }
@@ -38,19 +39,21 @@ function removeNode(root: FilterGroup, targetId: string): FilterGroup {
         ...root,
         rules: root.rules
             .filter((r) => r.id !== targetId)
-            .map((r) =>
-                r.type === 'group' ? removeNode(r as FilterGroup, targetId) : r,
-            ),
+            .map((r) => (r.type === 'group' ? removeNode(r, targetId) : r)),
     }
 }
 
 // Update a specific rule anywhere in the tree
-function updateRule(root: FilterGroup, id: string, patch: Partial<FilterRule>): FilterGroup {
+function updateRule(
+    root: FilterGroup,
+    id: string,
+    patch: Partial<FilterRule>
+): FilterGroup {
     return {
         ...root,
         rules: root.rules.map((r) => {
             if (r.id === id && r.type === 'rule') return { ...r, ...patch }
-            if (r.type === 'group') return updateRule(r as FilterGroup, id, patch)
+            if (r.type === 'group') return updateRule(r, id, patch)
             return r
         }),
     }
@@ -61,13 +64,19 @@ export function useFilterBuilder(initial?: FilterGroup) {
 
     const addRule = useCallback((groupId: string) => {
         setRoot((prev) =>
-            mutateTree(prev, groupId, (g) => ({ ...g, rules: [...g.rules, makeEmptyRule()] }))
+            mutateTree(prev, groupId, (g) => ({
+                ...g,
+                rules: [...g.rules, makeEmptyRule()],
+            }))
         )
     }, [])
 
     const addGroup = useCallback((groupId: string) => {
         setRoot((prev) =>
-            mutateTree(prev, groupId, (g) => ({ ...g, rules: [...g.rules, makeEmptyGroup()] }))
+            mutateTree(prev, groupId, (g) => ({
+                ...g,
+                rules: [...g.rules, makeEmptyGroup()],
+            }))
         )
     }, [])
 
@@ -75,13 +84,19 @@ export function useFilterBuilder(initial?: FilterGroup) {
         setRoot((prev) => removeNode(prev, nodeId))
     }, [])
 
-    const updateRule_ = useCallback((id: string, patch: Partial<Omit<FilterRule, 'id' | 'type'>>) => {
-        setRoot((prev) => updateRule(prev, id, patch))
-    }, [])
+    const updateRule_ = useCallback(
+        (id: string, patch: Partial<Omit<FilterRule, 'id' | 'type'>>) => {
+            setRoot((prev) => updateRule(prev, id, patch))
+        },
+        []
+    )
 
     const toggleLogic = useCallback((groupId: string) => {
         setRoot((prev) =>
-            mutateTree(prev, groupId, (g) => ({ ...g, logic: g.logic === 'AND' ? 'OR' : 'AND' }))
+            mutateTree(prev, groupId, (g) => ({
+                ...g,
+                logic: g.logic === 'AND' ? 'OR' : 'AND',
+            }))
         )
     }, [])
 

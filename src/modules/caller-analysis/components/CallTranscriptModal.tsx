@@ -124,7 +124,9 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
             position={isMobile ? 'bottom' : 'center'}
             size={isMobile ? 'full' : 'lg'}
             className={clsx(
-                isMobile ? 'mx-6 max-w-full max-h-[75vh]' : 'min-w-[720px] h-[70vh]'
+                isMobile
+                    ? 'mx-6 max-w-full max-h-[75vh]'
+                    : 'min-w-[720px] h-[70vh]'
             )}
             animation={isMobile ? 'slide' : 'fade'}
             titleClassName="px-6 pt-6 pb-0"
@@ -132,16 +134,16 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
         >
             <div className="flex flex-col h-full min-h-0 p-[20px]">
                 {/* Fixed height content area with border to prevent size changes */}
-            <div
-                className={clsx(
+                <div
+                    className={clsx(
                         'flex-1 min-h-0 overflow-y-auto px-6 rounded-lg border',
-                    isDark
-                        ? 'bg-transparent border-[#1B456F]'
-                        : 'bg-[#FFFFFF] border-[#E1E5E9]'
-                )}
-            >
-                {activeTabContent}
-            </div>
+                        isDark
+                            ? 'bg-transparent border-[#1B456F]'
+                            : 'bg-[#FFFFFF] border-[#E1E5E9]'
+                    )}
+                >
+                    {activeTabContent}
+                </div>
             </div>
         </Modal>
     )

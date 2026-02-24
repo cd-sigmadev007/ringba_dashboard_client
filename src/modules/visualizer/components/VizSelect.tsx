@@ -5,7 +5,7 @@
  * Renders the dropdown via ReactDOM.createPortal so it is never
  * clipped by an overflow:auto/hidden parent.
  */
-import React, { useRef, useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import clsx from 'clsx'
 import { useThemeStore } from '@/store/themeStore'
@@ -18,7 +18,7 @@ export interface VizSelectOption {
 }
 
 interface Props {
-    options: VizSelectOption[]
+    options: Array<VizSelectOption>
     value: string
     onChange: (value: string) => void
     placeholder?: string
@@ -27,7 +27,12 @@ interface Props {
 }
 
 export const VizSelect: React.FC<Props> = ({
-    options, value, onChange, placeholder = 'Select…', disabled, className,
+    options,
+    value,
+    onChange,
+    placeholder = 'Select…',
+    disabled,
+    className,
 }) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
@@ -36,7 +41,8 @@ export const VizSelect: React.FC<Props> = ({
     const triggerRef = useRef<HTMLDivElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
-    const selectedLabel = options.find((o) => o.value === value)?.label ?? placeholder
+    const selectedLabel =
+        options.find((o) => o.value === value)?.label ?? placeholder
 
     const updatePosition = useCallback(() => {
         if (!triggerRef.current) return
@@ -81,7 +87,8 @@ export const VizSelect: React.FC<Props> = ({
             if (
                 triggerRef.current?.contains(e.target as Node) ||
                 dropdownRef.current?.contains(e.target as Node)
-            ) return
+            )
+                return
             setOpen(false)
         }
         document.addEventListener('mousedown', handler)
@@ -93,7 +100,9 @@ export const VizSelect: React.FC<Props> = ({
     const triggerText = isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
     const triggerBorder = open
         ? 'border-[#007FFF]/80'
-        : isDark ? 'border-[#1E3A5F] hover:border-[#007FFF]/60' : 'border-gray-200 hover:border-blue-400'
+        : isDark
+          ? 'border-[#1E3A5F] hover:border-[#007FFF]/60'
+          : 'border-gray-200 hover:border-blue-400'
 
     // Dropdown styles
     const dropdownBg = isDark ? 'bg-[#0D2137]' : 'bg-white'
@@ -102,13 +111,19 @@ export const VizSelect: React.FC<Props> = ({
         : 'shadow-[0_10px_35px_rgba(55,71,109,0.10)]'
     const optionText = isDark ? 'text-[#B0C4DE]' : 'text-[#3F4254]'
     const optionHover = isDark ? 'hover:bg-[#1E3A5F]/60' : 'hover:bg-[#F5F8FA]'
-    const optionSelected = isDark ? 'bg-[#007FFF]/20 text-blue-300' : 'bg-[#E3F2FD] text-blue-700'
+    const optionSelected = isDark
+        ? 'bg-[#007FFF]/20 text-blue-300'
+        : 'bg-[#E3F2FD] text-blue-700'
 
     const dropdown = open ? (
         <div
             ref={dropdownRef}
             style={dropdownStyle}
-            className={clsx('rounded-[7px] backdrop-blur-[25px] overflow-hidden', dropdownBg, dropdownShadow)}
+            className={clsx(
+                'rounded-[7px] backdrop-blur-[25px] overflow-hidden',
+                dropdownBg,
+                dropdownShadow
+            )}
         >
             <ul className="flex flex-col gap-y-1 max-h-60 overflow-y-auto custom-scroll text-xs p-2.5">
                 {options.map((opt) => (
@@ -121,15 +136,27 @@ export const VizSelect: React.FC<Props> = ({
                         }}
                         className={clsx(
                             'flex items-center gap-x-2.5 p-2 rounded-[7px] cursor-pointer transition-colors',
-                            opt.disabled ? 'opacity-40 cursor-not-allowed' : optionHover,
+                            opt.disabled
+                                ? 'opacity-40 cursor-not-allowed'
+                                : optionHover,
                             opt.value === value ? optionSelected : '',
-                            optionText,
+                            optionText
                         )}
                     >
                         <span className="flex-1">{opt.label}</span>
                         {opt.value === value && (
-                            <svg className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            <svg
+                                className="w-3.5 h-3.5 text-blue-400 flex-shrink-0"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2.5}
+                                    d="M5 13l4 4L19 7"
+                                />
                             </svg>
                         )}
                     </li>
@@ -148,14 +175,26 @@ export const VizSelect: React.FC<Props> = ({
                     triggerBg,
                     triggerText,
                     triggerBorder,
-                    disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+                    disabled &&
+                        'opacity-50 cursor-not-allowed pointer-events-none'
                 )}
             >
                 <span className="truncate">{selectedLabel}</span>
-                {isDark
-                    ? <ChevronDownDark className={clsx('transition-transform duration-200 flex-shrink-0', open && 'rotate-180')} />
-                    : <ChevronDownLight className={clsx('transition-transform duration-200 flex-shrink-0', open && 'rotate-180')} />
-                }
+                {isDark ? (
+                    <ChevronDownDark
+                        className={clsx(
+                            'transition-transform duration-200 flex-shrink-0',
+                            open && 'rotate-180'
+                        )}
+                    />
+                ) : (
+                    <ChevronDownLight
+                        className={clsx(
+                            'transition-transform duration-200 flex-shrink-0',
+                            open && 'rotate-180'
+                        )}
+                    />
+                )}
             </div>
 
             {typeof document !== 'undefined' && dropdown

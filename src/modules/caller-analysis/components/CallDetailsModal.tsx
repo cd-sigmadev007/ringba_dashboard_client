@@ -21,7 +21,6 @@ export const CallDetailsModal: React.FC<CallDetailsModalProps> = ({
 }) => {
     const isMobile = useIsMobile()
 
-
     if (!isOpen) {
         return null
     }

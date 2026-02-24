@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
 import clsx from 'clsx'
+import { useCallAnalysisV2, useCallTagsForCall } from '../../graphql/hooks'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../../types'
 import { useThemeStore } from '@/store/themeStore'
-import { useCallAnalysisV2, useCallTagsForCall } from '../../graphql/hooks'
 import { Table } from '@/components/ui'
 
 export interface SummaryTabContentProps {
@@ -54,7 +54,7 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
             if (bIdx >= 0) return 1
             return (a.priority ?? '').localeCompare(b.priority ?? '')
         })
-        return sorted as CallTagRow[]
+        return sorted as Array<CallTagRow>
     }, [tags])
 
     const columns = useMemo<Array<ColumnDef<CallTagRow>>>(
@@ -65,7 +65,12 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                 cell: ({ getValue }) => {
                     const v = getValue() as number | null
                     return (
-                        <span className={clsx('font-medium', isDark ? 'text-[#94A3B8]' : 'text-slate-600')}>
+                        <span
+                            className={clsx(
+                                'font-medium',
+                                isDark ? 'text-[#94A3B8]' : 'text-slate-600'
+                            )}
+                        >
                             {v ?? '-'}
                         </span>
                     )
@@ -81,15 +86,16 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                         <span
                             className={clsx(
                                 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
-                                !color && (isDark ? 'bg-slate-700' : 'bg-slate-200')
+                                !color &&
+                                    (isDark ? 'bg-slate-700' : 'bg-slate-200')
                             )}
                             style={
                                 color
                                     ? {
-                                        backgroundColor: `${color}20`,
-                                        color: color,
-                                        border: `1px solid ${color}`,
-                                    }
+                                          backgroundColor: `${color}20`,
+                                          color: color,
+                                          border: `1px solid ${color}`,
+                                      }
                                     : undefined
                             }
                         >
@@ -102,7 +108,12 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                 accessorKey: 'tagValue',
                 header: 'VALUE',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -111,7 +122,12 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                 accessorKey: 'priority',
                 header: 'PRIORITY',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#94A3B8]' : 'text-slate-600')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#94A3B8]' : 'text-slate-600'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -127,16 +143,23 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                         pct >= 80
                             ? 'text-green-600 dark:text-green-400'
                             : pct >= 50
-                                ? 'text-amber-600 dark:text-amber-400'
-                                : 'text-red-600 dark:text-red-400'
-                    return <span className={clsx('text-sm font-medium', color)}>{pct}%</span>
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : 'text-red-600 dark:text-red-400'
+                    return (
+                        <span className={clsx('text-sm font-medium', color)}>
+                            {pct}%
+                        </span>
+                    )
                 },
             },
         ],
         [isDark]
     )
 
-    const valueClass = clsx('text-sm', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')
+    const valueClass = clsx(
+        'text-sm',
+        isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+    )
     const labelClass = clsx(
         'text-xs font-semibold uppercase tracking-wide',
         isDark ? 'text-[#94A3B8]' : 'text-[#64748B]'
@@ -152,8 +175,8 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
             ? analysis.confidenceScore < 0.5
                 ? 'bg-red-500'
                 : analysis.confidenceScore < 0.8
-                    ? 'bg-amber-500'
-                    : 'bg-green-500'
+                  ? 'bg-amber-500'
+                  : 'bg-green-500'
             : 'bg-slate-300 dark:bg-slate-600'
 
     return (
@@ -161,7 +184,12 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
             {/* Primary Summary */}
             <section>
                 <h3 className={clsx(labelClass, 'mb-2')}>Call Summary</h3>
-                <p className={clsx(valueClass, 'whitespace-pre-wrap break-words leading-relaxed')}>
+                <p
+                    className={clsx(
+                        valueClass,
+                        'whitespace-pre-wrap break-words leading-relaxed'
+                    )}
+                >
                     {summaryText}
                 </p>
             </section>
@@ -179,30 +207,54 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
                 <div className="space-y-8 pt-6 border-t border-slate-200 dark:border-[#1B456F]">
                     {analysis && (
                         <section className="space-y-4">
-                            <h3 className={clsx(labelClass)}>Extended Analysis</h3>
+                            <h3 className={clsx(labelClass)}>
+                                Extended Analysis
+                            </h3>
 
-                            {analysis.disputeRecommendation && analysis.disputeRecommendation !== 'NONE' && (
-                                <div className={clsx(
-                                    'p-4 rounded-lg border',
-                                    isDark ? 'bg-red-950/20 border-red-800/40 text-red-200' : 'bg-red-50 border-red-200 text-red-800'
-                                )}>
-                                    <p className="text-xs font-bold uppercase mb-1">Dispute Recommendation</p>
-                                    <p className="font-semibold">{analysis.disputeRecommendation}</p>
-                                    {analysis.disputeRecommendationReason && (
-                                        <p className="mt-2 text-sm opacity-90">{analysis.disputeRecommendationReason}</p>
-                                    )}
-                                </div>
-                            )}
+                            {analysis.disputeRecommendation &&
+                                analysis.disputeRecommendation !== 'NONE' && (
+                                    <div
+                                        className={clsx(
+                                            'p-4 rounded-lg border',
+                                            isDark
+                                                ? 'bg-red-950/20 border-red-800/40 text-red-200'
+                                                : 'bg-red-50 border-red-200 text-red-800'
+                                        )}
+                                    >
+                                        <p className="text-xs font-bold uppercase mb-1">
+                                            Dispute Recommendation
+                                        </p>
+                                        <p className="font-semibold">
+                                            {analysis.disputeRecommendation}
+                                        </p>
+                                        {analysis.disputeRecommendationReason && (
+                                            <p className="mt-2 text-sm opacity-90">
+                                                {
+                                                    analysis.disputeRecommendationReason
+                                                }
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
                             {analysis.confidenceScore != null && (
                                 <div className={cardBg}>
                                     <p className={clsx(labelClass, 'mb-2')}>
-                                        AI Confidence: {Math.round(analysis.confidenceScore * 100)}%
+                                        AI Confidence:{' '}
+                                        {Math.round(
+                                            analysis.confidenceScore * 100
+                                        )}
+                                        %
                                     </p>
                                     <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                         <div
-                                            className={clsx('h-full rounded-full transition-all', confidenceColor)}
-                                            style={{ width: `${Math.min(100, analysis.confidenceScore * 100)}%` }}
+                                            className={clsx(
+                                                'h-full rounded-full transition-all',
+                                                confidenceColor
+                                            )}
+                                            style={{
+                                                width: `${Math.min(100, analysis.confidenceScore * 100)}%`,
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -210,17 +262,38 @@ export const SummaryTabContent: React.FC<SummaryTabContentProps> = ({
 
                             <div className="flex flex-wrap gap-3">
                                 {analysis.currentRevenue != null && (
-                                    <div className={clsx('px-3 py-1.5 rounded-md text-sm font-medium border', isDark ? 'bg-[#1e3a5f]/30 border-[#1B456F]' : 'bg-slate-100 border-slate-200')}>
-                                        Revenue: <span className="text-blue-500 font-bold">${Number(analysis.currentRevenue).toFixed(2)}</span>
+                                    <div
+                                        className={clsx(
+                                            'px-3 py-1.5 rounded-md text-sm font-medium border',
+                                            isDark
+                                                ? 'bg-[#1e3a5f]/30 border-[#1B456F]'
+                                                : 'bg-slate-100 border-slate-200'
+                                        )}
+                                    >
+                                        Revenue:{' '}
+                                        <span className="text-blue-500 font-bold">
+                                            $
+                                            {Number(
+                                                analysis.currentRevenue
+                                            ).toFixed(2)}
+                                        </span>
                                     </div>
                                 )}
-                                <div className={clsx(
-                                    'px-3 py-1.5 rounded-md text-sm font-medium border',
-                                    analysis.currentBilledStatus
-                                        ? isDark ? 'bg-green-900/20 border-green-800/40 text-green-300' : 'bg-green-50 border-green-200 text-green-800'
-                                        : isDark ? 'bg-[#1e3a5f]/30 border-[#1B456F]' : 'bg-slate-100 border-slate-200'
-                                )}>
-                                    {analysis.currentBilledStatus ? 'Billed' : 'Not Billed'}
+                                <div
+                                    className={clsx(
+                                        'px-3 py-1.5 rounded-md text-sm font-medium border',
+                                        analysis.currentBilledStatus
+                                            ? isDark
+                                                ? 'bg-green-900/20 border-green-800/40 text-green-300'
+                                                : 'bg-green-50 border-green-200 text-green-800'
+                                            : isDark
+                                              ? 'bg-[#1e3a5f]/30 border-[#1B456F]'
+                                              : 'bg-slate-100 border-slate-200'
+                                    )}
+                                >
+                                    {analysis.currentBilledStatus
+                                        ? 'Billed'
+                                        : 'Not Billed'}
                                 </div>
                             </div>
                         </section>

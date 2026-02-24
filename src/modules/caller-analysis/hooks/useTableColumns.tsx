@@ -3,10 +3,10 @@ import Button from '../../../components/ui/Button'
 import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
 import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
-import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import { Campaign } from '@/modules'
 import {
     CheckboxIcon,
@@ -20,7 +20,7 @@ import { cn } from '@/lib'
 
 // Status cell - uses tag definitions store for priority colors (single source)
 const StatusCell: React.FC<{
-    status: string[]
+    status: Array<string>
     callerData: CallData
     onStatusClick: (callerData: CallData) => void
 }> = ({ status, callerData, onStatusClick }) => {

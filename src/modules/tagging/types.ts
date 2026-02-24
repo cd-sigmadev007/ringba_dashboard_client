@@ -10,22 +10,22 @@ export interface TagCount {
 
 export interface TagUsageStats {
     totalTaggedCalls: number
-    tagCounts: TagCount[]
+    tagCounts: Array<TagCount>
 }
 
 export interface TierTagCount {
     tierNumber: number
-    tagCounts: TagCount[]
+    tagCounts: Array<TagCount>
 }
 
 export interface PriorityTagCount {
     priority: string
-    tagCounts: TagCount[]
+    tagCounts: Array<TagCount>
 }
 
 export interface TaggingDashboard {
     totalTaggedCalls: number
-    tagCounts: TagCount[]
-    tagCountByTier: TierTagCount[]
-    tagCountByPriority: PriorityTagCount[]
+    tagCounts: Array<TagCount>
+    tagCountByTier: Array<TierTagCount>
+    tagCountByPriority: Array<PriorityTagCount>
 }

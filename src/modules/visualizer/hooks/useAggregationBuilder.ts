@@ -7,11 +7,12 @@ import { useCallback, useState } from 'react'
 import type { AggDef, AggFn } from '../types'
 
 let _aggCounter = 0
-const uid = () => `agg_${++_aggCounter}_${Math.random().toString(36).slice(2, 7)}`
+const uid = () =>
+    `agg_${++_aggCounter}_${Math.random().toString(36).slice(2, 7)}`
 
 export function useAggregationBuilder() {
-    const [groupBy, setGroupBy] = useState<string[]>([])
-    const [aggregations, setAggregations] = useState<AggDef[]>([])
+    const [groupBy, setGroupBy] = useState<Array<string>>([])
+    const [aggregations, setAggregations] = useState<Array<AggDef>>([])
 
     const addGroupBy = useCallback((field: string) => {
         setGroupBy((prev) => (prev.includes(field) ? prev : [...prev, field]))

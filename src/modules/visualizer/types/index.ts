@@ -7,102 +7,123 @@
  * ============================================================
  */
 
-export type FieldSource = 'call_analysis_v2' | 'tag_definitions' | 'call_tags';
-export type FieldType = 'text' | 'numeric' | 'boolean' | 'timestamp' | 'enum' | 'jsonb';
+export type FieldSource = 'call_analysis_v2' | 'tag_definitions' | 'call_tags'
+export type FieldType =
+    | 'text'
+    | 'numeric'
+    | 'boolean'
+    | 'timestamp'
+    | 'enum'
+    | 'jsonb'
 
 export interface FieldDef {
-    key: string;
-    label: string;
-    source: FieldSource;
-    type: FieldType;
-    groupable: boolean;
-    aggregatable: boolean;
-    filterable: boolean;
-    enumValues?: string[];
+    key: string
+    label: string
+    source: FieldSource
+    type: FieldType
+    groupable: boolean
+    aggregatable: boolean
+    filterable: boolean
+    enumValues?: Array<string>
 }
 
 export type Operator =
-    | 'eq' | 'ne'
-    | 'gt' | 'gte' | 'lt' | 'lte'
-    | 'contains' | 'not_contains' | 'starts_with' | 'ends_with'
-    | 'in' | 'not_in'
-    | 'is_null' | 'is_not_null'
+    | 'eq'
+    | 'ne'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte'
+    | 'contains'
+    | 'not_contains'
+    | 'starts_with'
+    | 'ends_with'
+    | 'in'
+    | 'not_in'
+    | 'is_null'
+    | 'is_not_null'
     | 'between'
     | 'date_preset'
-    | 'contains_key';
+    | 'contains_key'
 
 export interface FilterRule {
-    id: string;
-    type: 'rule';
-    field: string;
-    operator: Operator;
-    value: any;
+    id: string
+    type: 'rule'
+    field: string
+    operator: Operator
+    value: any
 }
 
 export interface FilterGroup {
-    id: string;
-    type: 'group';
-    logic: 'AND' | 'OR';
-    rules: FilterNode[];
+    id: string
+    type: 'group'
+    logic: 'AND' | 'OR'
+    rules: Array<FilterNode>
 }
 
-export type FilterNode = FilterRule | FilterGroup;
+export type FilterNode = FilterRule | FilterGroup
 
-export type AggFn = 'count' | 'count_distinct' | 'sum' | 'avg' | 'min' | 'max';
+export type AggFn = 'count' | 'count_distinct' | 'sum' | 'avg' | 'min' | 'max'
 
 export interface AggDef {
-    id: string;
-    fn: AggFn;
-    field: string;
-    alias: string;
+    id: string
+    fn: AggFn
+    field: string
+    alias: string
 }
 
 export interface SortDef {
-    field: string;
-    direction: 'asc' | 'desc';
+    field: string
+    direction: 'asc' | 'desc'
 }
 
 export interface VisualizerQueryRequest {
-    includeTagJoin?: boolean;
-    filters: FilterGroup;
-    groupBy: string[];
-    aggregations: AggDef[];
-    sort: SortDef[];
-    limit: number;
+    includeTagJoin?: boolean
+    filters: FilterGroup
+    groupBy: Array<string>
+    aggregations: Array<AggDef>
+    sort: Array<SortDef>
+    limit: number
 }
 
 export interface VisualizerQueryResult {
-    columns: string[];
-    rows: Record<string, any>[];
-    rowCount: number;
-    truncated: boolean;
-    executionMs: number;
+    columns: Array<string>
+    rows: Array<Record<string, any>>
+    rowCount: number
+    truncated: boolean
+    executionMs: number
 }
 
-export type VizType = 'table' | 'bar' | 'stacked_bar' | 'line' | 'area' | 'donut';
+export type VizType =
+    | 'table'
+    | 'bar'
+    | 'stacked_bar'
+    | 'line'
+    | 'area'
+    | 'donut'
 
 export interface ColorRule {
-    field: string;
-    value: any;
-    color: string;
+    field: string
+    value: any
+    color: string
 }
 
 export interface VizConfig {
-    type: VizType;
-    xField?: string;
-    yFields?: string[];
-    seriesField?: string;
-    labelField?: string;
-    tooltipFields?: string[];
-    colorRules?: ColorRule[];
-    valueFormat?: 'number' | 'percent';
+    type: VizType
+    xField?: string
+    yFields?: Array<string>
+    seriesField?: string
+    labelField?: string
+    tooltipFields?: Array<string>
+    colorRules?: Array<ColorRule>
+    valueFormat?: 'number' | 'percent'
 }
 
 export interface VisualizerSchema {
-    fields: FieldDef[];
-    datePresets: string[];
-    allowedOperators: Record<FieldType, Operator[]>;
-    aggregationFns: AggFn[];
+    fields: Array<FieldDef>
+    datePresets: Array<string>
+    allowedOperators: Record<FieldType, Array<Operator>>
+    aggregationFns: Array<AggFn>
 }
 
 // ---------------------------------------------------------------------------
@@ -113,13 +134,13 @@ export const SOURCE_LABELS: Record<FieldSource, string> = {
     call_analysis_v2: 'Call Analysis',
     tag_definitions: 'Tag Definitions',
     call_tags: 'Call Tags',
-};
+}
 
 export const SOURCE_COLORS: Record<FieldSource, string> = {
     call_analysis_v2: 'blue',
     tag_definitions: 'purple',
     call_tags: 'teal',
-};
+}
 
 export const VIZ_LABELS: Record<VizType, string> = {
     table: 'Table',
@@ -128,7 +149,7 @@ export const VIZ_LABELS: Record<VizType, string> = {
     line: 'Line Chart',
     area: 'Area Chart',
     donut: 'Donut / Pie',
-};
+}
 
 export const AGG_LABELS: Record<AggFn, string> = {
     count: 'Count',
@@ -137,7 +158,7 @@ export const AGG_LABELS: Record<AggFn, string> = {
     avg: 'Average',
     min: 'Min',
     max: 'Max',
-};
+}
 
 export const OPERATOR_LABELS: Record<Operator, string> = {
     eq: '= equals',
@@ -157,7 +178,7 @@ export const OPERATOR_LABELS: Record<Operator, string> = {
     between: 'is between',
     date_preset: 'date preset',
     contains_key: 'has key',
-};
+}
 
 export const DATE_PRESET_LABELS: Record<string, string> = {
     today: 'Today',
@@ -166,4 +187,4 @@ export const DATE_PRESET_LABELS: Record<string, string> = {
     last_30_days: 'Last 30 days',
     this_month: 'This month',
     this_year: 'This year',
-};
+}

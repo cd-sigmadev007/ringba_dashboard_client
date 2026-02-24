@@ -48,7 +48,9 @@ export interface BarChartSkeletonProps {
     height?: number
 }
 
-export const BarChartSkeleton: React.FC<BarChartSkeletonProps> = ({ height = 320 }) => {
+export const BarChartSkeleton: React.FC<BarChartSkeletonProps> = ({
+    height = 320,
+}) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const fill = isDark ? '#132F4C' : '#ECECEC'
@@ -69,15 +71,21 @@ export const BarChartSkeleton: React.FC<BarChartSkeletonProps> = ({ height = 320
         >
             {/* Y-axis line */}
             <line
-                x1="48" y1={Math.round(16 * scale)}
-                x2="48" y2={Math.round(258 * scale)}
-                stroke={axisColor} strokeWidth="1"
+                x1="48"
+                y1={Math.round(16 * scale)}
+                x2="48"
+                y2={Math.round(258 * scale)}
+                stroke={axisColor}
+                strokeWidth="1"
             />
             {/* X-axis line */}
             <line
-                x1="48" y1={Math.round(258 * scale)}
-                x2="492" y2={Math.round(258 * scale)}
-                stroke={axisColor} strokeWidth="1"
+                x1="48"
+                y1={Math.round(258 * scale)}
+                x2="492"
+                y2={Math.round(258 * scale)}
+                stroke={axisColor}
+                strokeWidth="1"
             />
 
             {/* Y-axis tick placeholders */}
@@ -86,7 +94,9 @@ export const BarChartSkeleton: React.FC<BarChartSkeletonProps> = ({ height = 320
                     key={i}
                     x={8}
                     y={Math.round((16 + offset) * scale - 5)}
-                    width={32} height={8} rx={3}
+                    width={32}
+                    height={8}
+                    rx={3}
                     fill={fill}
                 />
             ))}
@@ -98,11 +108,22 @@ export const BarChartSkeleton: React.FC<BarChartSkeletonProps> = ({ height = 320
                 const y = Math.round(258 * scale) - bh
                 return (
                     <g key={i}>
-                        <rect x={x} y={y} width={28} height={bh} rx={4} fill={fill} />
+                        <rect
+                            x={x}
+                            y={y}
+                            width={28}
+                            height={bh}
+                            rx={4}
+                            fill={fill}
+                        />
                         {/* X-axis label */}
                         <rect
-                            x={x - 2} y={Math.round(258 * scale) + 8}
-                            width={32} height={7} rx={3} fill={fill}
+                            x={x - 2}
+                            y={Math.round(258 * scale) + 8}
+                            width={32}
+                            height={7}
+                            rx={3}
+                            fill={fill}
                         />
                     </g>
                 )
@@ -124,7 +145,9 @@ export interface PieChartSkeletonProps {
     height?: number
 }
 
-export const PieChartSkeleton: React.FC<PieChartSkeletonProps> = ({ height = 320 }) => {
+export const PieChartSkeleton: React.FC<PieChartSkeletonProps> = ({
+    height = 320,
+}) => {
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const fill = isDark ? '#132F4C' : '#ECECEC'
@@ -143,23 +166,54 @@ export const PieChartSkeleton: React.FC<PieChartSkeletonProps> = ({ height = 320
             <rect x={130} y={10} width={140} height={10} rx={4} fill={fill} />
 
             {/* Donut ring */}
-            <circle cx={200} cy={155} r={90} fill="none" stroke={ringFill} strokeWidth={38} />
             <circle
-                cx={200} cy={155} r={90} fill="none"
-                stroke={fill} strokeWidth={38}
-                strokeDasharray="120 450" strokeDashoffset={0}
+                cx={200}
+                cy={155}
+                r={90}
+                fill="none"
+                stroke={ringFill}
+                strokeWidth={38}
             />
             <circle
-                cx={200} cy={155} r={90} fill="none"
-                stroke={ringFill} strokeWidth={36}
-                strokeDasharray="80 450" strokeDashoffset={-130}
+                cx={200}
+                cy={155}
+                r={90}
+                fill="none"
+                stroke={fill}
+                strokeWidth={38}
+                strokeDasharray="120 450"
+                strokeDashoffset={0}
+            />
+            <circle
+                cx={200}
+                cy={155}
+                r={90}
+                fill="none"
+                stroke={ringFill}
+                strokeWidth={36}
+                strokeDasharray="80 450"
+                strokeDashoffset={-130}
             />
 
             {/* Legend chips */}
             {[0, 1, 2, 3].map((i) => (
                 <g key={i} transform={`translate(${50 + i * 80}, 295)`}>
-                    <rect x={0} y={0} width={12} height={12} rx={3} fill={fill} />
-                    <rect x={16} y={2} width={48} height={8} rx={3} fill={fill} />
+                    <rect
+                        x={0}
+                        y={0}
+                        width={12}
+                        height={12}
+                        rx={3}
+                        fill={fill}
+                    />
+                    <rect
+                        x={16}
+                        y={2}
+                        width={48}
+                        height={8}
+                        rx={3}
+                        fill={fill}
+                    />
                 </g>
             ))}
         </svg>

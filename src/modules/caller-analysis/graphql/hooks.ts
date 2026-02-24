@@ -4,9 +4,9 @@ import {
     GET_CALLERS_QUERY,
     GET_CALLER_BY_ID_QUERY,
     GET_CALLER_BY_PHONE_QUERY,
-    GET_FIELD_VALUES_QUERY,
     GET_CALL_ANALYSIS_V2_QUERY,
     GET_CALL_TAGS_FOR_CALL_QUERY,
+    GET_FIELD_VALUES_QUERY,
 } from './queries'
 import type {
     Caller,
@@ -177,7 +177,7 @@ export const useCallTagsForCall = (
         queryKey: ['graphql', 'callTagsForCall', ringbaRowId],
         queryFn: async () => {
             const data = await graphqlClient.request<{
-                callTagsForCall: any[]
+                callTagsForCall: Array<any>
             }>(GET_CALL_TAGS_FOR_CALL_QUERY, {
                 ringbaRowId: ringbaRowId!,
             })

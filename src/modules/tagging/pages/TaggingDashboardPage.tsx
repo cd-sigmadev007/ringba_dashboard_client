@@ -1,14 +1,17 @@
 import React, { useMemo, useState } from 'react'
 import clsx from 'clsx'
-import type { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import ReactECharts from 'echarts-for-react'
-import { useThemeStore } from '@/store/themeStore'
 import { useTaggingDashboard } from '../hooks/useTaggingStats'
-import { useAuth } from '@/contexts/AuthContext'
-import { TimeFilter, Table } from '@/components/ui'
-import { BarChartSkeleton, PieChartSkeleton } from '@/components/ui/ChartSkeletons'
+import type { ColumnDef } from '@tanstack/react-table'
 import type { TagCount } from '../types'
+import { useThemeStore } from '@/store/themeStore'
+import { useAuth } from '@/contexts/AuthContext'
+import { Table, TimeFilter } from '@/components/ui'
+import {
+    BarChartSkeleton,
+    PieChartSkeleton,
+} from '@/components/ui/ChartSkeletons'
 
 const defaultFrom = dayjs().subtract(30, 'day').startOf('day').toDate()
 const defaultTo = dayjs().endOf('day').toDate()
@@ -24,7 +27,6 @@ const PRIORITY_ORDER: Record<string, number> = {
 }
 const priorityRank = (p: string) => PRIORITY_ORDER[p?.toLowerCase()] ?? 99
 
-
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
@@ -37,7 +39,9 @@ export const TaggingDashboardPage: React.FC = () => {
     // disabled queries, which causes empty ECharts shapes to flash briefly).
     const { loading: authLoading } = useAuth()
 
-    const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date } | undefined>({
+    const [dateRange, setDateRange] = useState<
+        { from?: Date; to?: Date } | undefined
+    >({
         from: defaultFrom,
         to: defaultTo,
     })
@@ -46,7 +50,12 @@ export const TaggingDashboardPage: React.FC = () => {
     const dateTo = dateRange?.to?.toISOString()
 
     // Single unified query — avoids 3 parallel waterfall requests
-    const { data, isLoading: queryLoading, isFetching, isError } = useTaggingDashboard(dateFrom, dateTo)
+    const {
+        data,
+        isLoading: queryLoading,
+        isFetching,
+        isError,
+    } = useTaggingDashboard(dateFrom, dateTo)
     // Show skeletons while auth OR the query itself is in flight
     const isLoading = authLoading || queryLoading || isFetching
 
@@ -54,7 +63,7 @@ export const TaggingDashboardPage: React.FC = () => {
     // Derived table data
     // -----------------------------------------------------------------------
 
-    const tierTableData = useMemo<TierTableRow[]>(() => {
+    const tierTableData = useMemo<Array<TierTableRow>>(() => {
         if (!data?.tagCountByTier?.length) return []
         // Groups: ascending tier number; within each group: count desc
         return [...data.tagCountByTier]
@@ -66,7 +75,7 @@ export const TaggingDashboardPage: React.FC = () => {
             )
     }, [data])
 
-    const priorityTableData = useMemo<PriorityTableRow[]>(() => {
+    const priorityTableData = useMemo<Array<PriorityTableRow>>(() => {
         if (!data?.tagCountByPriority?.length) return []
         // Groups: Highest → High → Medium → Low → unknown; within each group: count desc
         return [...data.tagCountByPriority]
@@ -123,7 +132,10 @@ export const TaggingDashboardPage: React.FC = () => {
     const chartBaseOptions = useMemo(
         () => ({
             backgroundColor: 'transparent',
-            textStyle: { fontFamily: 'Poppins, sans-serif', color: secondaryText },
+            textStyle: {
+                fontFamily: 'Poppins, sans-serif',
+                color: secondaryText,
+            },
         }),
         [secondaryText]
     )
@@ -134,32 +146,51 @@ export const TaggingDashboardPage: React.FC = () => {
             title: {
                 text: 'Top 10 Tags by Usage',
                 left: 'center',
-                textStyle: { color: primaryText, fontSize: 14, fontFamily: 'Poppins, sans-serif' },
+                textStyle: {
+                    color: primaryText,
+                    fontSize: 14,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'shadow' },
-                formatter: (params: any[]) => {
+                formatter: (params: Array<any>) => {
                     const p = params[0]
-                    const fullName = topTagsForChart[p.dataIndex]?.tagName ?? p.name
+                    const fullName =
+                        topTagsForChart[p.dataIndex]?.tagName ?? p.name
                     return `${fullName}<br/><b>${p.value.toLocaleString()}</b>`
                 },
             },
-            grid: { left: 16, right: 24, top: 44, bottom: 8, containLabel: true },
+            grid: {
+                left: 16,
+                right: 24,
+                top: 44,
+                bottom: 8,
+                containLabel: true,
+            },
             // Horizontal bar: xAxis is value, yAxis is category
             xAxis: {
                 type: 'value',
                 axisLine: { show: false },
                 axisTick: { show: false },
                 splitLine: { lineStyle: { color: splitLine } },
-                axisLabel: { color: secondaryText, fontFamily: 'Poppins, sans-serif', fontSize: 11 },
+                axisLabel: {
+                    color: secondaryText,
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: 11,
+                },
             },
             yAxis: {
                 type: 'category',
                 // Reverse so highest bar is at the top
-                data: [...topTagsForChart].reverse().map((t) =>
-                    t.tagName.length > 22 ? t.tagName.slice(0, 21) + '…' : t.tagName
-                ),
+                data: [...topTagsForChart]
+                    .reverse()
+                    .map((t) =>
+                        t.tagName.length > 22
+                            ? t.tagName.slice(0, 21) + '…'
+                            : t.tagName
+                    ),
                 axisLine: { lineStyle: { color: axisLine } },
                 axisTick: { show: false },
                 axisLabel: {
@@ -178,7 +209,11 @@ export const TaggingDashboardPage: React.FC = () => {
                     itemStyle: {
                         borderRadius: [0, 4, 4, 0],
                         color: {
-                            type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 1,
+                            y2: 0,
                             colorStops: [
                                 { offset: 0, color: '#0254A5' },
                                 { offset: 1, color: '#007FFF' },
@@ -188,7 +223,11 @@ export const TaggingDashboardPage: React.FC = () => {
                     emphasis: {
                         itemStyle: {
                             color: {
-                                type: 'linear', x: 0, y: 0, x2: 1, y2: 0,
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 1,
+                                y2: 0,
                                 colorStops: [
                                     { offset: 0, color: '#007FFF' },
                                     { offset: 1, color: '#42A0FF' },
@@ -207,7 +246,14 @@ export const TaggingDashboardPage: React.FC = () => {
                 },
             ],
         }),
-        [chartBaseOptions, topTagsForChart, primaryText, secondaryText, axisLine, splitLine]
+        [
+            chartBaseOptions,
+            topTagsForChart,
+            primaryText,
+            secondaryText,
+            axisLine,
+            splitLine,
+        ]
     )
 
     const pieChartOption = useMemo(
@@ -216,13 +262,20 @@ export const TaggingDashboardPage: React.FC = () => {
             title: {
                 text: 'Tags by Tier',
                 left: 'center',
-                textStyle: { color: primaryText, fontSize: 14, fontFamily: 'Poppins, sans-serif' },
+                textStyle: {
+                    color: primaryText,
+                    fontSize: 14,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             tooltip: { trigger: 'item' },
             legend: {
                 orient: 'horizontal',
                 bottom: 0,
-                textStyle: { color: secondaryText, fontFamily: 'Poppins, sans-serif' },
+                textStyle: {
+                    color: secondaryText,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             series: [
                 {
@@ -244,8 +297,18 @@ export const TaggingDashboardPage: React.FC = () => {
                         scaleSize: 6,
                     },
                     data: tierChartData,
-                    color: ['#007FFF', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-                        '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'],
+                    color: [
+                        '#007FFF',
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#06b6d4',
+                        '#84cc16',
+                        '#f97316',
+                        '#6366f1',
+                    ],
                 },
             ],
         }),
@@ -258,21 +321,37 @@ export const TaggingDashboardPage: React.FC = () => {
             title: {
                 text: 'Tags by Priority',
                 left: 'center',
-                textStyle: { color: primaryText, fontSize: 14, fontFamily: 'Poppins, sans-serif' },
+                textStyle: {
+                    color: primaryText,
+                    fontSize: 14,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-            grid: { left: '3%', right: '4%', bottom: '3%', top: 44, containLabel: true },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                top: 44,
+                containLabel: true,
+            },
             xAxis: {
                 type: 'category',
                 data: priorityChartData.map((p) => p.name),
                 axisLine: { lineStyle: { color: axisLine } },
-                axisLabel: { color: secondaryText, fontFamily: 'Poppins, sans-serif' },
+                axisLabel: {
+                    color: secondaryText,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             yAxis: {
                 type: 'value',
                 axisLine: { show: false },
                 splitLine: { lineStyle: { color: splitLine } },
-                axisLabel: { color: secondaryText, fontFamily: 'Poppins, sans-serif' },
+                axisLabel: {
+                    color: secondaryText,
+                    fontFamily: 'Poppins, sans-serif',
+                },
             },
             series: [
                 {
@@ -282,7 +361,11 @@ export const TaggingDashboardPage: React.FC = () => {
                     itemStyle: {
                         borderRadius: [4, 4, 0, 0],
                         color: {
-                            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
                             colorStops: [
                                 { offset: 0, color: '#10b981' },
                                 { offset: 1, color: '#059669' },
@@ -292,7 +375,14 @@ export const TaggingDashboardPage: React.FC = () => {
                 },
             ],
         }),
-        [chartBaseOptions, priorityChartData, primaryText, secondaryText, axisLine, splitLine]
+        [
+            chartBaseOptions,
+            priorityChartData,
+            primaryText,
+            secondaryText,
+            axisLine,
+            splitLine,
+        ]
     )
 
     // -----------------------------------------------------------------------
@@ -305,7 +395,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'groupTier',
                 header: 'TIER',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {getValue() as number}
                     </span>
                 ),
@@ -314,7 +409,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'tagName',
                 header: 'TAG',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -323,7 +423,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'priority',
                 header: 'PRIORITY',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -332,7 +437,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'count',
                 header: 'COUNT',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as number).toLocaleString()}
                     </span>
                 ),
@@ -341,7 +451,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'percentOfTotal',
                 header: '%',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {((getValue() as number) ?? 0).toFixed(1)}%
                     </span>
                 ),
@@ -356,7 +471,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'groupPriority',
                 header: 'PRIORITY',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -365,7 +485,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'tagName',
                 header: 'TAG',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -374,7 +499,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'tierNumber',
                 header: 'TIER',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {(getValue() as number | null) ?? '-'}
                     </span>
                 ),
@@ -383,7 +513,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'count',
                 header: 'COUNT',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as number).toLocaleString()}
                     </span>
                 ),
@@ -392,7 +527,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'percentOfTotal',
                 header: '%',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {((getValue() as number) ?? 0).toFixed(1)}%
                     </span>
                 ),
@@ -407,7 +547,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'tagName',
                 header: 'TAG',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -416,7 +561,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'tierNumber',
                 header: 'TIER',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {(getValue() as number | null) ?? '-'}
                     </span>
                 ),
@@ -425,7 +575,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'priority',
                 header: 'PRIORITY',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {(getValue() as string) || '-'}
                     </span>
                 ),
@@ -434,7 +589,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'count',
                 header: 'COUNT',
                 cell: ({ getValue }) => (
-                    <span className={clsx('font-medium', isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]')}>
+                    <span
+                        className={clsx(
+                            'font-medium',
+                            isDark ? 'text-[#F5F8FA]' : 'text-[#3F4254]'
+                        )}
+                    >
                         {(getValue() as number).toLocaleString()}
                     </span>
                 ),
@@ -443,7 +603,12 @@ export const TaggingDashboardPage: React.FC = () => {
                 accessorKey: 'percentOfTotal',
                 header: '%',
                 cell: ({ getValue }) => (
-                    <span className={clsx('text-sm', isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]')}>
+                    <span
+                        className={clsx(
+                            'text-sm',
+                            isDark ? 'text-[#A1A5B7]' : 'text-[#5E6278]'
+                        )}
+                    >
                         {((getValue() as number) ?? 0).toFixed(1)}%
                     </span>
                 ),
@@ -495,7 +660,10 @@ export const TaggingDashboardPage: React.FC = () => {
 
                         {/* Right: compact date-picker input */}
                         <div className="shrink-0">
-                            <TimeFilter value={dateRange} onChange={setDateRange} />
+                            <TimeFilter
+                                value={dateRange}
+                                onChange={setDateRange}
+                            />
                         </div>
                     </div>
                 </div>
@@ -520,8 +688,6 @@ export const TaggingDashboardPage: React.FC = () => {
                         </p>
                     </div>
                 )}
-
-
 
                 {/* ── Charts (or skeletons) ─────────────────────────────── */}
                 {!isError && (
@@ -581,7 +747,12 @@ export const TaggingDashboardPage: React.FC = () => {
                         >
                             No tag data available
                         </p>
-                        <p className={clsx('text-sm', isDark ? 'text-[#7E8299]' : 'text-[#A1A5B7]')}>
+                        <p
+                            className={clsx(
+                                'text-sm',
+                                isDark ? 'text-[#7E8299]' : 'text-[#A1A5B7]'
+                            )}
+                        >
                             Try selecting a different date range.
                         </p>
                     </div>
@@ -610,7 +781,9 @@ export const TaggingDashboardPage: React.FC = () => {
                                 size="small"
                                 enableStickyColumns={false}
                                 emptyMessage="No tier data available"
-                                getRowId={(row) => `tier-${row.groupTier}-${row.tagId}`}
+                                getRowId={(row) =>
+                                    `tier-${row.groupTier}-${row.tagId}`
+                                }
                             />
                         </section>
 
@@ -634,7 +807,9 @@ export const TaggingDashboardPage: React.FC = () => {
                                 size="small"
                                 enableStickyColumns={false}
                                 emptyMessage="No priority data available"
-                                getRowId={(row) => `priority-${row.groupPriority}-${row.tagId}`}
+                                getRowId={(row) =>
+                                    `priority-${row.groupPriority}-${row.tagId}`
+                                }
                             />
                         </section>
 

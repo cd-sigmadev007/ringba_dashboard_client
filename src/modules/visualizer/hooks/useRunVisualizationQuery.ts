@@ -3,15 +3,17 @@
  * Debounced query execution hook.
  * No JSX. Pure data hook.
  */
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type { VisualizerQueryRequest, VisualizerQueryResult } from '../types'
 
-const BASE_URL =
-    (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001')
-        .replace(/\/$/, '')
+const BASE_URL = (
+    import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+).replace(/\/$/, '')
 
-async function executeQuery(req: VisualizerQueryRequest): Promise<VisualizerQueryResult> {
+async function executeQuery(
+    req: VisualizerQueryRequest
+): Promise<VisualizerQueryResult> {
     const res = await fetch(`${BASE_URL}/api/visualizer/query`, {
         method: 'POST',
         credentials: 'include',
@@ -47,18 +49,21 @@ export function useRunVisualizationQuery(
     const { enabled = true, debounceMs = 600 } = options
 
     // Debounce: only update the "committed" request after the debounce window
-    const [debouncedReq, setDebouncedReq] = useState<VisualizerQueryRequest>(request)
+    const [debouncedReq, setDebouncedReq] =
+        useState<VisualizerQueryRequest>(request)
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const serialized = serializeRequest(request)
 
-    useMemo(() => {
+    useEffect(() => {
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => {
             setDebouncedReq(request)
         }, debounceMs)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [serialized, debounceMs])
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current)
+        }
+    }, [serialized, debounceMs, request])
 
     const queryKey = ['visualizer', 'query', serializeRequest(debouncedReq)]
 
