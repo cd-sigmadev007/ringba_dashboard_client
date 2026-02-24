@@ -13,6 +13,7 @@ import { ColumnsDropdown } from '../components/ColumnsDropdown'
 import { FilterDropdown } from '../components/FilterDropdown'
 import { useColumnStore } from '../store/columnStore'
 import { useFilterStore } from '../store/filterStore'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import { MultiSelectActionBar } from '../components/MultiSelectActionBar'
 import { callerApiService } from '../services/api'
 import { exportToCSV } from '../utils/csvExport'
@@ -73,6 +74,14 @@ export const CallerAnalysisContainer: React.FC = () => {
     // Column visibility state from Zustand store
     const { columnVisibility, toggleColumn, setColumnVisibility } =
         useColumnStore()
+    const fetchTagDefinitions = useTagDefinitionsStore((s) => s.fetch)
+
+    // Fetch tag definitions once on mount (used for status colors in table, modals)
+    React.useEffect(() => {
+        if (isAuthenticated) {
+            fetchTagDefinitions()
+        }
+    }, [isAuthenticated, fetchTagDefinitions])
 
     // GraphQL field discovery
     const { data: availableFields } = useGetAvailableFields()
@@ -264,12 +273,13 @@ export const CallerAnalysisContainer: React.FC = () => {
     const isLoadingBatch = false
     const totalRecords = graphqlHook.totalRecords
 
-    // Wrap refetch to match expected signature
+    // Wrap refetch to match expected signature (callers + tag definitions)
     const refetch = React.useCallback(() => {
+        fetchTagDefinitions()
         graphqlHook.refetch().catch((err) => {
             console.error('Error refetching:', err)
         })
-    }, [graphqlHook.refetch])
+    }, [graphqlHook.refetch, fetchTagDefinitions])
 
     const lastUpdated = new Date()
 
@@ -580,7 +590,7 @@ export const CallerAnalysisContainer: React.FC = () => {
                         clickableRows={true}
                         onRowClick={handleRowClick}
                         size="medium"
-                        loading={isLoading || isLoadingBatch}
+                        loading={isLoading || isLoadingBatch || authLoading}
                         className="w-full"
                         onPaginationChange={handlePaginationChange}
                         enableRowSelection={true}

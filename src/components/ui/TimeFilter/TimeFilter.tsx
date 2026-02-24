@@ -111,20 +111,17 @@ const TimeFilter: React.FC<TimeFilterProps> = ({
     // Raw mode: just show presets and calendar, no input trigger or action buttons
     if (filterType === 'raw') {
         return (
-            <div className={twMerge('flex flex-col gap-[15px]', className)}>
-                <div className="flex flex-col md:flex-row gap-[15px] text-body-xs">
-                    {/* Presets */}
-                    <PresetButtons
-                        activePreset={activePreset}
-                        onPresetClick={handlePresetClick}
-                    />
-
-                    {/* Calendar */}
-                    <DatePickerCalendar
-                        selected={range}
-                        onSelect={handleSelect}
-                    />
-                </div>
+            <div
+                className={twMerge(
+                    'flex flex-col sm:flex-row gap-4 rounded-lg',
+                    className
+                )}
+            >
+                <PresetButtons
+                    activePreset={activePreset}
+                    onPresetClick={handlePresetClick}
+                />
+                <DatePickerCalendar selected={range} onSelect={handleSelect} />
             </div>
         )
     }
@@ -146,11 +143,11 @@ const TimeFilter: React.FC<TimeFilterProps> = ({
                 />
             </div>
 
-            {/* Desktop popover */}
+            {/* Desktop popover — right-0 anchors it to the right edge of the trigger */}
             {!isMobile && open && (
                 <div
                     className={clsx(
-                        'absolute z-50 rounded-[7px] max-w-[450px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)] mt-2',
+                        'absolute right-0 z-50 rounded-[7px] max-w-[450px] p-[20px] w-max border flex flex-col gap-[15px] backdrop-blur-[25px] shadow-[0_10px_35px_rgba(0,0,0,0.30)] mt-2',
                         isDark
                             ? 'border-[#002B57] bg-[#071B2FE6] text-neutrals-50'
                             : 'border-gray-200 bg-white text-neutrals-800'

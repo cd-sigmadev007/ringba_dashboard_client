@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import clsx from 'clsx'
-import { Priority, STATUS_PRIORITY_MAP } from '../types/priority.types'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
@@ -22,43 +22,15 @@ export const StatusModal: React.FC<StatusModalProps> = ({
     const isDark = theme === 'dark'
     const isMobile = useIsMobile()
 
-    // Categorize statuses by priority dynamically using STATUS_PRIORITY_MAP
-    // This ensures all tags from the database are shown, not just hardcoded ones
-    const categorizeByPriority = (statuses: Array<string>) => {
-        const highest: Array<string> = []
-        const high: Array<string> = []
-        const medium: Array<string> = []
-        const low: Array<string> = []
-
-        statuses.forEach((status) => {
-            const priority = STATUS_PRIORITY_MAP[status] ?? Priority.LOW
-            switch (priority) {
-                case Priority.HIGHEST:
-                    highest.push(status)
-                    break
-                case Priority.HIGH:
-                    high.push(status)
-                    break
-                case Priority.MEDIUM:
-                    medium.push(status)
-                    break
-                case Priority.LOW:
-                    low.push(status)
-                    break
-                default:
-                    low.push(status) // Default to low if not found
-            }
-        })
-
-        return { highest, high, medium, low }
-    }
-
-    const {
-        highest: highestPriorityStatuses,
-        high: highPriorityStatuses,
-        medium: mediumPriorityStatuses,
-        low: lowPriorityStatuses,
-    } = categorizeByPriority(callerData.status)
+    // Use status from callerData + tag definitions store (single source, no per-call fetch)
+    const statusToPriorityRows = useTagDefinitionsStore(
+        (s) => s.statusToPriorityRows
+    )
+    const isLoading = useTagDefinitionsStore((s) => s.isLoading)
+    const { highest, high, medium, low } = useMemo(
+        () => statusToPriorityRows(callerData.status ?? []),
+        [statusToPriorityRows, callerData.status]
+    )
 
     return (
         <Modal
@@ -72,7 +44,6 @@ export const StatusModal: React.FC<StatusModalProps> = ({
             border={true}
         >
             <div className="space-y-6">
-                {/* Status Sections */}
                 <div
                     className={clsx(
                         'flex flex-col rounded-sm',
@@ -81,22 +52,19 @@ export const StatusModal: React.FC<StatusModalProps> = ({
                 >
                     <PriorityStatusSection
                         title="Highest Priority"
-                        statuses={highestPriorityStatuses}
+                        statuses={isLoading ? [] : highest}
                     />
-
                     <PriorityStatusSection
                         title="High Priority"
-                        statuses={highPriorityStatuses}
+                        statuses={isLoading ? [] : high}
                     />
-
                     <PriorityStatusSection
                         title="Medium Priority"
-                        statuses={mediumPriorityStatuses}
+                        statuses={isLoading ? [] : medium}
                     />
-
                     <PriorityStatusSection
                         title="Low Priority"
-                        statuses={lowPriorityStatuses}
+                        statuses={isLoading ? [] : low}
                     />
                 </div>
             </div>

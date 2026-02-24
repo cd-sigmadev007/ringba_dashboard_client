@@ -4,6 +4,8 @@ import {
     GET_CALLERS_QUERY,
     GET_CALLER_BY_ID_QUERY,
     GET_CALLER_BY_PHONE_QUERY,
+    GET_CALL_ANALYSIS_V2_QUERY,
+    GET_CALL_TAGS_FOR_CALL_QUERY,
     GET_FIELD_VALUES_QUERY,
 } from './queries'
 import type {
@@ -134,6 +136,54 @@ export const useGetCallerById = (id: string) => {
             return data.caller
         },
         enabled: !!id && isAuthenticated, // Only run when id provided and authenticated
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+    })
+}
+
+// Hook to get call analysis v2 for a call (lazy load when modal opens)
+export const useCallAnalysisV2 = (
+    ringbaRowId: string | undefined,
+    enabled: boolean
+) => {
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user && !authLoading
+
+    return useQuery({
+        queryKey: ['graphql', 'callAnalysisV2', ringbaRowId],
+        queryFn: async () => {
+            const data = await graphqlClient.request<{
+                callAnalysisV2: any
+            }>(GET_CALL_ANALYSIS_V2_QUERY, {
+                ringbaRowId: ringbaRowId!,
+            })
+            return data.callAnalysisV2
+        },
+        enabled: !!ringbaRowId && enabled && isAuthenticated,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+    })
+}
+
+// Hook to get call tags for a call (lazy load when modal opens)
+export const useCallTagsForCall = (
+    ringbaRowId: string | undefined,
+    enabled: boolean
+) => {
+    const { user, loading: authLoading } = useAuth()
+    const isAuthenticated = !!user && !authLoading
+
+    return useQuery({
+        queryKey: ['graphql', 'callTagsForCall', ringbaRowId],
+        queryFn: async () => {
+            const data = await graphqlClient.request<{
+                callTagsForCall: Array<any>
+            }>(GET_CALL_TAGS_FOR_CALL_QUERY, {
+                ringbaRowId: ringbaRowId!,
+            })
+            return data.callTagsForCall
+        },
+        enabled: !!ringbaRowId && enabled && isAuthenticated,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,
     })

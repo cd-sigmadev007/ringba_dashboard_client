@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import clsx from 'clsx'
 import { useCallerAnalysisApi } from '../hooks'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import { buildAddressFromCallData } from '../utils/addressUtils'
 import { mapApiDataToHistoryEntries } from '../utils/historyUtils'
-import { Priority, STATUS_PRIORITY_MAP } from '../types/priority.types'
 import { PriorityStatusSection } from './PriorityStatusSection'
 import { HistoryTabContent, JSONTabContent } from './tabs'
 import type { CallData } from '../types'
+
 import type { TabItem } from '@/components/ui/Tabs'
 import type { HistoryEntry } from '@/data/caller-tabs-data'
 import { useThemeStore } from '@/store/themeStore'
@@ -100,6 +101,16 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
     )
 
     const containerBgClass = clsx(isDark ? 'bg-transparent' : 'bg-[#FFFFFF]')
+
+    // Use status from callerData + tag definitions store (single source, no per-call fetch)
+    const statusToPriorityRows = useTagDefinitionsStore(
+        (s) => s.statusToPriorityRows
+    )
+    const isTagsLoading = useTagDefinitionsStore((s) => s.isLoading)
+    const { highest, high, medium, low } = useMemo(
+        () => statusToPriorityRows(callerData.status ?? []),
+        [statusToPriorityRows, callerData.status]
+    )
 
     // Fetch history by phone number (use phoneNumber when available for exact DB match)
     const phoneForHistory = callerData.phoneNumber ?? callerData.callerId
@@ -220,71 +231,23 @@ export const PersonalIdentification: React.FC<PersonalIdentificationProps> = ({
                     </div>
                 </div>
 
-                {/* Status Section - Use dynamic categorization like StatusModal */}
-                {(() => {
-                    // Categorize statuses by priority dynamically using STATUS_PRIORITY_MAP
-                    // This ensures all tags from the database are shown, not just hardcoded ones
-                    const categorizeByPriority = (statuses: Array<string>) => {
-                        const highest: Array<string> = []
-                        const high: Array<string> = []
-                        const medium: Array<string> = []
-                        const low: Array<string> = []
-
-                        statuses.forEach((status) => {
-                            const priority =
-                                STATUS_PRIORITY_MAP[status] ?? Priority.LOW
-                            switch (priority) {
-                                case Priority.HIGHEST:
-                                    highest.push(status)
-                                    break
-                                case Priority.HIGH:
-                                    high.push(status)
-                                    break
-                                case Priority.MEDIUM:
-                                    medium.push(status)
-                                    break
-                                case Priority.LOW:
-                                    low.push(status)
-                                    break
-                                default:
-                                    low.push(status) // Default to low if not found
-                            }
-                        })
-
-                        return { highest, high, medium, low }
-                    }
-
-                    const {
-                        highest: highestPriorityStatuses,
-                        high: highPriorityStatuses,
-                        medium: mediumPriorityStatuses,
-                        low: lowPriorityStatuses,
-                    } = categorizeByPriority(callerData.status)
-
-                    return (
-                        <>
-                            <PriorityStatusSection
-                                title="Highest Priority"
-                                statuses={highestPriorityStatuses}
-                            />
-
-                            <PriorityStatusSection
-                                title="High Priority"
-                                statuses={highPriorityStatuses}
-                            />
-
-                            <PriorityStatusSection
-                                title="Medium Priority"
-                                statuses={mediumPriorityStatuses}
-                            />
-
-                            <PriorityStatusSection
-                                title="Low Priority"
-                                statuses={lowPriorityStatuses}
-                            />
-                        </>
-                    )
-                })()}
+                {/* Status Section - Tags from call_tags, categorized by priority (same 4 rows as before) */}
+                <PriorityStatusSection
+                    title="Highest Priority"
+                    statuses={isTagsLoading ? [] : highest}
+                />
+                <PriorityStatusSection
+                    title="High Priority"
+                    statuses={isTagsLoading ? [] : high}
+                />
+                <PriorityStatusSection
+                    title="Medium Priority"
+                    statuses={isTagsLoading ? [] : medium}
+                />
+                <PriorityStatusSection
+                    title="Low Priority"
+                    statuses={isTagsLoading ? [] : low}
+                />
             </div>
 
             {/* Tabs Section */}

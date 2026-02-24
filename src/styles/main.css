@@ -1080,8 +1080,18 @@ input[type='search']::-webkit-search-results-decoration {
     border: 1px solid #1b456f;
 }
 
-.rdp-month_caption {
+.theme-dark .rdp-month_caption {
     color: #f5f8fa;
+    font-family: Poppins;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    letter-spacing: 0.16px;
+}
+
+.theme-light .rdp-month_caption {
+    color: #334155;
     font-family: Poppins;
     font-size: 14px;
     font-style: normal;

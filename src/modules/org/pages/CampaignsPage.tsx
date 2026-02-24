@@ -199,7 +199,7 @@ const CampaignsPage: React.FC = () => {
                     data={data}
                     columns={columns as any}
                     pagination={true}
-                    loading={loading}
+                    loading={loading || authLoading}
                     className={clsx(theme === 'dark' ? 'dark' : '')}
                 />
             </div>

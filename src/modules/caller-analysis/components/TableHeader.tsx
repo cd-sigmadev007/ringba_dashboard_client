@@ -52,7 +52,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     const { theme } = useThemeStore()
     const isDark = theme === 'dark'
     const campaignOptions = useCampaignOptions()
-    const { statusOptions } = useFilterTags(true)
+    const { statusOptions } = useFilterTags()
 
     const formatDurationRange = (range: DurationRange) => {
         if (range.min !== undefined && range.max !== undefined) {

@@ -3,6 +3,7 @@ import Button from '../../../components/ui/Button'
 import { Tooltip } from '../../../components/common'
 import Status from '../components/Status'
 import { LifetimeRevenueBreakdown } from '../components/LifetimeRevenueBreakdown'
+import { useTagDefinitionsStore } from '../store/tagDefinitionsStore'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CallData } from '../types'
 import { useThemeStore } from '@/store/themeStore'
@@ -16,6 +17,53 @@ import {
     WarningIcon,
 } from '@/assets/svg'
 import { cn } from '@/lib'
+
+// Status cell - uses tag definitions store for priority colors (single source)
+const StatusCell: React.FC<{
+    status: Array<string>
+    callerData: CallData
+    onStatusClick: (callerData: CallData) => void
+}> = ({ status, callerData, onStatusClick }) => {
+    const statusToStatusItems = useTagDefinitionsStore(
+        (s) => s.statusToStatusItems
+    )
+    const statusItems = statusToStatusItems(status ?? [])
+    const hasTags = statusItems.length > 0
+    const remainingCount = hasTags ? statusItems.length - 1 : 0
+
+    if (callerData.ai_processed === false) return null
+    if (!hasTags) return null
+
+    return (
+        <div
+            className="flex items-center justify-end gap-2 w-full"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <Status
+                truncate={true}
+                status={statusItems.slice(0, 1)}
+                sortByPriority={false}
+            />
+            {remainingCount > 0 && (
+                <Tooltip
+                    tooltipText={`View all ${statusItems.length} statuses`}
+                >
+                    <span
+                        className={cn(
+                            'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
+                        )}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onStatusClick(callerData)
+                        }}
+                    >
+                        +{remainingCount}
+                    </span>
+                </Tooltip>
+            )}
+        </div>
+    )
+}
 
 // Caller ID cell component with copy functionality
 const CallerIdCell: React.FC<{ callerId: string }> = ({ callerId }) => {
@@ -328,57 +376,13 @@ export const useTableColumns = (
                     className: 'status-column',
                     category: 'applied',
                 } as any,
-                cell: ({ getValue, row }) => {
-                    const status = getValue() as Array<string>
-                    const aiProcessed = row.original.ai_processed
-
-                    // Ensure status is an array and filter out empty/null values
-                    const statusArray = Array.isArray(status)
-                        ? status.filter((s) => s && s.trim() !== '')
-                        : []
-                    // Remove duplicates to ensure accurate count
-                    const uniqueStatus = Array.from(new Set(statusArray))
-                    const hasTags = uniqueStatus.length > 0
-                    const remainingCount = hasTags ? uniqueStatus.length - 1 : 0
-
-                    // If ai_processed is explicitly false, hide status
-                    // Otherwise, show tags if they exist
-                    if (aiProcessed === false) {
-                        return null
-                    }
-
-                    // If no tags, show nothing
-                    if (!hasTags) {
-                        return null
-                    }
-
-                    // Show tags (ai_processed is not false and tags exist)
-                    return (
-                        <div
-                            className="flex items-center justify-end gap-2 w-full"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <Status truncate={true} status={uniqueStatus[0]} />
-                            {remainingCount > 0 && (
-                                <Tooltip
-                                    tooltipText={`View all ${uniqueStatus.length} statuses`}
-                                >
-                                    <span
-                                        className={cn(
-                                            'px-[7px] py-[7px] rounded-full flex items-center justify-center text-xs text-white bg-[#0254A5] cursor-pointer hover:bg-[#1B456F] transition-colors'
-                                        )}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            onStatusClick(row.original)
-                                        }}
-                                    >
-                                        +{remainingCount}
-                                    </span>
-                                </Tooltip>
-                            )}
-                        </div>
-                    )
-                },
+                cell: ({ getValue, row }) => (
+                    <StatusCell
+                        status={(getValue() as Array<string>) ?? []}
+                        callerData={row.original}
+                        onStatusClick={onStatusClick}
+                    />
+                ),
             }
         )
 

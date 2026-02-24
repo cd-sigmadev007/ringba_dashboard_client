@@ -1,64 +1,114 @@
-/* Start date button */
-.rdp-range_start .rdp-day_button {
+/* Dark theme - calendar */
+.theme-dark .rdp-range_start .rdp-day_button {
     background-color: #1b456f;
     border: 3px solid #132f4c;
 }
 
-.rdp-range_start {
+.theme-dark .rdp-range_start {
     background: linear-gradient(to right, #132f4c, #132f4c);
     border-top-left-radius: 9999px;
     border-bottom-left-radius: 9999px;
 }
 
-/* End date button */
-.rdp-range_end .rdp-day_button {
+.theme-dark .rdp-range_end .rdp-day_button {
     background-color: #1b456f;
     border: 3px solid #132f4c;
 }
 
-/* Middle range */
-.rdp-range_middle .rdp-day_button {
+.theme-dark .rdp-range_middle .rdp-day_button {
     background-color: #132f4c;
 }
 
-/* Remove background from the outer cell entirely */
-.rdp-range_start,
-.rdp-range_end {
+.theme-dark .rdp-range_start,
+.theme-dark .rdp-range_end {
     background-color: transparent !important;
 }
 
+.theme-dark .rdp-day {
+    color: #ebebeb;
+}
+
+/* Light theme - calendar */
+.theme-light .rdp-range_start .rdp-day_button {
+    background-color: #2563eb;
+    border: 2px solid #1d4ed8;
+}
+
+.theme-light .rdp-range_start {
+    background: linear-gradient(to right, #3b82f6, #3b82f6);
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+}
+
+.theme-light .rdp-range_end .rdp-day_button {
+    background-color: #2563eb;
+    border: 2px solid #1d4ed8;
+}
+
+.theme-light .rdp-range_middle .rdp-day_button {
+    background-color: #dbeafe;
+}
+
+.theme-light .rdp-range_start,
+.theme-light .rdp-range_end {
+    background-color: transparent !important;
+}
+
+.theme-light .rdp-day {
+    color: #334155;
+}
+
+.theme-light .rdp-day_button:hover {
+    background-color: #e2e8f0;
+}
+
+/* Shared - root vars and layout */
 .rdp-root {
     --rdp-day-width: 100px;
     --rdp-day-height: 32px;
+    --rdp-day_button-height: 32px;
+    --rdp-day_button-width: 32px;
+}
+
+.theme-dark .rdp-root {
     --rdp-accent-color: #132f4c;
     --rdp-range_start-background: linear-gradient(
         var(--rdp-gradient-direction),
         transparent 50%,
         #132f4c 50%
     );
-
     --rdp-range_end-background: linear-gradient(
         var(--rdp-gradient-direction),
         #132f4c 30%,
         transparent 50%
     );
-
     --rdp-range_middle-background-color: #132f4c;
     --rdp-today-color: #007fff;
-    --rdp-day_button-height: 32px;
-    --rdp-day_button-width: 32px;
 }
 
-/* Change size for all days */
+.theme-light .rdp-root {
+    --rdp-accent-color: #3b82f6;
+    --rdp-range_start-background: linear-gradient(
+        var(--rdp-gradient-direction),
+        transparent 50%,
+        #93c5fd 50%
+    );
+    --rdp-range_end-background: linear-gradient(
+        var(--rdp-gradient-direction),
+        #93c5fd 30%,
+        transparent 50%
+    );
+    --rdp-range_middle-background-color: #dbeafe;
+    --rdp-today-color: #2563eb;
+}
+
 .rdp-day {
-    color: #ebebeb;
     font-size: 14px;
     font-weight: 400;
     line-height: 150%;
     text-align: center;
 }
 
-/* Center align day buttons */
 .rdp-day_button {
     display: flex;
     align-items: center;
